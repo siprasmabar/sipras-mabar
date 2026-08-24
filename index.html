@@ -670,6 +670,443 @@
                 }
             },
 
+            <!-- ... existing code ... -->
+                    <!-- Menu Sarpras -->
+                    <button id="menu-btn-sarana" onclick="app.showSarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-chair w-5 text-center"></i> Data Sarana
+                        </div>
+                        <i class="fa-solid fa-lock text-xs"></i>
+                    </button>
+                    <button id="menu-btn-prasarana" onclick="app.showPrasarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent mt-1">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-house-chimney w-5 text-center"></i> Data Prasarana
+                        </div>
+                        <i class="fa-solid fa-lock text-xs"></i>
+                    </button>
+                </nav>
+<!-- ... existing code ... -->
+                                <tbody id="tabel-sarana-body" class="text-sm divide-y divide-slate-100">
+                                    <!-- Populated via JS -->
+                                    <tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modul Data Prasarana -->
+                <div id="content-prasarana" class="hidden p-4 md:p-6 max-w-7xl mx-auto space-y-6 pb-20">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-house-chimney text-brand-600 mr-2"></i>Data Prasarana</h2>
+                            <p class="text-slate-500 text-sm mt-1">Kelola data lahan, bangunan, dan ruang milik sekolah Anda.</p>
+                        </div>
+                    </div>
+
+                    <!-- Prasarana Tabs -->
+                    <div class="border-b border-slate-200">
+                        <nav class="-mb-px flex space-x-6">
+                            <button onclick="app.switchPrasaranaTab('bangunan')" id="tab-btn-bangunan" class="tab-btn border-brand-500 text-brand-600 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-building"></i> Bangunan
+                            </button>
+                            <button onclick="app.switchPrasaranaTab('ruang')" id="tab-btn-ruang" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-door-open"></i> Ruang
+                            </button>
+                            <!-- Tab Lahan & Fasilitas (Placeholder untuk MVP) -->
+                            <button onclick="app.showToast('Modul Lahan dalam pengembangan', 'info')" class="border-transparent text-slate-400 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2 cursor-not-allowed">
+                                <i class="fa-solid fa-map"></i> Lahan (Segera)
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- TAB CONTENT: BANGUNAN -->
+                    <div id="tab-content-bangunan" class="space-y-6">
+                        <div class="flex justify-end">
+                            <button onclick="app.openFormBangunan()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Tambah Bangunan
+                            </button>
+                        </div>
+
+                        <!-- Form Input Bangunan -->
+                        <div id="panel-form-bangunan" class="hidden bg-white p-5 rounded-xl shadow-md border border-slate-200 relative">
+                            <button type="button" onclick="document.getElementById('panel-form-bangunan').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                            <h3 class="text-lg font-bold text-slate-700 mb-4 pb-2 border-b">Form Bangunan Baru</h3>
+                            
+                            <form id="form-bangunan" onsubmit="app.saveBangunan(event)">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                    <!-- Identitas Bangunan -->
+                                    <div class="space-y-4">
+                                        <h4 class="font-semibold text-brand-700 text-xs uppercase tracking-wider">1. Identitas</h4>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Nama Bangunan <span class="text-red-500">*</span></label>
+                                            <input type="text" id="bgn_nama" required class="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Kode</label>
+                                                <input type="text" id="bgn_kode" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Tahun</label>
+                                                <input type="number" id="bgn_tahun" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Dimensi -->
+                                    <div class="space-y-4">
+                                        <h4 class="font-semibold text-brand-700 text-xs uppercase tracking-wider">2. Dimensi (Meter)</h4>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Panjang <span class="text-red-500">*</span></label>
+                                                <input type="number" step="0.01" id="bgn_p" required oninput="app.calcDimensi('bgn_p','bgn_l','bgn_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Lebar <span class="text-red-500">*</span></label>
+                                                <input type="number" step="0.01" id="bgn_l" required oninput="app.calcDimensi('bgn_p','bgn_l','bgn_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Luas (Auto - m²)</label>
+                                            <input type="text" id="bgn_luas" readonly class="w-full rounded-lg border bg-slate-100 px-3 py-2 text-sm font-bold text-brand-700" value="0">
+                                        </div>
+                                    </div>
+
+                                    <!-- Kerusakan -->
+                                    <div class="space-y-4">
+                                        <h4 class="font-semibold text-brand-700 text-xs uppercase tracking-wider">3. Kondisi</h4>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label>
+                                            <input type="number" step="0.01" max="100" min="0" id="bgn_kerusakan" required oninput="app.previewKondisi('bgn_kerusakan','bgn_kondisi_preview')" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Prediksi Kondisi (Auto Sistem)</label>
+                                            <div id="bgn_kondisi_preview" class="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm font-bold text-slate-500 text-center">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex justify-end">
+                                    <button type="submit" id="btn-save-bangunan" class="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md">Simpan Bangunan</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tabel Bangunan -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-3 border-b">Nama Bangunan</th>
+                                        <th class="p-3 border-b text-center">Luas (m²)</th>
+                                        <th class="p-3 border-b text-center">Kerusakan (%)</th>
+                                        <th class="p-3 border-b text-center">Kondisi (DB)</th>
+                                        <th class="p-3 border-b text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel-bangunan-body" class="text-sm divide-y divide-slate-100">
+                                    <tr><td colspan="5" class="p-8 text-center text-slate-400">Belum ada data bangunan.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB CONTENT: RUANG -->
+                    <div id="tab-content-ruang" class="hidden space-y-6">
+                         <div class="flex justify-end">
+                            <button onclick="app.openFormRuang()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Tambah Ruang
+                            </button>
+                        </div>
+                        
+                        <!-- Form Input Ruang -->
+                        <div id="panel-form-ruang" class="hidden bg-white p-5 rounded-xl shadow-md border border-slate-200 relative">
+                            <button type="button" onclick="document.getElementById('panel-form-ruang').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                            <h3 class="text-lg font-bold text-slate-700 mb-4 pb-2 border-b">Form Ruangan Baru</h3>
+                            
+                            <form id="form-ruang" onsubmit="app.saveRuang(event)">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Pilih Bangunan Induk <span class="text-red-500">*</span></label>
+                                        <select id="rng_bangunan_id" required class="w-full rounded-lg border px-3 py-2 text-sm bg-white">
+                                            <option value="">-- Memuat Bangunan... --</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Jenis Ruang <span class="text-red-500">*</span></label>
+                                        <select id="rng_jenis" required class="w-full rounded-lg border px-3 py-2 text-sm bg-white">
+                                            <option value="">-- Pilih Jenis Ruang --</option>
+                                            <option value="Ruang Kelas">Ruang Kelas</option>
+                                            <option value="Perpustakaan">Perpustakaan</option>
+                                            <option value="Laboratorium IPA">Laboratorium IPA</option>
+                                            <option value="Ruang Guru">Ruang Guru</option>
+                                            <option value="Toilet">Toilet / WC</option>
+                                        </select>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Panjang (m)</label>
+                                            <input type="number" step="0.01" id="rng_p" required oninput="app.calcDimensi('rng_p','rng_l','rng_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Lebar (m)</label>
+                                            <input type="number" step="0.01" id="rng_l" required oninput="app.calcDimensi('rng_p','rng_l','rng_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Luas (Auto - m²)</label>
+                                            <input type="text" id="rng_luas" readonly class="w-full rounded-lg border bg-slate-100 px-3 py-2 text-sm font-bold text-brand-700" value="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Tingkat Kerusakan (%)</label>
+                                            <input type="number" step="0.01" max="100" min="0" id="rng_kerusakan" required class="w-full rounded-lg border px-3 py-2 text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex justify-end">
+                                    <button type="submit" id="btn-save-ruang" class="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md">Simpan Ruang</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Tabel Ruang -->
+                        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-100 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-3 border-b">Induk Bangunan</th>
+                                        <th class="p-3 border-b">Jenis Ruang</th>
+                                        <th class="p-3 border-b text-center">Luas</th>
+                                        <th class="p-3 border-b text-center">Kondisi (DB)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel-ruang-body" class="text-sm divide-y">
+                                    <tr><td colspan="4" class="p-8 text-center text-slate-400">Belum ada data ruang.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container (Custom UI instead of Alert) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+<!-- ... existing code ... -->
+                    // Kembalikan event klik asli untuk menu sarana
+                    document.getElementById('menu-btn-sarana').onclick = () => app.showSarana();
+                    document.getElementById('menu-btn-prasarana').onclick = () => app.showPrasarana();
+                }
+            },
+<!-- ... existing code ... -->
+            // --- FUNGSI BARU PHASE 5: MODUL PRASARANA --- //
+
+            showToast: (message, type = 'success') => {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const colors = type === 'success' ? 'bg-emerald-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
+                const icon = type === 'success' ? 'fa-check' : (type === 'error' ? 'fa-xmark' : 'fa-info');
+                
+                toast.className = `${colors} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0`;
+                toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="text-sm font-medium">${message}</span>`;
+                
+                container.appendChild(toast);
+                
+                // Animate In
+                setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+                
+                // Animate Out & Remove
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-x-10');
+                    setTimeout(() => { toast.remove(); }, 300);
+                }, 3500);
+            },
+
+            showPrasarana: () => {
+                if(!app.currentSchool?.profil_lengkap) return; 
+                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
+
+                document.getElementById('content-dashboard-home').classList.add('hidden');
+                document.getElementById('content-profil-sekolah').classList.add('hidden');
+                document.getElementById('content-sarana').classList.add('hidden');
+                document.getElementById('content-prasarana').classList.remove('hidden');
+
+                // Load default tab (Bangunan)
+                app.switchPrasaranaTab('bangunan');
+            },
+
+            switchPrasaranaTab: (tabId) => {
+                // UI Tab Buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('border-brand-500', 'text-brand-600');
+                    btn.classList.add('border-transparent', 'text-slate-500');
+                });
+                const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+                if(activeBtn) {
+                    activeBtn.classList.remove('border-transparent', 'text-slate-500');
+                    activeBtn.classList.add('border-brand-500', 'text-brand-600');
+                }
+
+                // UI Tab Content
+                document.getElementById('tab-content-bangunan').classList.add('hidden');
+                document.getElementById('tab-content-ruang').classList.add('hidden');
+                
+                document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+
+                // Fetch Data berdasarkan tab aktif
+                if(tabId === 'bangunan') app.loadBangunan();
+                if(tabId === 'ruang') { app.loadBangunanDropdown(); app.loadRuang(); }
+            },
+
+            calcDimensi: (idP, idL, idHasil) => {
+                const p = parseFloat(document.getElementById(idP).value) || 0;
+                const l = parseFloat(document.getElementById(idL).value) || 0;
+                document.getElementById(idHasil).value = (p * l).toFixed(2);
+            },
+
+            previewKondisi: (idPersen, idHasil) => {
+                const val = parseFloat(document.getElementById(idPersen).value) || 0;
+                const el = document.getElementById(idHasil);
+                if(val <= 0) { el.innerText = "Baik"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-emerald-50 text-emerald-600 border-emerald-200"; }
+                else if(val <= 30) { el.innerText = "Rusak Ringan"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-amber-50 text-amber-600 border-amber-200"; }
+                else if(val <= 46) { el.innerText = "Rusak Sedang"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-orange-50 text-orange-600 border-orange-200"; }
+                else if(val <= 85) { el.innerText = "Rusak Berat"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-red-50 text-red-600 border-red-200"; }
+                else { el.innerText = "Rusak Total"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-red-100 text-red-700 border-red-300"; }
+            },
+
+            openFormBangunan: () => {
+                document.getElementById('panel-form-bangunan').classList.remove('hidden');
+                document.getElementById('form-bangunan').reset();
+                document.getElementById('bgn_luas').value = '0';
+                app.previewKondisi('bgn_kerusakan', 'bgn_kondisi_preview');
+            },
+
+            saveBangunan: async (e) => {
+                e.preventDefault();
+                app.setLoading('btn-save-bangunan', true, 'Menyimpan...');
+
+                const payload = {
+                    school_id: app.currentSchool.id,
+                    nama_bangunan: document.getElementById('bgn_nama').value,
+                    kode_bangunan: document.getElementById('bgn_kode').value,
+                    tahun_pembangunan: document.getElementById('bgn_tahun').value || null,
+                    panjang: parseFloat(document.getElementById('bgn_p').value) || 0,
+                    lebar: parseFloat(document.getElementById('bgn_l').value) || 0,
+                    tingkat_kerusakan: parseFloat(document.getElementById('bgn_kerusakan').value) || 0
+                    // Catatan: 'luas_bangunan' dan 'kondisi' tidak kita kirim. Mereka dihitung OTOMATIS oleh DB!
+                };
+
+                try {
+                    const { error } = await supabase.from('prasarana_bangunan').insert([payload]);
+                    if (error) throw error;
+                    app.showToast("Data Bangunan berhasil disimpan!");
+                    document.getElementById('panel-form-bangunan').classList.add('hidden');
+                    app.loadBangunan();
+                } catch (error) {
+                    app.showToast("Gagal menyimpan DB: " + error.message, "error");
+                } finally {
+                    app.setLoading('btn-save-bangunan', false, 'Simpan Bangunan');
+                }
+            },
+
+            loadBangunan: async () => {
+                const tbody = document.getElementById('tabel-bangunan-body');
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
+                try {
+                    const { data, error } = await supabase.from('prasarana_bangunan').select('*').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
+                    if (error) throw error;
+                    
+                    if(data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400">Belum ada data bangunan.</td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = '';
+                    data.forEach(b => {
+                        // Perhatikan bahwa b.luas_bangunan dan b.kondisi berasal murni dari Database (bukan kalkulasi UI)
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 border-b font-medium">${b.nama_bangunan}<br><span class="text-xs text-slate-400">Kode: ${b.kode_bangunan || '-'}</span></td>
+                                <td class="p-3 border-b text-center font-bold text-slate-700">${b.luas_bangunan}</td>
+                                <td class="p-3 border-b text-center">${b.tingkat_kerusakan}%</td>
+                                <td class="p-3 border-b text-center"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">${b.kondisi}</span></td>
+                                <td class="p-3 border-b text-center"><button class="text-red-500 hover:text-red-700" onclick="app.showToast('Fitur hapus dinonaktifkan di demo','info')"><i class="fa-solid fa-trash"></i></button></td>
+                            </tr>
+                        `;
+                    });
+                } catch (error) { console.error(error); }
+            },
+
+            loadBangunanDropdown: async () => {
+                const select = document.getElementById('rng_bangunan_id');
+                try {
+                    const { data } = await supabase.from('prasarana_bangunan').select('id, nama_bangunan').eq('school_id', app.currentSchool.id);
+                    select.innerHTML = '<option value="">-- Pilih Bangunan Induk --</option>';
+                    if(data) data.forEach(b => { select.innerHTML += `<option value="${b.id}">${b.nama_bangunan}</option>`; });
+                } catch(e) {}
+            },
+
+            openFormRuang: () => {
+                document.getElementById('panel-form-ruang').classList.remove('hidden');
+                document.getElementById('form-ruang').reset();
+                document.getElementById('rng_luas').value = '0';
+            },
+
+            saveRuang: async (e) => {
+                e.preventDefault();
+                app.setLoading('btn-save-ruang', true, 'Menyimpan...');
+
+                const payload = {
+                    school_id: app.currentSchool.id,
+                    bangunan_id: document.getElementById('rng_bangunan_id').value,
+                    jenis_ruang: document.getElementById('rng_jenis').value,
+                    panjang: parseFloat(document.getElementById('rng_p').value) || 0,
+                    lebar: parseFloat(document.getElementById('rng_l').value) || 0,
+                    tingkat_kerusakan: parseFloat(document.getElementById('rng_kerusakan').value) || 0
+                };
+
+                try {
+                    const { error } = await supabase.from('prasarana_ruang').insert([payload]);
+                    if (error) throw error;
+                    app.showToast("Data Ruang berhasil disimpan!");
+                    document.getElementById('panel-form-ruang').classList.add('hidden');
+                    app.loadRuang();
+                } catch (error) { app.showToast(error.message, "error"); } 
+                finally { app.setLoading('btn-save-ruang', false, 'Simpan Ruang'); }
+            },
+
+            loadRuang: async () => {
+                const tbody = document.getElementById('tabel-ruang-body');
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
+                try {
+                    // Gunakan Relasi Foreign Key untuk mengambil nama bangunan induk sekaligus
+                    const { data, error } = await supabase.from('prasarana_ruang').select('*, prasarana_bangunan(nama_bangunan)').eq('school_id', app.currentSchool.id);
+                    if (error) throw error;
+                    
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400">Belum ada data ruang.</td></tr>'; return; }
+                    
+                    tbody.innerHTML = '';
+                    data.forEach(r => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 border-b text-slate-500 text-xs"><i class="fa-solid fa-level-up-alt fa-rotate-90 mr-1"></i> ${r.prasarana_bangunan?.nama_bangunan || 'Bangunan Terhapus'}</td>
+                                <td class="p-3 border-b font-medium">${r.jenis_ruang}</td>
+                                <td class="p-3 border-b text-center font-bold text-slate-700">${r.luas} m²</td>
+                                <td class="p-3 border-b text-center"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border">${r.kondisi}</span></td>
+                            </tr>
+                        `;
+                    });
+                } catch (error) { console.error(error); }
+            },
+
+            // --- END FUNGSI PHASE 5 --- //
+<!-- ... existing code ... -->
+                
             // Proses Login
             handleLogin: async (e) => {
                 e.preventDefault();
