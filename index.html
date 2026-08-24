@@ -31,6 +31,10 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Leaflet JS untuk Peta -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         /* Custom Styles for Loader and Transitions */
         .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
@@ -146,14 +150,221 @@
         </div>
     </main>
 
-    <!-- VIEW 4: DASHBOARD (Placeholder until Phase 6) -->
-    <main id="view-dashboard" class="view-section flex-grow flex flex-col bg-slate-100">
-        <!-- Header -->
-        <header class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-brand-600 rounded-lg flex items-center justify-center text-white">
-                    <i class="fa-solid fa-school"></i>
+    <!-- VIEW 4: DASHBOARD (Phase 3 Layout Setup) -->
+    <div id="view-dashboard" class="view-section h-screen flex flex-col bg-slate-50">
+        <!-- Top Navbar -->
+        <header class="bg-brand-600 text-white shadow-md z-20 flex-shrink-0">
+            <div class="flex justify-between items-center px-4 md:px-6 py-3">
+                <div class="flex items-center gap-3">
+                    <button id="btn-mobile-menu" class="md:hidden text-white hover:bg-brand-700 p-2 rounded-lg">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <i class="fa-solid fa-school text-2xl hidden md:block"></i>
+                    <div>
+                        <h1 class="font-bold leading-tight">SIPRAS MABAR</h1>
+                        <p class="text-xs text-brand-100" id="dash-user-role">Role: Loading...</p>
+                    </div>
                 </div>
+                <div class="flex items-center gap-4">
+                    <span id="dash-user-name" class="text-sm font-medium hidden sm:block">User Name</span>
+                    <button onclick="app.handleLogout()" class="bg-brand-700 hover:bg-brand-800 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Keluar</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout with Sidebar -->
+        <div class="flex flex-grow overflow-hidden relative">
+            
+            <!-- Sidebar (Will be hidden on mobile by default) -->
+            <aside id="sidebar" class="bg-white w-64 shadow-lg flex-shrink-0 flex flex-col absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-10 border-r border-slate-200">
+                <div class="p-4 bg-slate-50 border-b border-slate-100">
+                    <h2 class="text-sm font-semibold text-slate-800" id="sidebar-school-name">Menu Utama</h2>
+                    <p class="text-xs text-slate-500" id="sidebar-npsn">...</p>
+                </div>
+                <nav class="flex-grow p-4 space-y-1 overflow-y-auto">
+                    <button onclick="app.initDashboard()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-brand-700 bg-brand-50 font-medium transition-colors">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i> Beranda
+                    </button>
+                    <button onclick="app.showProfilSekolah()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-colors">
+                        <i class="fa-solid fa-building text-center w-5"></i> Profil Sekolah
+                    </button>
+                    
+                    <div class="pt-4 pb-2">
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Modul Data</p>
+                    </div>
+                    
+                    <!-- Menu Sarpras (Disabled until Profile is complete) -->
+                    <button class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-chair w-5 text-center"></i> Data Sarana
+                        </div>
+                        <i class="fa-solid fa-lock text-xs"></i>
+                    </button>
+                    <button class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent mt-1">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-house-chimney w-5 text-center"></i> Data Prasarana
+                        </div>
+                        <i class="fa-solid fa-lock text-xs"></i>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Overlay for mobile sidebar -->
+            <div id="sidebar-overlay" onclick="app.toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-0 hidden md:hidden"></div>
+
+            <!-- Main Content Area -->
+            <main class="flex-grow bg-slate-50 overflow-y-auto w-full">
+                <!-- Dashboard Home Content -->
+                <div id="content-dashboard-home" class="p-4 md:p-6 space-y-6">
+                    
+                    <!-- Warning Banner: Lengkapi Profil -->
+                    <div id="banner-lengkapi-profil" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm">
+                        <div class="flex items-start md:items-center justify-between flex-col md:flex-row gap-4">
+                            <div class="flex items-start gap-3">
+                                <div class="text-amber-500 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+                                <div>
+                                    <h3 class="text-amber-800 font-bold">Lengkapi Profil Sekolah Terlebih Dahulu</h3>
+                                    <p class="text-amber-700 text-sm mt-1">Anda tidak dapat mengisi data Sarana dan Prasarana sebelum melengkapi titik koordinat (GPS) dan profil dasar sekolah.</p>
+                                </div>
+                            </div>
+                            <button onclick="app.showProfilSekolah()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap shadow-sm transition-colors">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> Lengkapi Sekarang
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder Welcome Card -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Selamat Datang di SIPRAS MABAR!</h2>
+                        <p class="text-slate-600">Sistem Informasi Pendataan Sarana dan Prasarana Sekolah. Pilih menu di sebelah kiri untuk mulai mengelola data Anda.</p>
+                        <div class="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg max-w-sm">
+                            <p class="text-sm text-blue-800 font-medium mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Sesi Aktif:</p>
+                            <ul class="text-xs text-blue-700 space-y-1 list-disc pl-5" id="dash-session-info"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profil Sekolah Form Content -->
+                <div id="content-profil-sekolah" class="hidden p-4 md:p-6 max-w-5xl mx-auto space-y-6 pb-20">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Profil Sekolah</h2>
+                            <p class="text-slate-500 text-sm mt-1">Perbarui informasi identitas dan lokasi sekolah Anda.</p>
+                        </div>
+                    </div>
+
+                    <form id="form-profil-sekolah" onsubmit="app.handleSaveProfil(event)" class="space-y-8">
+                        
+                        <!-- Identitas Sekolah Section -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-lg font-semibold text-brand-700 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-school-flag mr-2"></i>Identitas Dasar</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">NPSN (Read Only)</label>
+                                    <input type="text" id="prof_npsn" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-2 text-slate-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Jenjang (Read Only)</label>
+                                    <input type="text" id="prof_jenjang" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-2 text-slate-500 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Sekolah <span class="text-red-500">*</span></label>
+                                    <input type="text" id="prof_nama_sekolah" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Berdiri</label>
+                                    <input type="number" id="prof_tahun_berdiri" placeholder="Contoh: 1980" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Telepon Sekolah</label>
+                                    <input type="text" id="prof_telp_sekolah" placeholder="Contoh: 0385-XXXXX" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Kepala Sekolah Section -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-lg font-semibold text-brand-700 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-user-tie mr-2"></i>Kepala Sekolah</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Kepala Sekolah <span class="text-red-500">*</span></label>
+                                    <input type="text" id="prof_nama_kepsek" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">NIP Kepala Sekolah</label>
+                                    <input type="text" id="prof_nip_kepsek" placeholder="Kosongkan jika non-PNS" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Status Kepala Sekolah <span class="text-red-500">*</span></label>
+                                    <select id="prof_status_kepsek" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white">
+                                        <option value="">-- Pilih Status --</option>
+                                        <option value="Definitif">Definitif</option>
+                                        <option value="Plt">Plt (Pelaksana Tugas)</option>
+                                        <option value="Plh">Plh (Pelaksana Harian)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">No. HP / WhatsApp <span class="text-red-500">*</span></label>
+                                    <input type="text" id="prof_hp_kepsek" required placeholder="Contoh: 0812xxxxxx" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lokasi & Peta Section -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-lg font-semibold text-brand-700 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-map-location-dot mr-2"></i>Alamat & Titik Koordinat</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Kecamatan <span class="text-red-500">*</span></label>
+                                    <select id="prof_kecamatan" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white">
+                                        <option value="">-- Memuat Kecamatan... --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Alamat Jalan / Dusun <span class="text-red-500">*</span></label>
+                                    <input type="text" id="prof_alamat" required placeholder="Contoh: Jl. Lintas Flores KM 10, Desa Wae Kelambu" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Latitude (Garis Lintang) <span class="text-red-500">*</span></label>
+                                    <input type="number" step="any" id="prof_lat" required class="w-full rounded-lg border border-slate-300 px-4 py-2 bg-slate-50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Geser pin pada peta">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Longitude (Garis Bujur) <span class="text-red-500">*</span></label>
+                                    <input type="number" step="any" id="prof_lng" required class="w-full rounded-lg border border-slate-300 px-4 py-2 bg-slate-50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Geser pin pada peta">
+                                </div>
+                            </div>
+                            
+                            <!-- Leaflet Map Container -->
+                            <div class="w-full">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="block text-sm font-medium text-slate-700">Peta Lokasi Sekolah</label>
+                                    <button type="button" onclick="app.getLocationGPS()" id="btn-get-location" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 py-1.5 px-3 rounded-md font-medium transition-colors">
+                                        <i class="fa-solid fa-location-crosshairs"></i> Deteksi GPS Saya
+                                    </button>
+                                </div>
+                                <div class="p-1 border border-slate-300 rounded-lg bg-slate-100">
+                                    <div id="map-container" class="w-full h-80 rounded-md z-0 relative"></div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> <i>Tips: Geser pin merah (marker) pada peta ke titik lokasi gedung sekolah Anda dengan akurat.</i></p>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                            <button type="button" onclick="app.initDashboard()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                                Batal
+                            </button>
+                            <button type="submit" id="btn-save-profil" class="bg-brand-600 hover:bg-brand-500 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-save"></i> Simpan Profil Sekolah
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
                 <div>
                     <h1 class="font-bold text-slate-800 leading-tight">SIPRAS MABAR</h1>
                     <p class="text-xs text-slate-500" id="dash-user-role">Role: Loading...</p>
@@ -198,6 +409,10 @@
         var app = {
             currentUser: null,
             userProfile: null,
+            currentSchool: null, // Data sekolah khusus operator
+            refKecamatan: [], // Data master kecamatan
+            mapInstance: null,
+            mapMarker: null,
 
             // View Router sederhana
             showView: (viewId) => {
@@ -345,21 +560,283 @@
             },
 
             // Inisialisasi Dashboard
-            initDashboard: () => {
+            initDashboard: async () => {
                 app.showView('view-dashboard');
                 
+                // Set Header Info
                 document.getElementById('dash-user-name').textContent = app.userProfile.nama || app.userProfile.username;
                 document.getElementById('dash-user-role').textContent = `Role: ${app.userProfile.role.toUpperCase()}`;
 
+                // Set Mobile Sidebar events
+                document.getElementById('btn-mobile-menu').onclick = app.toggleSidebar;
+
+                // Load Data Spesifik Role
+                if (app.userProfile.role === 'operator' && app.userProfile.school_id) {
+                    await app.loadSchoolData();
+                }
+
+                // Tampilkan Konten Beranda
+                document.getElementById('content-dashboard-home').classList.remove('hidden');
+                document.getElementById('content-profil-sekolah').classList.add('hidden');
+
+                // Update Session Info UI
                 const infoList = document.getElementById('dash-session-info');
                 infoList.innerHTML = `
                     <li><b>Nama:</b> ${app.userProfile.nama}</li>
                     <li><b>Username:</b> ${app.userProfile.username}</li>
                     <li><b>Role:</b> <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">${app.userProfile.role}</span></li>
                     <li><b>Jenjang:</b> ${app.userProfile.jenjang || '-'}</li>
-                    <li><b>School ID:</b> ${app.userProfile.school_id || 'Dinas (Semua)'}</li>
                 `;
             },
+
+            // --- FUNGSI BARU PHASE 3 --- //
+
+            toggleSidebar: () => {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            },
+
+            // Mengambil data sekolah dari database (khusus Operator)
+            loadSchoolData: async () => {
+                try {
+                    const { data, error } = await supabase
+                        .from('schools')
+                        .select('*')
+                        .eq('id', app.userProfile.school_id)
+                        .single();
+
+                    if (error) throw error;
+                    app.currentSchool = data;
+
+                    // Update UI Sidebar
+                    document.getElementById('sidebar-school-name').textContent = data.nama_sekolah || "Nama Sekolah Belum Diatur";
+                    document.getElementById('sidebar-npsn').textContent = `NPSN: ${data.npsn}`;
+
+                    // Cek kelengkapan profil
+                    app.checkProfilStatus();
+
+                } catch (error) {
+                    console.error("Error loading school data:", error);
+                }
+            },
+
+            // Mengecek apakah profil sekolah sudah lengkap (Logic Penguncian Menu)
+            checkProfilStatus: () => {
+                const bannerWarning = document.getElementById('banner-lengkapi-profil');
+                const menuSarpras = document.querySelectorAll('.menu-sarpras');
+
+                if (app.currentSchool && !app.currentSchool.profil_lengkap) {
+                    // Profil belum lengkap: Tampilkan banner, kunci menu
+                    bannerWarning.classList.remove('hidden');
+                    menuSarpras.forEach(btn => {
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                        btn.classList.remove('hover:bg-slate-100', 'hover:text-brand-600', 'text-slate-600');
+                        btn.onclick = (e) => { e.preventDefault(); alert("Silakan lengkapi Profil Sekolah dan Titik Koordinat terlebih dahulu!"); };
+                        btn.querySelector('.fa-lock').classList.remove('hidden');
+                    });
+                } else {
+                    // Profil sudah lengkap: Sembunyikan banner, buka menu
+                    bannerWarning.classList.add('hidden');
+                    menuSarpras.forEach(btn => {
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed', 'text-slate-400', 'bg-slate-50', 'border-transparent');
+                        btn.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-brand-600', 'cursor-pointer');
+                        btn.onclick = () => { alert("Modul Sarpras akan dibangun pada Phase 4 & 5."); };
+                        btn.querySelector('.fa-lock').classList.add('hidden');
+                    });
+                }
+            },
+
+            // Mengambil master data Kecamatan
+            loadMasterKecamatan: async () => {
+                if (app.refKecamatan.length > 0) return; // cache
+                const { data, error } = await supabase.from('ref_kecamatan').select('*').order('nama_kecamatan', { ascending: true });
+                if (!error && data) {
+                    app.refKecamatan = data;
+                    const select = document.getElementById('prof_kecamatan');
+                    select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+                    data.forEach(kec => {
+                        select.innerHTML += `<option value="${kec.id}">${kec.nama_kecamatan}</option>`;
+                    });
+                }
+            },
+
+            // Menampilkan halaman Form Profil Sekolah
+            showProfilSekolah: async () => {
+                // Hanya operator yang bisa akses form ini di Phase 3
+                if(app.userProfile.role !== 'operator' || !app.currentSchool) {
+                    alert("Menu ini khusus untuk Operator Sekolah.");
+                    return;
+                }
+
+                // Tutup sidebar mobile jika terbuka
+                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
+
+                document.getElementById('content-dashboard-home').classList.add('hidden');
+                document.getElementById('content-profil-sekolah').classList.remove('hidden');
+
+                // Load opsi dropdown kecamatan
+                await app.loadMasterKecamatan();
+
+                // Isi Form dengan data dari database
+                const s = app.currentSchool;
+                document.getElementById('prof_npsn').value = s.npsn || '';
+                document.getElementById('prof_jenjang').value = s.jenjang || '';
+                document.getElementById('prof_nama_sekolah').value = s.nama_sekolah || '';
+                document.getElementById('prof_tahun_berdiri').value = s.tahun_berdiri || '';
+                document.getElementById('prof_telp_sekolah').value = s.no_telp_sekolah || '';
+                document.getElementById('prof_nama_kepsek').value = s.nama_kepala_sekolah || '';
+                document.getElementById('prof_nip_kepsek').value = s.nip_kepala_sekolah || '';
+                document.getElementById('prof_status_kepsek').value = s.status_kepala_sekolah || '';
+                document.getElementById('prof_hp_kepsek').value = s.no_hp_kepala_sekolah || '';
+                document.getElementById('prof_kecamatan').value = s.kecamatan_id || '';
+                document.getElementById('prof_alamat').value = s.alamat || '';
+                document.getElementById('prof_lat').value = s.latitude || '';
+                document.getElementById('prof_lng').value = s.longitude || '';
+
+                // Inisialisasi Peta Leaflet
+                app.initMap(s.latitude, s.longitude);
+            },
+
+            // Inisialisasi Peta Leaflet.js
+            initMap: (lat, lng) => {
+                // Default center (Kab. Manggarai Barat jika kosong)
+                const startLat = lat || -8.6449;
+                const startLng = lng || 119.8821;
+                const zoomLevel = lat ? 15 : 10; // Zoom in jika sudah ada koordinat spesifik
+
+                if (!app.mapInstance) {
+                    // Buat instance baru
+                    app.mapInstance = L.map('map-container').setView([startLat, startLng], zoomLevel);
+                    
+                    // Tambahkan tile layer dari OpenStreetMap
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(app.mapInstance);
+
+                    // Tambahkan marker (Bisa didrag/digeser)
+                    app.mapMarker = L.marker([startLat, startLng], { draggable: true }).addTo(app.mapInstance);
+
+                    // Event saat marker selesai digeser -> Update nilai input teks form
+                    app.mapMarker.on('dragend', function (event) {
+                        const position = app.mapMarker.getLatLng();
+                        document.getElementById('prof_lat').value = position.lat.toFixed(6);
+                        document.getElementById('prof_lng').value = position.lng.toFixed(6);
+                    });
+
+                    // Event saat form diubah manual -> Update posisi marker
+                    ['prof_lat', 'prof_lng'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', () => {
+                            const newLat = parseFloat(document.getElementById('prof_lat').value);
+                            const newLng = parseFloat(document.getElementById('prof_lng').value);
+                            if(!isNaN(newLat) && !isNaN(newLng)) {
+                                app.mapMarker.setLatLng([newLat, newLng]);
+                                app.mapInstance.panTo([newLat, newLng]);
+                            }
+                        });
+                    });
+
+                } else {
+                    // Jika map sudah ada, cukup update view dan marker
+                    app.mapInstance.setView([startLat, startLng], zoomLevel);
+                    app.mapMarker.setLatLng([startLat, startLng]);
+                }
+
+                // WORKAROUND: Perbaiki ukuran peta setelah div ditampilkan (Bug Leaflet pada div tersembunyi)
+                setTimeout(() => { app.mapInstance.invalidateSize(); }, 300);
+            },
+
+            // Fitur Geolocation GPS Browser
+            getLocationGPS: () => {
+                if (navigator.geolocation) {
+                    app.setLoading('btn-get-location', true, '<i class="fa-solid fa-spinner fa-spin"></i> Mendeteksi...');
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            // Isi ke form
+                            document.getElementById('prof_lat').value = lat.toFixed(6);
+                            document.getElementById('prof_lng').value = lng.toFixed(6);
+                            
+                            // Update peta
+                            app.initMap(lat, lng);
+                            
+                            app.setLoading('btn-get-location', false, '<i class="fa-solid fa-location-crosshairs"></i> Deteksi GPS Saya');
+                            alert("Lokasi GPS berhasil ditemukan!");
+                        },
+                        (error) => {
+                            let msg = "Gagal mengambil lokasi. ";
+                            if (error.code === 1) msg += "Izin akses lokasi ditolak oleh Anda.";
+                            else if (error.code === 2) msg += "Lokasi tidak tersedia (jaringan/satelit tidak aktif).";
+                            else msg += "Terjadi kesalahan (Timeout).";
+                            
+                            alert(msg);
+                            app.setLoading('btn-get-location', false, '<i class="fa-solid fa-location-crosshairs"></i> Deteksi GPS Saya');
+                        },
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Opsi untuk akurasi tinggi (Mobile)
+                    );
+                } else {
+                    alert("Browser Anda tidak mendukung fitur Geolocation/GPS.");
+                }
+            },
+
+            // Menyimpan Update Data Profil Sekolah ke Supabase
+            handleSaveProfil: async (e) => {
+                e.preventDefault();
+                
+                const lat = parseFloat(document.getElementById('prof_lat').value);
+                const lng = parseFloat(document.getElementById('prof_lng').value);
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    alert("Latitude dan Longitude harus berupa angka valid. Silakan gunakan peta.");
+                    return;
+                }
+
+                app.setLoading('btn-save-profil', true, '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...');
+
+                // Buat Payload
+                const payload = {
+                    nama_sekolah: document.getElementById('prof_nama_sekolah').value.trim(),
+                    tahun_berdiri: document.getElementById('prof_tahun_berdiri').value ? parseInt(document.getElementById('prof_tahun_berdiri').value) : null,
+                    nama_kepala_sekolah: document.getElementById('prof_nama_kepsek').value.trim(),
+                    nip_kepala_sekolah: document.getElementById('prof_nip_kepsek').value.trim() || null,
+                    status_kepala_sekolah: document.getElementById('prof_status_kepsek').value,
+                    no_hp_kepala_sekolah: document.getElementById('prof_hp_kepsek').value.trim(),
+                    no_telp_sekolah: document.getElementById('prof_telp_sekolah').value.trim() || null,
+                    kecamatan_id: document.getElementById('prof_kecamatan').value,
+                    alamat: document.getElementById('prof_alamat').value.trim(),
+                    latitude: lat,
+                    longitude: lng,
+                    profil_lengkap: true // Begitu disimpan form ini, kita anggap profil sudah diselesaikan
+                };
+
+                try {
+                    const { data, error } = await window.supabase
+                        .from('schools')
+                        .update(payload)
+                        .eq('id', app.currentSchool.id);
+                    
+                    if (error) throw error;
+
+                    alert("Profil Sekolah berhasil disimpan dan diperbarui!");
+                    
+                    // Update cache local & reload Dashboard
+                    app.currentSchool = { ...app.currentSchool, ...payload };
+                    app.initDashboard();
+
+                } catch(error) {
+                    console.error(error);
+                    alert("Gagal menyimpan data: " + (error.message || "Terjadi kesalahan server."));
+                } finally {
+                    app.setLoading('btn-save-profil', false, '<i class="fa-solid fa-save"></i> Simpan Profil Sekolah');
+                }
+            },
+
+            // --- END FUNGSI PHASE 3 --- //
 
             // Proses Logout
             handleLogout: async () => {
