@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPRAS MABAR - Dinas PKO Kab. Manggarai Barat</title>
+    <title>SIPRAS MABAR - Dashboard</title>
     
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- Leaflet CSS & JS untuk Peta -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -22,8 +25,7 @@
                     colors: {
                         primary: '#1E3A8A', // Biru Dinas
                         secondary: '#00B5A6', // Tosca
-                        background: '#F3F4F6',
-                        surface: '#FFFFFF'
+                        accent: '#F3F4F6'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -32,9 +34,9 @@
             }
         }
     </script>
-    
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
         .bg-pattern {
             background-color: #f3f4f6;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e3a8a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
@@ -44,107 +46,109 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .app-view { display: none; }
+        .app-view.active { display: block; }
     </style>
 </head>
-<body class="text-gray-800 antialiased h-screen overflow-hidden flex flex-col">
+<body class="text-gray-800 antialiased overflow-hidden h-screen w-screen">
 
-    <!-- Global Loading Overlay -->
-    <div id="global-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center transition-opacity duration-300">
-        <svg class="animate-spin h-10 w-10 text-secondary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <!-- Global Loader UI -->
+    <div id="global-loader" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center hidden">
+        <svg class="animate-spin h-10 w-10 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <p class="text-gray-600 font-medium animate-pulse">Memuat sistem...</p>
+        <p class="text-gray-500 font-medium">Memuat sistem...</p>
     </div>
 
-    <!-- Global Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+    <!-- Global Toast UI -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[60] flex flex-col gap-2"></div>
 
-    <!-- ========================================== -->
-    <!-- VIEW: LOGIN -->
-    <!-- ========================================== -->
-    <div id="view-login" class="app-view hidden bg-pattern min-h-screen flex items-center justify-center p-4 absolute inset-0 z-10">
+    <!-- ================= VIEW: LOGIN ================= -->
+    <div id="view-login" class="app-view bg-pattern min-h-screen flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
             <div class="bg-primary px-6 py-8 text-center">
                 <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-4 shadow-md">
-                    <svg class="w-10 h-10 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <svg class="w-12 h-12 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 </div>
                 <h1 class="text-2xl font-bold text-white tracking-wide">SIPRAS MABAR</h1>
-                <p class="text-blue-200 text-sm mt-2">Sistem Informasi Pendataan Sarana & Prasarana<br>Kabupaten Manggarai Barat</p>
+                <p class="text-blue-200 text-sm mt-2">Sistem Informasi Pendataan Sarana & Prasarana</p>
             </div>
             <div class="p-8">
+                <div id="login-error-alert" class="hidden mb-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded text-sm">
+                    <p id="login-error-message"></p>
+                </div>
                 <form id="form-login" class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="login-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all" placeholder="admin@dinas.go.id">
+                        <input type="email" id="login-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary outline-none">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all" placeholder="••••••••">
+                        <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary outline-none">
                     </div>
-                    <button type="submit" id="btn-login" class="w-full bg-secondary hover:bg-[#009b8e] text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">
-                        Masuk
+                    <button type="submit" id="btn-login" class="w-full bg-secondary hover:bg-[#009b8e] text-white font-semibold py-2.5 px-4 rounded-lg flex justify-center items-center">
+                        <span id="btn-login-text">Masuk</span>
                     </button>
                 </form>
-                <div class="mt-6 text-center text-xs text-gray-500">
-                    Gunakan kredensial yang diberikan oleh Dinas Pendidikan.
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- VIEW: CHANGE PASSWORD (FIRST LOGIN) -->
-    <!-- ========================================== -->
-    <div id="view-change-password" class="app-view hidden bg-pattern min-h-screen flex items-center justify-center p-4 absolute inset-0 z-10">
+    <!-- ================= VIEW: CHANGE PASSWORD ================= -->
+    <div id="view-change-password" class="app-view bg-pattern min-h-screen flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-8">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-red-100 rounded-full mx-auto flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <h2 class="text-xl font-bold text-gray-800">Keamanan Akun</h2>
-                <p class="text-sm text-gray-500 mt-2">Ini adalah pertama kalinya Anda login. Demi keamanan, Anda wajib mengubah password default sebelum melanjutkan.</p>
-            </div>
-            <form id="form-change-password" class="space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Ubah Password</h2>
+            <p class="text-sm text-gray-600 mb-6">Demi keamanan, Anda diwajibkan mengubah password default saat login pertama kali.</p>
+            
+            <div id="pwd-error-alert" class="hidden mb-4 bg-red-50 text-red-700 p-3 rounded text-sm"></div>
+            
+            <form id="form-change-pwd" class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
-                    <input type="password" id="new-password" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all">
+                    <input type="password" id="new-pwd" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
-                    <input type="password" id="confirm-password" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all">
+                    <input type="password" id="confirm-pwd" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary outline-none">
                 </div>
-                <button type="submit" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors mt-4">
-                    Simpan Password & Lanjutkan
+                <button type="submit" id="btn-save-pwd" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-lg">
+                    Simpan Password Baru
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- VIEW: DASHBOARD & APP SHELL -->
-    <!-- ========================================== -->
-    <div id="view-dashboard" class="app-view hidden w-full h-full flex bg-background absolute inset-0 z-0">
+    <!-- ================= VIEW: DASHBOARD ================= -->
+    <div id="view-dashboard" class="app-view flex h-screen w-full bg-gray-50">
         
-        <!-- Sidebar (Desktop) -->
-        <aside class="w-64 bg-primary text-white flex-shrink-0 hidden md:flex flex-col shadow-xl z-20">
-            <div class="h-16 flex items-center px-6 border-b border-white/10 bg-black/10">
-                <svg class="w-6 h-6 text-secondary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                <span class="text-lg font-bold tracking-wider">SIPRAS</span>
+        <!-- Sidebar Desktop -->
+        <aside class="w-64 bg-primary text-white flex-col hidden lg:flex flex-shrink-0 relative z-20 shadow-xl">
+            <div class="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
+                <svg class="w-8 h-8 text-secondary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <span class="text-lg font-bold tracking-wider">SIPRAS MABAR</span>
             </div>
             
-            <div class="flex-1 overflow-y-auto py-4 px-3" id="sidebar-menu">
-                <!-- Menu akan di-render via JS berdasarkan Role -->
-            </div>
-
-            <div class="p-4 border-t border-white/10 bg-black/20">
+            <div class="px-4 py-6 border-b border-white/10">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white font-bold" id="avatar-initial">U</div>
+                    <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-lg" id="avatar-initial">U</div>
                     <div class="ml-3 overflow-hidden">
                         <p class="text-sm font-medium truncate" id="sidebar-user-name">User Name</p>
-                        <p class="text-xs text-blue-200 capitalize truncate" id="sidebar-user-role">Role</p>
+                        <p class="text-xs text-blue-200 capitalize" id="sidebar-user-role">Role</p>
                     </div>
                 </div>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto py-4 space-y-1 pr-2" id="sidebar-menu">
+                <!-- Menu di-generate via JS -->
+            </nav>
+
+            <div class="p-4 border-t border-white/10 shrink-0">
+                <button onclick="doLogout()" class="flex items-center w-full px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Keluar Sistem
+                </button>
             </div>
         </aside>
 
@@ -152,62 +156,160 @@
         <div class="flex-1 flex flex-col h-full overflow-hidden relative">
             
             <!-- Top Header -->
-            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-8 flex-shrink-0 z-10">
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-8 flex-shrink-0 z-10 relative">
                 <div class="flex items-center">
-                    <button class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <!-- Mobile Menu Button -->
+                    <button class="lg:hidden text-gray-500 hover:text-primary focus:outline-none p-2 mr-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <h2 class="text-lg font-semibold text-gray-800 ml-2 md:ml-0" id="page-title">Dashboard</h2>
+                    <h2 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h2>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button class="p-2 text-gray-400 hover:text-gray-600 relative">
+                    <button class="text-gray-400 hover:text-primary relative p-1">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                    </button>
-                    <button onclick="logout()" class="flex items-center text-sm font-medium text-red-600 hover:text-red-800 transition-colors bg-red-50 px-3 py-1.5 rounded-lg">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                        Keluar
                     </button>
                 </div>
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-4 lg:p-8" id="main-content">
+            <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative z-0" id="main-content">
                 
-                <div class="bg-gradient-to-r from-primary to-blue-700 rounded-2xl shadow-lg p-6 lg:p-8 text-white mb-6">
-                    <h3 class="text-2xl font-bold mb-2">Selamat Datang, <span id="welcome-name">User</span>!</h3>
-                    <p class="text-blue-100 opacity-90">Sistem Informasi Pendataan Sarana dan Prasarana Sekolah Kabupaten Manggarai Barat.</p>
+                <!-- Alert Profil Belum Lengkap -->
+                <div id="alert-profil-incomplete" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg shadow-sm flex items-start gap-3">
+                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div>
+                        <p class="font-bold text-sm">Perhatian!</p>
+                        <p class="text-sm">Anda wajib melengkapi <b>Profil Sekolah</b> dan <b>Lokasi Peta</b> terlebih dahulu sebelum dapat mengakses menu lainnya.</p>
+                    </div>
                 </div>
 
-                <!-- Stats Grid (Placeholder for Phase 6) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center">
-                        <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-primary mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <!-- PAGE: DASHBOARD HOME -->
+                <div id="page-dashboard-home" class="dashboard-page hidden">
+                    <div class="bg-gradient-to-r from-primary to-blue-700 rounded-2xl shadow-lg p-6 lg:p-8 text-white mb-6">
+                        <h3 class="text-2xl font-bold mb-2">Selamat Datang, <span id="welcome-name">User</span>!</h3>
+                        <p class="text-blue-100 opacity-90">Sistem Informasi Pendataan Sarana dan Prasarana Sekolah Kabupaten Manggarai Barat.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center">
+                            <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-primary mr-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 mb-1">Total Sekolah</p>
+                                <h4 class="text-2xl font-bold text-gray-800" id="stat-sekolah">0</h4>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 mb-1">Total Sekolah</p>
-                            <h4 class="text-2xl font-bold text-gray-800" id="stat-sekolah">0</h4>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center opacity-70">
+                            <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center text-green-600 mr-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                            </div>
+                            <div><p class="text-sm font-medium text-gray-500 mb-1">Sarana Baik</p><h4 class="text-2xl font-bold text-gray-800">-</h4></div>
                         </div>
                     </div>
-                    <!-- Mockup Stats Lainnya -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center opacity-70">
-                        <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center text-green-600 mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                </div>
+
+                <!-- PAGE: PROFIL SEKOLAH -->
+                <div id="page-profil-sekolah" class="dashboard-page hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-800">Formulir Profil Sekolah</h3>
+                            <span class="px-3 py-1 bg-primary text-white text-xs rounded-full font-semibold" id="badge-jenjang">JENJANG</span>
                         </div>
-                        <div><p class="text-sm font-medium text-gray-500 mb-1">Sarana Baik</p><h4 class="text-2xl font-bold text-gray-800">-</h4></div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center opacity-70">
-                        <div class="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center text-red-600 mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        </div>
-                        <div><p class="text-sm font-medium text-gray-500 mb-1">Ruang Rusak</p><h4 class="text-2xl font-bold text-gray-800">-</h4></div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center opacity-70">
-                        <div class="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div><p class="text-sm font-medium text-gray-500 mb-1">Data Tervalidasi</p><h4 class="text-2xl font-bold text-gray-800">-</h4></div>
+                        
+                        <form id="form-profil-sekolah" class="p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <!-- Info Dasar -->
+                                <div class="space-y-4">
+                                    <h4 class="font-semibold text-gray-800 border-b pb-2">Informasi Dasar</h4>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Nama Sekolah</label>
+                                        <input type="text" id="prof-nama" class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600" readonly>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">NPSN</label>
+                                            <input type="text" id="prof-npsn" class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600" readonly>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">Tahun Berdiri</label>
+                                            <input type="number" id="prof-tahun" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Alamat Lengkap <span class="text-red-500">*</span></label>
+                                        <textarea id="prof-alamat" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Kepemimpinan -->
+                                <div class="space-y-4">
+                                    <h4 class="font-semibold text-gray-800 border-b pb-2">Kepemimpinan & Kontak</h4>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Nama Kepala Sekolah <span class="text-red-500">*</span></label>
+                                        <input type="text" id="prof-kepsek" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">NIP Kepala Sekolah</label>
+                                            <input type="text" id="prof-nip" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">Status Kepsek</label>
+                                            <select id="prof-status-kepsek" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none">
+                                                <option value="Definitif">Definitif</option>
+                                                <option value="Plt">Plt (Pelaksana Tugas)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">No. HP Kepsek</label>
+                                            <input type="text" id="prof-hp" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">No. Telp Sekolah</label>
+                                            <input type="text" id="prof-telp" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Peta & Lokasi -->
+                            <div class="mt-10 space-y-4">
+                                <h4 class="font-semibold text-gray-800 border-b pb-2">Titik Koordinat (Peta Lokasi) <span class="text-red-500">*</span></h4>
+                                <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg border border-blue-100">
+                                    Geser peta atau klik pada peta untuk menentukan lokasi. Tekan tombol "Gunakan GPS Saat Ini" jika Anda sedang berada di sekolah.
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <div class="md:col-span-3 relative rounded-xl overflow-hidden border border-gray-300 z-0">
+                                        <div id="map-container" class="w-full h-80 bg-gray-200"></div>
+                                    </div>
+                                    
+                                    <div class="space-y-4 flex flex-col justify-center">
+                                        <button type="button" onclick="getLocationGPS()" class="w-full flex items-center justify-center gap-2 bg-white border border-secondary text-secondary hover:bg-secondary hover:text-white transition-colors py-3 rounded-lg text-sm font-semibold shadow-sm">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
+                                            Deteksi GPS Saya
+                                        </button>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">Latitude</label>
+                                            <input type="text" id="prof-lat" required class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-700" readonly>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-500 mb-1">Longitude</label>
+                                            <input type="text" id="prof-lng" required class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-700" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+                                <button type="submit" id="btn-save-profil" class="bg-primary hover:bg-blue-800 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all">
+                                    Simpan & Validasi Profil
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </main>
@@ -216,131 +318,121 @@
 
     <script>
         // ==========================================
-        // 1. KONFIGURASI SUPABASE (UBAH BAGIAN INI)
+        // 1. KONFIGURASI SUPABASE (Wajib Diubah)
         // ==========================================
         const SUPABASE_URL = 'https://jiruttcarflcoepuhkiw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f';
         
-        // Mencegah error di platform Sandbox/Previewer jika key belum diganti
         const validUrl = SUPABASE_URL.includes('GANTI') ? 'https://example.supabase.co' : SUPABASE_URL;
-        
-        // Inisialisasi Supabase Client
-        // FIX: Menggunakan supabaseClient agar tidak bentrok dengan library global
-        const supabaseClient = window.supabase.createClient(validUrl, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(validUrl, SUPABASE_ANON_KEY);
 
         // ==========================================
         // 2. STATE APLIKASI
         // ==========================================
         let currentUser = null;
         let currentUserProfile = null;
+        let currentSchoolId = null;
+        let isProfileComplete = true; // Default true, akan diubah jika operator profilnya belum lengkap
+        let map = null;
+        let marker = null;
 
         // ==========================================
-        // 3. UTILITY FUNCTIONS
+        // 3. UTILITY & UI HELPERS
         // ==========================================
         function showLoading(show) {
             const loader = document.getElementById('global-loader');
-            if (show) {
-                loader.classList.remove('hidden');
-                setTimeout(() => loader.style.opacity = '1', 10);
-            } else {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.classList.add('hidden'), 300);
-            }
+            if (show) loader.classList.remove('hidden');
+            else loader.classList.add('hidden');
         }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
-            
-            toast.className = `${bgColor} text-white px-4 py-3 rounded shadow-lg transform transition-all duration-300 translate-x-full flex items-center gap-2`;
-            toast.innerHTML = `
-                ${type === 'success' ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : ''}
-                ${type === 'error' ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' : ''}
-                <span class="text-sm font-medium">${message}</span>
-            `;
-            
+            const bg = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            toast.className = `${bg} text-white px-4 py-3 rounded shadow-lg text-sm flex items-center gap-2 transform transition-all duration-300 translate-y-0 opacity-100`;
+            toast.innerHTML = `<p>${message}</p>`;
             container.appendChild(toast);
-            
-            // Animate In
-            setTimeout(() => toast.classList.remove('translate-x-full'), 10);
-            
-            // Auto hapus
             setTimeout(() => {
-                toast.classList.add('translate-x-full');
+                toast.classList.add('opacity-0', 'translate-x-full');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
         // ==========================================
-        // 4. SISTEM ROUTING SPA (Fix untuk error "await")
+        // 4. SISTEM ROUTING SPA & SIDEBAR
         // ==========================================
-        
-        // FIX: Menambahkan "async" pada fungsi navigateTo agar await di dalamnya valid
         async function navigateTo(viewId) {
-            // Sembunyikan semua view
-            document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
-            // Tampilkan view yang dituju
+            document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
             const targetView = document.getElementById(viewId);
-            if(targetView) targetView.classList.remove('hidden');
+            if(targetView) targetView.classList.add('active');
 
-            // Logika spesifik saat view dirender
             if (viewId === 'view-dashboard') {
-                renderSidebar();
-                
-                // Update Identitas Header
                 document.getElementById('sidebar-user-name').textContent = currentUserProfile?.nama || 'User';
                 document.getElementById('sidebar-user-role').textContent = (currentUserProfile?.role || 'Guest').toUpperCase();
                 document.getElementById('welcome-name').textContent = currentUserProfile?.nama || 'User';
-                
                 if (currentUserProfile?.nama) {
                     document.getElementById('avatar-initial').textContent = currentUserProfile.nama.charAt(0).toUpperCase();
                 }
 
-                // FIX: Penggunaan await di sini sekarang valid karena fungsinya async
                 if (!SUPABASE_URL.includes('GANTI')) {
                     if (currentUserProfile?.role === 'superadmin') {
                         try {
-                            const { count, error } = await supabaseClient
-                                .from('schools')
-                                .select('*', { count: 'exact', head: true });
-                            
+                            const { count, error } = await supabaseClient.from('schools').select('*', { count: 'exact', head: true });
                             if (!error && count !== null) {
                                 document.getElementById('stat-sekolah').textContent = count;
                             }
                         } catch (err) {
-                            console.error("Gagal load count:", err);
+                            console.error("Gagal memuat count sekolah", err);
                         }
                     } else if (currentUserProfile?.role === 'operator') {
                         document.getElementById('stat-sekolah').textContent = "1";
                     }
-                } else {
-                    document.getElementById('stat-sekolah').textContent = "Demo";
                 }
             }
         }
 
-        function renderSidebar() {
+        function switchDashboardPage(pageId, title) {
+            // Pengecekan Lockout Profil
+            if (!isProfileComplete && pageId !== 'page-profil-sekolah' && currentUserProfile?.role === 'operator') {
+                showToast('Akses ditolak! Lengkapi Profil Sekolah terlebih dahulu.', 'error');
+                return;
+            }
+
+            document.getElementById('page-title').textContent = title;
+            document.querySelectorAll('.dashboard-page').forEach(el => el.classList.add('hidden'));
+            
+            const target = document.getElementById(pageId);
+            if(target) target.classList.remove('hidden');
+
+            renderSidebar(pageId);
+
+            if (pageId === 'page-profil-sekolah') {
+                loadProfilSekolah();
+            }
+        }
+
+        function renderSidebar(activePageId = 'page-dashboard-home') {
             const menuContainer = document.getElementById('sidebar-menu');
             const role = currentUserProfile?.role;
-            let menus = [
-                { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Dashboard', roles: ['superadmin', 'admin_sd', 'admin_smp', 'operator'] },
-                { icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', label: 'Profil Sekolah', roles: ['operator'] },
-                { icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', label: 'Data Sekolah', roles: ['superadmin', 'admin_sd', 'admin_smp'] },
-                { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', label: 'Sarana & Prasarana', roles: ['superadmin', 'admin_sd', 'admin_smp', 'operator'] },
-                { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Validasi Data', roles: ['superadmin', 'admin_sd', 'admin_smp'] },
-                { icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', label: 'Manajemen User', roles: ['superadmin'] },
-                { icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM12 15a3 3 0 100-6 3 3 0 000 6z', label: 'Pengaturan Sistem', roles: ['superadmin'] },
+            const menus = [
+                { id: 'page-dashboard-home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Dashboard', roles: ['superadmin', 'admin_sd', 'admin_smp', 'operator'] },
+                { id: 'page-profil-sekolah', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', label: 'Profil Sekolah', roles: ['operator'] },
+                { id: 'page-data-sekolah', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', label: 'Data Sekolah', roles: ['superadmin', 'admin_sd', 'admin_smp'] },
             ];
 
             menuContainer.innerHTML = '';
             menus.forEach(menu => {
                 if(menu.roles.includes(role) || !role) {
-                    const activeClass = menu.label === 'Dashboard' ? 'bg-white/10 border-l-4 border-secondary text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white';
+                    const isActive = menu.id === activePageId;
+                    const activeClass = isActive ? 'bg-white/10 border-l-4 border-secondary text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white';
+                    const isLocked = !isProfileComplete && menu.id !== 'page-profil-sekolah' && role === 'operator';
+                    const lockClass = isLocked ? 'opacity-40 cursor-not-allowed' : '';
+                    
                     const html = `
-                        <a href="#" class="flex items-center px-4 py-3 mb-1 rounded-r-lg transition-colors ${activeClass}">
+                        <a href="#" onclick="switchDashboardPage('${menu.id}', '${menu.label}')" class="flex items-center px-4 py-3 mb-1 rounded-r-lg transition-colors ${activeClass} ${lockClass}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${menu.icon}"></path></svg>
                             <span class="font-medium text-sm">${menu.label}</span>
+                            ${isLocked ? '<svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>' : ''}
                         </a>
                     `;
                     menuContainer.innerHTML += html;
@@ -351,33 +443,27 @@
         // ==========================================
         // 5. LOGIKA AUTENTIKASI
         // ==========================================
+        async function doLogout() {
+            await supabaseClient.auth.signOut();
+            isProfileComplete = true; // reset state
+            navigateTo('view-login');
+        }
+
         async function checkSession() {
             showLoading(true);
             try {
                 if(SUPABASE_URL.includes('GANTI')) {
-                    console.warn("Mode Dummy Aktif: Supabase URL belum diatur.");
                     navigateTo('view-login');
                     return;
                 }
-
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (error) throw error;
-
-                if (!session) {
-                    navigateTo('view-login');
-                    return;
-                }
+                if (!session) { navigateTo('view-login'); return; }
 
                 currentUser = session.user;
-
-                // Ambil profil dari tabel users
-                const { data: profile, error: profileError } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('id', currentUser.id)
-                    .single();
-
-                if (profileError) throw profileError;
+                const { data: profile, error: profileError } = await supabaseClient.from('users').select('*').eq('id', currentUser.id).single();
+                if (profileError || !profile) throw new Error("Gagal mengambil profil.");
+                
                 currentUserProfile = profile;
 
                 if (!profile.status) {
@@ -390,98 +476,208 @@
                 if (profile.must_change_password) {
                     navigateTo('view-change-password');
                 } else {
-                    navigateTo('view-dashboard');
+                    // Pengecekan Profil (Phase 3)
+                    if (profile.role === 'operator' && profile.school_id) {
+                        currentSchoolId = profile.school_id;
+                        const { data: schoolData } = await supabaseClient.from('schools').select('*').eq('id', profile.school_id).single();
+                        if (schoolData) {
+                            isProfileComplete = !!(schoolData.alamat && schoolData.nama_kepala_sekolah && schoolData.latitude);
+                        }
+                    }
+
+                    await navigateTo('view-dashboard');
+                    
+                    if (profile.role === 'operator' && !isProfileComplete) {
+                        document.getElementById('alert-profil-incomplete').classList.remove('hidden');
+                        switchDashboardPage('page-profil-sekolah', 'Profil Sekolah');
+                    } else {
+                        document.getElementById('alert-profil-incomplete').classList.add('hidden');
+                        switchDashboardPage('page-dashboard-home', 'Dashboard');
+                    }
                 }
             } catch (err) {
-                console.error('Check session error:', err);
+                console.error(err);
                 navigateTo('view-login');
             } finally {
                 showLoading(false);
             }
         }
 
-        // Handler Form Login
-        document.getElementById('form-login').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('btn-login');
-
-            if(SUPABASE_URL.includes('GANTI')) {
-                showToast('URL Supabase belum dikonfigurasi. Ini hanya tampilan demo.', 'error');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
-
-            try {
-                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                
-                showToast('Login berhasil!');
-                await checkSession(); // Re-evaluasi route
-            } catch (err) {
-                showToast('Email atau password salah.', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Masuk';
-            }
-        });
-
-        // Handler Form Ganti Password
-        document.getElementById('form-change-password').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const pwd = document.getElementById('new-password').value;
-            const confirm = document.getElementById('confirm-password').value;
-
-            if (pwd !== confirm) {
-                showToast('Password dan konfirmasi tidak cocok!', 'error');
-                return;
-            }
-
-            if(SUPABASE_URL.includes('GANTI')) return;
-
+        // ==========================================
+        // 6. PROFIL SEKOLAH & PETA (PHASE 3)
+        // ==========================================
+        async function loadProfilSekolah() {
+            if (!currentSchoolId || SUPABASE_URL.includes('GANTI')) return;
             showLoading(true);
             try {
-                const { error: authError } = await supabaseClient.auth.updateUser({ password: pwd });
-                if (authError) throw authError;
+                const { data, error } = await supabaseClient.from('schools').select('*').eq('id', currentSchoolId).single();
+                if (error) throw error;
+                
+                document.getElementById('badge-jenjang').textContent = `JENJANG ${data.jenjang || ''}`;
+                document.getElementById('prof-nama').value = data.nama_sekolah || '';
+                document.getElementById('prof-npsn').value = data.npsn || '';
+                document.getElementById('prof-tahun').value = data.tahun_berdiri || '';
+                document.getElementById('prof-alamat').value = data.alamat || '';
+                document.getElementById('prof-kepsek').value = data.nama_kepala_sekolah || '';
+                document.getElementById('prof-nip').value = data.nip_kepala_sekolah || '';
+                if(data.status_kepala_sekolah) document.getElementById('prof-status-kepsek').value = data.status_kepala_sekolah;
+                document.getElementById('prof-hp').value = data.no_hp_kepala_sekolah || '';
+                document.getElementById('prof-telp').value = data.no_telp_sekolah || '';
+                
+                const lat = data.latitude || -8.4908; // Default Manggarai Barat
+                const lng = data.longitude || 119.8829;
+                
+                if (data.latitude) {
+                    document.getElementById('prof-lat').value = data.latitude;
+                    document.getElementById('prof-lng').value = data.longitude;
+                }
 
-                const { error: dbError } = await supabaseClient
-                    .from('users')
-                    .update({ must_change_password: false, updated_at: new Date().toISOString() })
-                    .eq('id', currentUser.id);
-                if (dbError) throw dbError;
-
-                showToast('Password berhasil diperbarui!');
-                currentUserProfile.must_change_password = false;
-                navigateTo('view-dashboard');
+                initMap(lat, lng, !!data.latitude);
             } catch (err) {
-                showToast('Gagal merubah password: ' + err.message, 'error');
+                showToast('Gagal memuat data sekolah.', 'error');
             } finally {
                 showLoading(false);
             }
-        });
+        }
 
-        async function logout() {
-            showLoading(true);
-            if(!SUPABASE_URL.includes('GANTI')) {
-                await supabaseClient.auth.signOut();
+        function initMap(lat, lng, hasData) {
+            setTimeout(() => {
+                if (!map) {
+                    map = L.map('map-container').setView([lat, lng], hasData ? 15 : 9);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(map);
+
+                    map.on('click', function(e) {
+                        setMapMarker(e.latlng.lat, e.latlng.lng);
+                    });
+                } else {
+                    map.setView([lat, lng], hasData ? 15 : 9);
+                    map.invalidateSize();
+                }
+                if (hasData) setMapMarker(lat, lng);
+            }, 300);
+        }
+
+        function setMapMarker(lat, lng) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lng]).addTo(map);
+            document.getElementById('prof-lat').value = lat.toFixed(6);
+            document.getElementById('prof-lng').value = lng.toFixed(6);
+        }
+
+        function getLocationGPS() {
+            if (navigator.geolocation) {
+                showToast('Mencari koordinat GPS...', 'info');
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        setMapMarker(lat, lng);
+                        map.setView([lat, lng], 17);
+                        showToast('Lokasi ditemukan!');
+                    },
+                    (error) => { showToast('Gagal mendeteksi lokasi.', 'error'); },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                showToast('Browser tidak mendukung GPS.', 'error');
             }
-            currentUser = null;
-            currentUserProfile = null;
-            navigateTo('view-login');
-            showLoading(false);
-            showToast('Berhasil keluar sistem.');
         }
 
         // ==========================================
-        // 6. INISIALISASI APLIKASI
+        // 7. EVENT LISTENERS
         // ==========================================
-        window.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             checkSession();
-        });
 
+            // Login Form Submit
+            document.getElementById('form-login').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(SUPABASE_URL.includes('GANTI')) {
+                    showToast('Konfigurasi API Key diperlukan!', 'error'); return;
+                }
+                const btn = document.getElementById('btn-login');
+                btn.disabled = true; btn.textContent = "Memproses...";
+                try {
+                    const email = document.getElementById('login-email').value;
+                    const pwd = document.getElementById('login-password').value;
+                    const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pwd });
+                    if (error) throw error;
+                    await checkSession();
+                } catch(err) {
+                    document.getElementById('login-error-alert').classList.remove('hidden');
+                    document.getElementById('login-error-message').textContent = "Email atau password salah.";
+                } finally {
+                    btn.disabled = false; btn.textContent = "Masuk";
+                }
+            });
+
+            // Change Password Submit
+            document.getElementById('form-change-pwd').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const pwd1 = document.getElementById('new-pwd').value;
+                const pwd2 = document.getElementById('confirm-pwd').value;
+                const alertBox = document.getElementById('pwd-error-alert');
+                if(pwd1 !== pwd2) {
+                    alertBox.classList.remove('hidden');
+                    alertBox.textContent = "Password tidak cocok!";
+                    return;
+                }
+                showLoading(true);
+                try {
+                    const { error: authErr } = await supabaseClient.auth.updateUser({ password: pwd1 });
+                    if(authErr) throw authErr;
+                    
+                    const { error: dbErr } = await supabaseClient.from('users').update({ must_change_password: false }).eq('id', currentUser.id);
+                    if(dbErr) throw dbErr;
+                    
+                    showToast("Password berhasil diperbarui!");
+                    await checkSession();
+                } catch(err) {
+                    alertBox.classList.remove('hidden');
+                    alertBox.textContent = err.message;
+                } finally {
+                    showLoading(false);
+                }
+            });
+
+            // Profil Form Submit
+            document.getElementById('form-profil-sekolah').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(SUPABASE_URL.includes('GANTI')) return;
+                
+                const btn = document.getElementById('btn-save-profil');
+                btn.disabled = true; btn.textContent = 'Menyimpan...';
+
+                try {
+                    const updateData = {
+                        tahun_berdiri: document.getElementById('prof-tahun').value || null,
+                        alamat: document.getElementById('prof-alamat').value,
+                        nama_kepala_sekolah: document.getElementById('prof-kepsek').value,
+                        nip_kepala_sekolah: document.getElementById('prof-nip').value || null,
+                        status_kepala_sekolah: document.getElementById('prof-status-kepsek').value,
+                        no_hp_kepala_sekolah: document.getElementById('prof-hp').value || null,
+                        no_telp_sekolah: document.getElementById('prof-telp').value || null,
+                        latitude: parseFloat(document.getElementById('prof-lat').value) || null,
+                        longitude: parseFloat(document.getElementById('prof-lng').value) || null,
+                        updated_at: new Date().toISOString()
+                    };
+
+                    const { error } = await supabaseClient.from('schools').update(updateData).eq('id', currentSchoolId);
+                    if (error) throw error;
+
+                    showToast('Profil berhasil disimpan!');
+                    isProfileComplete = true; // Buka kunci menu
+                    document.getElementById('alert-profil-incomplete').classList.add('hidden');
+                    renderSidebar('page-profil-sekolah');
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    btn.disabled = false; btn.textContent = 'Simpan & Validasi Profil';
+                }
+            });
+        });
     </script>
 </body>
 </html>
