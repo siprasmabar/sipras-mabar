@@ -323,7 +323,7 @@
         const SUPABASE_URL = 'https://jiruttcarflcoepuhkiw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f';
         
-        const validUrl = SUPABASE_URL.includes('https://jiruttcarflcoepuhkiw.supabase.co') ? 'https://jiruttcarflcoepuhkiw.supabase.co' : SUPABASE_URL;
+        const validUrl = SUPABASE_URL.includes('GANTI') ? 'https://jiruttcarflcoepuhkiw.supabase.co' : SUPABASE_URL;
         const supabaseClient = supabase.createClient(validUrl, SUPABASE_ANON_KEY);
 
         // ==========================================
@@ -461,8 +461,20 @@
                 if (!session) { navigateTo('view-login'); return; }
 
                 currentUser = session.user;
-                const { data: profile, error: profileError } = await supabaseClient.from('users').select('*').eq('id', currentUser.id).single();
-                if (profileError || !profile) throw new Error("Gagal mengambil profil.");
+                
+                // MENGAMBIL DATA PROFIL
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single(); // single() akan error jika data tidak ditemukan (0 baris)
+
+                if (profileError) {
+                    throw new Error("Profil tidak ditemukan di tabel users. Pastikan UUID cocok! Error: " + profileError.message);
+                }
+                if (!profile) {
+                    throw new Error("Gagal mengambil profil.");
+                }
                 
                 currentUserProfile = profile;
 
@@ -496,7 +508,10 @@
                     }
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Cek Session Error:", err);
+                // INI PERBAIKANNYA: Tampilkan error di UI sebelum kembali ke login
+                showToast("Akses ditolak: " + err.message, "error");
+                await supabaseClient.auth.signOut(); // Bersihkan sesi yang error
                 navigateTo('view-login');
             } finally {
                 showLoading(false);
