@@ -170,6 +170,7 @@
                             <a href="#" onclick="app.navTo('profil')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-building w-5"></i> Profil Sekolah</a>
                             <a href="#" onclick="app.navTo('sarana')" id="menu-sarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-chair w-5"></i> Data Sarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
                             <a href="#" onclick="app.navTo('prasarana')" id="menu-prasarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-door-open w-5"></i> Data Prasarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
+                            <a href="#" onclick="app.navTo('helpdesk')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-headset w-5"></i> Bantuan (Helpdesk)</a>
                         </div>
 
                         <!-- Menu Dinas (Admin & Superadmin) -->
@@ -177,6 +178,8 @@
                             <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-2">Menu Admin Dinas</div>
                             <a href="#" onclick="app.navTo('data-sekolah')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-school w-5"></i> Data Sekolah</a>
                             <a href="#" onclick="app.navTo('validasi')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-clipboard-check w-5"></i> Validasi Data</a>
+                            <a href="#" onclick="app.navTo('pengumuman')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-bullhorn w-5"></i> Pengumuman</a>
+                            <a href="#" onclick="app.navTo('helpdesk')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-headset w-5"></i> Tiket Bantuan</a>
                             <a href="#" onclick="app.navTo('peta-sebaran')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-map-marked-alt w-5"></i> Peta Sebaran</a>
                         </div>
                     </nav>
@@ -708,6 +711,79 @@
                         </div>
                     </div>
 
+                    <!-- VIEW: HELPDESK -->
+                    <div id="content-helpdesk" class="dashboard-content hidden space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-800">Tiket Bantuan (Helpdesk)</h2>
+                                    <p class="text-sm text-gray-500">Pusat layanan bantuan terkait kendala sistem pendataan.</p>
+                                </div>
+                                <button id="btn-buat-tiket" onclick="document.getElementById('form-tiket-container').classList.toggle('hidden')" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition hidden">
+                                    <i class="fas fa-plus mr-1"></i> Buat Tiket Baru
+                                </button>
+                            </div>
+
+                            <!-- Form Buat Tiket (Khusus Operator) -->
+                            <div id="form-tiket-container" class="hidden mb-6 p-5 border border-gray-200 bg-gray-50 rounded-lg">
+                                <form id="form-tiket" onsubmit="app.simpanTiket(event)" class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="col-span-1 md:col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Subjek Masalah <span class="text-red-500">*</span></label>
+                                            <input type="text" id="tiket-subjek" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-teal-500 outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                            <select id="tiket-kategori" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-teal-500 outline-none">
+                                                <option value="">-- Pilih --</option>
+                                                <option value="Kesalahan Data">Kesalahan Data</option>
+                                                <option value="Sistem Error / Bug">Sistem Error / Bug</option>
+                                                <option value="Lupa Cara Input">Lupa Cara Input</option>
+                                                <option value="Lainnya">Lainnya</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Lampiran Foto/Screenshot (Maks 5MB)</label>
+                                            <input type="file" id="tiket-lampiran" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-sm">
+                                        </div>
+                                        <div class="col-span-1 md:col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Jelaskan Kendala <span class="text-red-500">*</span></label>
+                                            <textarea id="tiket-pesan" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-teal-500 outline-none" placeholder="Deskripsikan masalah dengan jelas..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit" id="btn-save-tiket" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-medium text-sm transition">Kirim Tiket</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Daftar Tiket -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-gray-600">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                        <tr><th class="px-4 py-3">No. Tiket</th><th class="px-4 py-3">Subjek & Kategori</th><th class="px-4 py-3 text-center">Tanggal</th><th class="px-4 py-3 text-center">Status</th></tr>
+                                    </thead>
+                                    <tbody id="table-body-helpdesk" class="divide-y divide-gray-100">
+                                        <!-- Data via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- VIEW: PENGUMUMAN -->
+                    <div id="content-pengumuman" class="dashboard-content hidden space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h2 class="text-lg font-bold text-gray-800 mb-4">Pengumuman & Informasi</h2>
+                            <p class="text-sm text-gray-500">Pusat informasi resmi dari Dinas Pendidikan Kepemudaan dan Olahraga.</p>
+                            <!-- Fitur Pengumuman akan diaktifkan secara utuh pada sub-menu khusus nanti -->
+                            <div class="mt-6 p-10 text-center border-2 border-dashed border-gray-200 rounded-lg">
+                                <i class="fas fa-bullhorn text-4xl text-gray-300 mb-3"></i>
+                                <h3 class="text-gray-500 font-medium">Belum Ada Pengumuman Baru</h3>
+                            </div>
+                        </div>
+                    </div>
+
                 </main>
             </div>
         </div>
@@ -842,7 +918,7 @@
 
                 document.getElementById(`content-${contentName}`).style.display = 'block';
 
-                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana', 'validasi':'Validasi Data' };
+                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana', 'validasi':'Validasi Data', 'helpdesk': 'Helpdesk & Bantuan', 'pengumuman': 'Pengumuman Resmi' };
                 document.getElementById('topbar-title').innerText = titles[contentName];
 
                 if(contentName === 'profil') { app.loadSchoolProfile(); } 
@@ -850,6 +926,7 @@
                 else if(contentName === 'prasarana') { app.switchPrasaranaTab('lahan'); }
                 else if(contentName === 'home') { app.loadDashboardData(); }
                 else if(contentName === 'validasi') { app.loadDataValidasiDinas('bangunan'); }
+                else if(contentName === 'helpdesk') { app.loadHelpdesk(); }
             },
 
             showLoginModal: () => document.getElementById('modal-login').classList.remove('hidden'),
@@ -909,11 +986,13 @@
                         document.getElementById('menu-dinas-group').classList.add('hidden');
                         document.getElementById('dashboard-operator-progress').classList.remove('hidden');
                         document.getElementById('dashboard-dinas-filters').classList.add('hidden');
+                        document.getElementById('btn-buat-tiket').classList.remove('hidden');
                     } else {
                         document.getElementById('menu-operator-group').classList.add('hidden');
                         document.getElementById('menu-dinas-group').classList.remove('hidden');
                         document.getElementById('dashboard-operator-progress').classList.add('hidden');
                         document.getElementById('dashboard-dinas-filters').classList.remove('hidden');
+                        document.getElementById('btn-buat-tiket').classList.add('hidden');
                         document.getElementById('topbar-school-name').innerText = "Portal Dinas";
                         document.getElementById('topbar-school-name').classList.remove('hidden');
                         
@@ -1574,6 +1653,96 @@
                     document.getElementById('modal-validasi').classList.add('hidden');
                     app.loadDataValidasiDinas(type); // Refresh tabel
                 } catch(err) { app.showToast("Gagal menyimpan validasi.", "error"); }
+            },
+
+            // ================== MODUL HELPDESK ================== //
+            getHelpdeskBadge: (status) => {
+                if(status === 'Open') return `<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-bold">OPEN</span>`;
+                if(status === 'Diproses') return `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">DIPROSES</span>`;
+                if(status === 'Menunggu') return `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] font-bold">MENUNGGU</span>`;
+                if(status === 'Selesai') return `<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">SELESAI</span>`;
+                return `<span>${status}</span>`;
+            },
+
+            simpanTiket: async (e) => {
+                e.preventDefault();
+                var btn = document.getElementById('btn-save-tiket');
+                btn.innerHTML = 'Mengirim...';
+                
+                var payload = {
+                    school_id: app.currentSchool.id,
+                    subject: document.getElementById('tiket-subjek').value,
+                    kategori: document.getElementById('tiket-kategori').value,
+                    isi_keluhan: document.getElementById('tiket-pesan').value,
+                    created_by: app.currentUser.id
+                };
+
+                try {
+                    // Upload Lampiran jika ada
+                    var fileInput = document.getElementById('tiket-lampiran');
+                    if(fileInput.files.length > 0) {
+                        var file = fileInput.files[0];
+                        if(file.size > 5 * 1024 * 1024) throw new Error("File melebihi 5MB");
+                        var fileName = `tiket/${app.currentSchool.id}_${Date.now()}.${file.name.split('.').pop()}`;
+                        var { error: uploadErr } = await supabaseClient.storage.from('helpdesk-files').upload(fileName, file);
+                        if(uploadErr) throw uploadErr;
+                        var { data: pubUrl } = supabaseClient.storage.from('helpdesk-files').getPublicUrl(fileName);
+                        payload.lampiran_url = pubUrl.publicUrl;
+                    }
+
+                    var { error } = await supabaseClient.from('helpdesk_tickets').insert([payload]);
+                    if(error) throw error;
+                    
+                    app.showToast("Tiket berhasil dibuat. Tim Dinas akan segera meninjau.", "success");
+                    document.getElementById('form-tiket').reset();
+                    document.getElementById('form-tiket-container').classList.add('hidden');
+                    app.loadHelpdesk();
+                } catch(err) { app.showToast(err.message || "Gagal membuat tiket.", "error"); }
+                finally { btn.innerHTML = 'Kirim Tiket'; }
+            },
+
+            loadHelpdesk: async () => {
+                var tbody = document.getElementById('table-body-helpdesk');
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Memuat tiket...</td></tr>';
+                
+                try {
+                    // Cek Role: Operator vs Admin
+                    var query = supabaseClient.from('helpdesk_tickets').select('*, schools(nama_sekolah, npsn)').order('created_at', { ascending: false });
+                    
+                    if(app.currentUser.role === 'operator') {
+                        query = query.eq('school_id', app.currentSchool.id);
+                    } else if (app.currentUser.role === 'admin_sd' || app.currentUser.role === 'admin_smp') {
+                        var targetJenjang = app.currentUser.role === 'admin_sd' ? 'SD' : 'SMP';
+                        query = supabaseClient.from('helpdesk_tickets').select('*, schools!inner(nama_sekolah, npsn, jenjang)').eq('schools.jenjang', targetJenjang).order('created_at', { ascending: false });
+                    }
+
+                    var { data, error } = await query;
+                    if(error) throw error;
+                    
+                    tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Tidak ada data tiket.</td></tr>'; return; }
+                    
+                    data.forEach(item => {
+                        var d = new Date(item.created_at).toLocaleDateString('id-ID');
+                        var badge = app.getHelpdeskBadge(item.status);
+                        var lampiranLink = item.lampiran_url ? `<a href="${item.lampiran_url}" target="_blank" class="text-blue-500 hover:underline mt-1 block text-[10px]"><i class="fas fa-paperclip"></i> Lihat Lampiran</a>` : '';
+                        
+                        var tr = `
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm text-gray-500">TKT-${item.ticket_no}</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-bold text-gray-800">${item.subject}</div>
+                                    <div class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded inline-block mt-1">${item.kategori}</div>
+                                    <div class="text-xs text-gray-500 mt-1 truncate max-w-xs">${item.isi_keluhan}</div>
+                                    ${lampiranLink}
+                                </td>
+                                <td class="px-4 py-3 text-center text-xs text-gray-500">${d}</td>
+                                <td class="px-4 py-3 text-center">${badge}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += tr;
+                    });
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat tiket bantuan.</td></tr>'; }
             }
         };
 
