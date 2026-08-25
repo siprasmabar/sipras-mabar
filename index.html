@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tambahan Phase 10: Library SheetJS untuk Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -21,6 +23,7 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-animate { animation: slideInRight 0.3s ease-out forwards; }
         
+        /* Pengaturan Cetak Dashboard Umum */
         @media print {
             aside, nav, header, button, #dashboard-dinas-filters, #toast-container, .nav-btn, #banner-profil-warning { display: none !important; }
             #view-dashboard { display: block !important; height: auto !important; overflow: visible !important; }
@@ -31,6 +34,7 @@
             .shadow-sm { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
         }
         
+        /* Pengaturan Cetak Khusus SPTJM */
         @media print {
             body.printing-sptjm #app-container { display: none !important; }
             body.printing-sptjm #toast-container { display: none !important; }
@@ -247,7 +251,7 @@
                             <p class="text-xs text-gray-500 mt-2">Indikator akan mencapai 100% jika Anda telah mengisi Profil, Lahan, Bangunan, Ruangan, dan Sarana.</p>
                         </div>
 
-                        <!-- FILTER DINAS (ADMIN/SUPERADMIN) -->
+                        <!-- FILTER DINAS (ADMIN/SUPERADMIN) & EXCEL BUTTON -->
                         <div id="dashboard-dinas-filters" class="hidden mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Filter Jenjang</label>
@@ -261,8 +265,9 @@
                                     <option value="ALL">Semua Kecamatan</option>
                                 </select>
                             </div>
-                            <div class="flex items-end">
-                                <button onclick="window.print()" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fas fa-print mr-2"></i> Cetak Laporan</button>
+                            <div class="flex items-end gap-2">
+                                <button onclick="window.print()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fas fa-print mr-1"></i> Cetak</button>
+                                <button onclick="app.exportDashboardExcel()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fas fa-file-excel mr-1"></i> Excel</button>
                             </div>
                         </div>
 
@@ -864,7 +869,7 @@
     </div>
 
     <script>
-        // MASUKKAN KEY SUPABASE ANDA DI BAWAH INI (Pastikan Ada Tanda Kutip Tutup)
+        // MASUKKAN KEY SUPABASE ANDA DI BAWAH INI
         var SUPABASE_URL = "https://jiruttcarflcoepuhkiw.supabase.co";
         var SUPABASE_ANON_KEY = "sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f"; 
         var supabaseClient = null;
@@ -1164,6 +1169,44 @@
                     app.renderChart('chart-bangunan', 'pie', 'Bangunan', ['Baik', 'R. Ringan', 'R. Sedang', 'R. Berat', 'R. Total'], [stats.b_baik||0, stats.b_rr||0, stats.b_rs||0, stats.b_rb||0, stats.b_rt||0], ['#10b981', '#fcd34d', '#f59e0b', '#ef4444', '#7f1d1d']);
                     app.renderChart('chart-ruang', 'bar', 'Ruangan', ['Baik', 'R. Ringan', 'R. Sedang', 'R. Berat', 'R. Total'], [stats.r_baik||0, stats.r_rr||0, stats.r_rs||0, stats.r_rb||0, stats.r_rt||0], ['#10b981', '#fcd34d', '#f59e0b', '#ef4444', '#7f1d1d']);
                 } catch (err) {}
+            },
+
+            exportDashboardExcel: async () => {
+                var p_jenjang = document.getElementById('filter-jenjang') ? document.getElementById('filter-jenjang').value : 'ALL';
+                var p_kec = document.getElementById('filter-kecamatan') ? document.getElementById('filter-kecamatan').value : 'ALL';
+
+                app.showToast("Menyiapkan file Excel...", "warning");
+                try {
+                    var { data, error } = await supabaseClient.rpc('get_export_rekap_sekolah', {
+                        p_jenjang: p_jenjang === 'ALL' ? null : p_jenjang,
+                        p_kecamatan_id: p_kec === 'ALL' ? null : p_kec
+                    });
+                    
+                    if (error) throw error;
+                    if (!data || data.length === 0) return app.showToast("Tidak ada data untuk diexport pada filter ini.", "warning");
+
+                    var excelData = data.map((item, index) => ({
+                        "No": index + 1,
+                        "Nama Sekolah": item.sekolah,
+                        "NPSN": item.npsn,
+                        "Jenjang": item.jenjang,
+                        "Kecamatan": item.kecamatan || '-',
+                        "Total Inventaris Sarana": item.tot_sarana,
+                        "Jumlah Bangunan Rusak Berat (>46%)": item.bang_rusak_berat,
+                        "Jumlah Ruangan Rusak Berat (>46%)": item.ruang_rusak_berat
+                    }));
+
+                    var worksheet = XLSX.utils.json_to_sheet(excelData);
+                    var workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap SIPRAS");
+                    
+                    var fileName = `Rekap_SIPRAS_MABAR_${p_jenjang}_${new Date().toISOString().slice(0,10)}.xlsx`;
+                    XLSX.writeFile(workbook, fileName);
+
+                    app.showToast("Excel berhasil diunduh!", "success");
+                } catch (err) {
+                    app.showToast("Gagal melakukan export Excel.", "error");
+                }
             },
 
             initMap: (lat, lng) => {
@@ -1616,14 +1659,25 @@
             },
 
             loadHelpdesk: async () => {
-                // ... existing loadHelpdesk code ...
+                var tbody = document.getElementById('table-body-helpdesk'); tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Memuat data...</td></tr>';
+                try {
+                    var query = supabaseClient.from('helpdesk_tickets').select('*, schools(nama_sekolah)').order('created_at', { ascending: false });
+                    if(app.currentUser.role === 'operator') query = query.eq('school_id', app.currentSchool.id);
+                    var { data, error } = await query;
+                    if(error) throw error; tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada tiket.</td></tr>'; return; }
+                    data.forEach(item => {
+                        var d = new Date(item.created_at).toLocaleDateString('id-ID'); 
+                        var prefix = app.currentUser.role !== 'operator' ? `<span class="text-[10px] text-teal-600 font-bold">${item.schools.nama_sekolah}</span><br>` : '';
+                        tbody.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs">TKT-${item.ticket_no}</td><td class="px-4 py-3">${prefix}<span class="font-bold text-gray-800">${item.subject}</span><br><span class="text-[10px] bg-gray-200 px-1 rounded">${item.kategori}</span></td><td class="px-4 py-3 text-center text-sm">${d}</td><td class="px-4 py-3 text-center">${app.getHelpdeskBadge(item.status)}</td></tr>`;
+                    });
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Error memuat tiket.</td></tr>'; }
             },
 
             cetakSPTJM: () => {
                 var s = app.currentSchool;
                 if(!s || !s.nama_kepala_sekolah) return app.showToast("Nama Kepala Sekolah belum diisi di Profil!", "error");
                 
-                // Isi template tersembunyi
                 document.getElementById('sptjm-print-kepsek').innerText = s.nama_kepala_sekolah.toUpperCase();
                 document.getElementById('sptjm-print-nip').innerText = s.nip_kepala_sekolah || '-';
                 document.getElementById('sptjm-print-sekolah').innerText = s.nama_sekolah.toUpperCase();
@@ -1633,15 +1687,12 @@
                 document.getElementById('sptjm-print-ttd').innerText = s.nama_kepala_sekolah.toUpperCase();
                 document.getElementById('sptjm-print-ttd-nip').innerText = "NIP. " + (s.nip_kepala_sekolah || '-');
                 
-                // Tanggal hari ini
                 var options = { day: 'numeric', month: 'long', year: 'numeric' };
                 document.getElementById('sptjm-print-tanggal').innerText = new Date().toLocaleDateString('id-ID', options);
 
-                // Tambahkan kelas khusus ke body agar hanya template yang diprint
                 document.body.classList.add('printing-sptjm');
                 window.print();
                 
-                // Kembalikan ke tampilan normal setelah print dialog selesai (atau dibatalkan)
                 setTimeout(() => { document.body.classList.remove('printing-sptjm'); }, 1000);
             },
 
@@ -1660,7 +1711,6 @@
                     
                     var { data: pubUrl } = supabaseClient.storage.from('sptjm').getPublicUrl(fileName);
                     
-                    // Simpan ke database
                     var payload = { school_id: app.currentSchool.id, file_url: pubUrl.publicUrl, uploaded_by: app.currentUser.id };
                     var { error: dbErr } = await supabaseClient.from('sptjm_docs').insert([payload]);
                     if(dbErr) throw dbErr;
