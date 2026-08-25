@@ -3,980 +3,1048 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPRAS MABAR - Login</title>
-    
+    <title>SIPRAS MABAR - Sistem Informasi Pendataan Sarana dan Prasarana</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind Custom Theme Extensions -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6', // Tosca primary
-                            600: '#0d9488',
-                            900: '#134e4a',
-                        },
-                        secondary: '#1e3a8a', // Blue soft
+                            50: '#e6f7f5',
+                            100: '#cceeeb',
+                            500: '#0d9488',
+                            600: '#0f766e',
+                            700: '#115e59'
+                        }
                     }
                 }
             }
         }
     </script>
-
-    <!-- Supabase JS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Leaflet JS untuk Peta -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
     <style>
-        /* Custom Styles for Loader and Transitions */
-        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
-        .view-section.active { display: block; opacity: 1; }
-        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        #map { height: 300px; width: 100%; border-radius: 0.5rem; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- VIEW 1: LANDING PAGE -->
-    <main id="view-landing" class="view-section active flex-grow flex flex-col items-center justify-center p-6">
-        <div class="max-w-3xl text-center space-y-6">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-100 text-brand-600 mb-4">
-                <i class="fa-solid fa-school text-4xl"></i>
-            </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">SIPRAS <span class="text-brand-600">MABAR</span></h1>
-            <h2 class="text-xl md:text-2xl font-medium text-slate-600">Sistem Informasi Pendataan Sarana dan Prasarana Sekolah</h2>
-            <p class="text-slate-500 max-w-2xl mx-auto">Dinas Pendidikan, Kepemudaan dan Olahraga<br>Kabupaten Manggarai Barat</p>
-            <div class="pt-8">
-                <button onclick="app.showView('view-login')" class="bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 mx-auto">
-                    Masuk ke Sistem <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-            <p class="text-sm text-slate-400 pt-10">Data Sarana dan Prasarana Sekolah, Akurat untuk Perencanaan yang Tepat.</p>
-        </div>
-    </main>
+    <!-- CONTAINER UTAMA APLIKASI -->
+    <div id="app-container" class="flex-1 flex flex-col">
 
-    <!-- VIEW 2: LOGIN FORM -->
-    <main id="view-login" class="view-section flex-grow flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100">
-            <div class="bg-brand-600 p-6 text-center text-white relative">
-                <button onclick="app.showView('view-landing')" class="absolute left-4 top-6 text-brand-100 hover:text-white transition-colors" title="Kembali">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <i class="fa-solid fa-user-lock text-3xl mb-2"></i>
-                <h2 class="text-2xl font-bold">Portal Login</h2>
-                <p class="text-brand-100 text-sm mt-1">Gunakan kredensial yang diberikan Dinas</p>
-            </div>
-            <div class="p-8">
-                <div id="login-error" class="hidden mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i> <span id="login-error-text">Error message</span>
-                </div>
-                <form id="form-login" onsubmit="app.handleLogin(event)" class="space-y-5">
-                    <div>
-                        <label for="username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fa-solid fa-user text-slate-400"></i>
-                            </div>
-                            <input type="text" id="username" required placeholder="Masukkan username (contoh: admin_komodo)" class="pl-10 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fa-solid fa-lock text-slate-400"></i>
-                            </div>
-                            <input type="password" id="password" required placeholder="••••••••" class="pl-10 pr-10 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
-                            <button type="button" onclick="app.togglePassword('password', 'toggle-icon-pwd')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-brand-600">
-                                <i id="toggle-icon-pwd" class="fa-regular fa-eye"></i>
-                            </button>
-                        </div>
-                        <div class="flex justify-end mt-2">
-                            <a href="#" onclick="alert('Silakan hubungi Superadmin Dinas untuk mereset password Anda.')" class="text-sm text-brand-600 hover:text-brand-800">Lupa password?</a>
-                        </div>
-                    </div>
-                    <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2">
-                        <span>Masuk</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </main>
-
-    <!-- VIEW 3: FORCE PASSWORD CHANGE (First Login) -->
-    <main id="view-change-password" class="view-section flex-grow flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100">
-            <div class="bg-amber-500 p-6 text-center text-white">
-                <i class="fa-solid fa-shield-halved text-4xl mb-2"></i>
-                <h2 class="text-2xl font-bold">Keamanan Akun</h2>
-                <p class="text-amber-100 text-sm mt-1">Anda wajib mengganti password default</p>
-            </div>
-            <div class="p-8">
-                <div class="mb-6 p-3 bg-blue-50 text-blue-700 text-sm rounded-lg border border-blue-100">
-                    Ini adalah login pertama Anda. Demi keamanan data sekolah, silakan buat password baru yang kuat.
-                </div>
-                <div id="pwd-error" class="hidden mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i> <span id="pwd-error-text">Error</span>
-                </div>
-                <form id="form-change-password" onsubmit="app.handleChangePassword(event)" class="space-y-5">
-                    <div>
-                        <label for="new_password" class="block text-sm font-medium text-slate-700 mb-1">Password Baru</label>
-                        <div class="relative">
-                            <input type="password" id="new_password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors">
-                            <button type="button" onclick="app.togglePassword('new_password', 'toggle-icon-new')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-amber-600">
-                                <i id="toggle-icon-new" class="fa-regular fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <label for="confirm_password" class="block text-sm font-medium text-slate-700 mb-1">Ulangi Password Baru</label>
-                        <div class="relative">
-                            <input type="password" id="confirm_password" required minlength="6" placeholder="Ulangi password di atas" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors">
-                        </div>
-                    </div>
-                    <button type="submit" id="btn-change-pwd" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2">
-                        <span>Simpan Password & Lanjutkan</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </main>
-
-    <!-- VIEW 4: DASHBOARD (Phase 3 Layout Setup) -->
-    <div id="view-dashboard" class="view-section h-screen flex flex-col bg-slate-50">
-        <!-- Top Navbar -->
-        <header class="bg-brand-600 text-white shadow-md z-20 flex-shrink-0">
-            <div class="flex justify-between items-center px-4 md:px-6 py-3">
+        <!-- 1. LANDING PAGE PUBLIK (Ditampilkan jika belum login) -->
+        <div id="view-landing" class="flex-1 flex flex-col">
+            <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-3">
-                    <button id="btn-mobile-menu" class="md:hidden text-white hover:bg-brand-700 p-2 rounded-lg">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                    <i class="fa-solid fa-school text-2xl hidden md:block"></i>
+                    <div class="bg-brand-600 text-white p-2.5 rounded-xl font-bold shadow-md"><i class="fa-solid fa-school text-xl"></i></div>
                     <div>
-                        <h1 class="font-bold leading-tight">SIPRAS MABAR</h1>
-                        <p class="text-xs text-brand-100" id="dash-user-role">Role: Loading...</p>
+                        <h1 class="font-bold text-slate-800 text-lg">SIPRAS MABAR</h1>
+                        <p class="text-xs text-slate-500">Dinas Pendidikan, Kepemudaan dan Olahraga Kab. Manggarai Barat</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span id="dash-user-name" class="text-sm font-medium hidden sm:block">User Name</span>
-                    <button onclick="app.handleLogout()" class="bg-brand-700 hover:bg-brand-800 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium">
-                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Keluar</span>
-                    </button>
-                </div>
-            </div>
-        </header>
+                <button onclick="app.showLoginModal()" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk Sistem
+                </button>
+            </header>
 
-        <!-- Main Layout with Sidebar -->
-        <div class="flex flex-grow overflow-hidden relative">
-            
-            <!-- Sidebar (Will be hidden on mobile by default) -->
-            <aside id="sidebar" class="bg-white w-64 shadow-lg flex-shrink-0 flex flex-col absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-10 border-r border-slate-200">
-                <div class="p-4 bg-slate-50 border-b border-slate-100">
-                    <h2 class="text-sm font-semibold text-slate-800" id="sidebar-school-name">Menu Utama</h2>
-                    <p class="text-xs text-slate-500" id="sidebar-npsn">...</p>
+            <main class="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-4xl mx-auto my-auto">
+                <span class="bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-brand-100">Portal Pendataan Terpadu</span>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                    Data Sarana dan Prasarana Sekolah, Akurat untuk Perencanaan yang Tepat.
+                </h2>
+                <p class="text-slate-600 text-base md:text-lg mb-8 max-w-2xl">
+                    Sistem informasi resmi untuk pemutakhiran, validasi, dan monitoring kondisi inventaris serta fasilitas seluruh satuan pendidikan SD dan SMP di Kabupaten Manggarai Barat.
+                </p>
+                <div class="flex gap-4">
+                    <button onclick="app.showLoginModal()" class="bg-brand-600 hover:bg-brand-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2">
+                        Mulai Masuk <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
-                <nav class="flex-grow p-4 space-y-1 overflow-y-auto">
-                    <button onclick="app.initDashboard()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-brand-700 bg-brand-50 font-medium transition-colors">
-                        <i class="fa-solid fa-chart-line w-5 text-center"></i> Beranda
-                    </button>
-                    <button onclick="app.showProfilSekolah()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-colors">
-                        <i class="fa-solid fa-building text-center w-5"></i> Profil Sekolah
-                    </button>
-                    
-                    <div class="pt-4 pb-2">
-                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Modul Data</p>
+            </main>
+
+            <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-100">
+                &copy; 2026 Pemerintah Kabupaten Manggarai Barat. All rights reserved.
+            </footer>
+        </div>
+
+        <!-- 2. HALAMAN LOGIN MODAL / CONTAINER -->
+        <div id="view-login" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+                <div class="bg-slate-900 p-6 text-white relative">
+                    <button onclick="app.hideLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="bg-brand-600 p-2 rounded-lg"><i class="fa-solid fa-school text-white"></i></div>
+                        <h3 class="font-bold text-xl">Login SIPRAS MABAR</h3>
                     </div>
+                    <p class="text-xs text-slate-400">Masukkan akun operasional instansi Anda.</p>
+                </div>
+                <form id="form-login" onsubmit="app.handleLogin(event)" class="p-6 space-y-4">
+                    <div id="login-error" class="hidden bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-200"></div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Username / Akun</label>
+                        <input type="text" id="login-username" required placeholder="Contoh: operator_sd1" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kata Sandi (Password)</label>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 rounded-lg shadow-md transition text-sm">
+                        Masuk Sistem
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. HALAMAN GANTI PASSWORD PAKSA (MUST CHANGE PASSWORD) -->
+        <div id="view-change-password" class="hidden fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+                <div class="text-center">
+                    <div class="bg-amber-100 text-amber-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-xl"><i class="fa-solid fa-key"></i></div>
+                    <h3 class="font-bold text-xl text-slate-800">Ganti Password Wajib</h3>
+                    <p class="text-xs text-slate-500 mt-1">Demi keamanan, Anda wajib mengganti password default saat pertama kali login.</p>
+                </div>
+                <form onsubmit="app.handleUpdatePassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password Baru</label>
+                        <input type="password" id="new-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                    </div>
+                    <button type="submit" id="btn-update-pwd" class="w-full bg-brand-600 text-white font-semibold py-2.5 rounded-lg text-sm">Simpan Password & Masuk</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 4. DASHBOARD UTAMA APLIKASI (Layout Dashboard & Sidebar) -->
+        <div id="view-dashboard" class="hidden flex-1 flex h-screen overflow-hidden">
+            
+            <!-- Sidebar Desktop & Mobile Overlay -->
+            <div id="sidebar-overlay" onclick="app.toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-20 hidden md:hidden"></div>
+            <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-30 w-64 bg-slate-900 text-slate-300 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out border-r border-slate-800">
+                <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-brand-600 text-white p-2 rounded-lg font-bold"><i class="fa-solid fa-school"></i></div>
+                        <div>
+                            <h2 class="font-bold text-white text-sm">SIPRAS MABAR</h2>
+                            <p class="text-[10px] text-slate-400" id="user-role-badge">Operator Sekolah</p>
+                        </div>
+                    </div>
+                    <button onclick="app.toggleSidebar()" class="md:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- Navigasi Menu Sidebar -->
+                <nav class="flex-1 overflow-y-auto p-4 space-y-1.5 text-sm">
+                    <button onclick="app.showDashboardHome()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-slate-200 hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-chart-pie w-5 text-center text-brand-500"></i> Beranda Utama
+                    </button>
+                    <button onclick="app.showProfilSekolah()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-slate-200 hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-building-columns w-5 text-center text-brand-500"></i> Profil Sekolah
+                    </button>
                     
-                    <!-- Menu Sarpras -->
-                    <button id="menu-btn-sarana" onclick="app.showSarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent">
+                    <div class="pt-4 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Modul Inventaris</div>
+                    
+                    <!-- Menu Sarana (Locked if profile incomplete) -->
+                    <button id="menu-btn-sarana" onclick="app.showSarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-800/40 cursor-not-allowed border border-transparent">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-chair w-5 text-center"></i> Data Sarana
+                            <i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Data Sarana
                         </div>
                         <i class="fa-solid fa-lock text-xs"></i>
                     </button>
-                    <button class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent mt-1">
+
+                    <!-- Menu Prasarana (Locked if profile incomplete) -->
+                    <button id="menu-btn-prasarana" onclick="app.showPrasarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-800/40 cursor-not-allowed border border-transparent mt-1">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-house-chimney w-5 text-center"></i> Data Prasarana
                         </div>
                         <i class="fa-solid fa-lock text-xs"></i>
                     </button>
                 </nav>
+
+                <!-- User Footer & Logout -->
+                <div class="p-4 border-t border-slate-800 flex items-center justify-between bg-slate-950/40">
+                    <div class="truncate pr-2">
+                        <p class="font-semibold text-xs text-white truncate" id="sidebar-user-name">Memuat...</p>
+                        <p class="text-[10px] text-slate-400 truncate" id="sidebar-school-name">-</p>
+                    </div>
+                    <button onclick="app.handleLogout()" title="Keluar Sistem" class="text-red-400 hover:text-red-300 p-2"><i class="fa-solid fa-power-off"></i></button>
+                </div>
             </aside>
 
-            <!-- Overlay for mobile sidebar -->
-            <div id="sidebar-overlay" onclick="app.toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-0 hidden md:hidden"></div>
+            <!-- Main Workspace Area -->
+            <div class="flex-1 flex flex-col h-screen overflow-y-auto">
+                <!-- Top Navbar Dashboard -->
+                <header class="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center sticky top-0 z-10">
+                    <button onclick="app.toggleSidebar()" class="md:hidden text-slate-600 hover:text-slate-900"><i class="fa-solid fa-bars text-lg"></i></button>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-medium text-slate-600">Sistem Aktif (Kab. Manggarai Barat)</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg" id="topbar-school-label">-</span>
+                    </div>
+                </header>
 
-            <!-- Main Content Area -->
-            <main class="flex-grow bg-slate-50 overflow-y-auto w-full">
-                <!-- Dashboard Home Content -->
-                <div id="content-dashboard-home" class="p-4 md:p-6 space-y-6">
-                    
-                    <!-- Warning Banner: Lengkapi Profil -->
-                    <div id="banner-lengkapi-profil" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm">
-                        <div class="flex items-start md:items-center justify-between flex-col md:flex-row gap-4">
-                            <div class="flex items-start gap-3">
-                                <div class="text-amber-500 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
-                                <div>
-                                    <h3 class="text-amber-800 font-bold">Lengkapi Profil Sekolah Terlebih Dahulu</h3>
-                                    <p class="text-amber-700 text-sm mt-1">Anda tidak dapat mengisi data Sarana dan Prasarana sebelum melengkapi titik koordinat (GPS) dan profil dasar sekolah.</p>
-                                </div>
+                <!-- CONTENT AREA: HOME DASHBOARD -->
+                <main id="content-dashboard-home" class="flex-1 p-6 space-y-6 max-w-7xl mx-auto w-full">
+                    <!-- Banner Warning Kelengkapan Profil -->
+                    <div id="banner-warning-profil" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="bg-amber-500 text-white p-2.5 rounded-lg text-lg"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div>
+                                <h4 class="font-bold text-amber-900">Profil Sekolah Belum Lengkap!</h4>
+                                <p class="text-xs text-amber-700 mt-0.5">Anda wajib melengkapi profil sekolah terlebih dahulu sebelum dapat mengakses modul Sarana dan Prasarana.</p>
                             </div>
-                            <button onclick="app.showProfilSekolah()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap shadow-sm transition-colors">
-                                <i class="fa-solid fa-pen-to-square mr-1"></i> Lengkapi Sekarang
-                            </button>
                         </div>
+                        <button onclick="app.showProfilSekolah()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm whitespace-nowrap">
+                            Lengkapi Sekarang <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
                     </div>
 
-                    <!-- Placeholder Welcome Card -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Selamat Datang di SIPRAS MABAR!</h2>
-                        <p class="text-slate-600">Sistem Informasi Pendataan Sarana dan Prasarana Sekolah. Pilih menu di sebelah kiri untuk mulai mengelola data Anda.</p>
-                        <div class="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg max-w-sm">
-                            <p class="text-sm text-blue-800 font-medium mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Sesi Aktif:</p>
-                            <ul class="text-xs text-blue-700 space-y-1 list-disc pl-5" id="dash-session-info"></ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Profil Sekolah Form Content -->
-                <div id="content-profil-sekolah" class="hidden p-4 md:p-6 max-w-5xl mx-auto space-y-6 pb-20">
-                    <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <!-- Welcome Banner -->
+                    <div class="bg-gradient-to-r from-brand-700 to-brand-500 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Profil Sekolah</h2>
-                            <p class="text-slate-500 text-sm mt-1">Perbarui informasi identitas dan lokasi sekolah Anda.</p>
+                            <span class="bg-white/20 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Dashboard Operator</span>
+                            <h2 class="text-2xl md:text-3xl font-bold mt-2" id="welcome-school-title">Memuat Profil Sekolah...</h2>
+                            <p class="text-brand-100 text-xs mt-1" id="welcome-school-subtitle">NPSN: - | Jenjang: -</p>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20 text-right">
+                            <p class="text-[10px] text-brand-100 uppercase tracking-wider">Status Data</p>
+                            <p class="text-lg font-extrabold" id="lbl-status-profil">-</p>
                         </div>
                     </div>
+                </main>
 
-                    <form id="form-profil-sekolah" onsubmit="app.handleSaveProfil(event)" class="space-y-8">
-                        
-                        <!-- Identitas Sekolah Section -->
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                            <h3 class="text-lg font-semibold text-brand-700 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-school-flag mr-2"></i>Identitas Dasar</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <!-- CONTENT AREA: PROFIL SEKOLAH (PHASE 3) -->
+                <main id="content-profil-sekolah" class="hidden flex-1 p-6 space-y-6 max-w-5xl mx-auto w-full pb-20">
+                    <div class="border-b border-slate-200 pb-4">
+                        <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-building-columns text-brand-600 mr-2"></i>Profil Sekolah</h2>
+                        <p class="text-slate-500 text-sm mt-1">Perbarui data identitas, kepala sekolah, dan titik koordinat peta sekolah Anda.</p>
+                    </div>
+
+                    <form id="form-profil" onsubmit="app.saveProfilSekolah(event)" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nama Sekolah <span class="text-red-500">*</span></label>
+                                <input type="text" id="prf_nama" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">NPSN (Read Only)</label>
-                                    <input type="text" id="prof_npsn" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-2 text-slate-500 focus:outline-none">
+                                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">NPSN</label>
+                                    <input type="text" id="prf_npsn" readonly class="w-full rounded-lg border bg-slate-100 border-slate-200 px-3 py-2 text-sm text-slate-500 cursor-not-allowed">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Jenjang (Read Only)</label>
-                                    <input type="text" id="prof_jenjang" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-2 text-slate-500 focus:outline-none">
+                                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Jenjang</label>
+                                    <input type="text" id="prf_jenjang" readonly class="w-full rounded-lg border bg-slate-100 border-slate-200 px-3 py-2 text-sm text-slate-500 cursor-not-allowed">
                                 </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Sekolah <span class="text-red-500">*</span></label>
-                                    <input type="text" id="prof_nama_sekolah" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nama Kepala Sekolah <span class="text-red-500">*</span></label>
+                                <input type="text" id="prf_kepsek" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">NIP Kepala Sekolah</label>
+                                <input type="text" id="prf_nip" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Kecamatan</label>
+                                <select id="prf_kecamatan" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white">
+                                    <option value="">-- Pilih Kecamatan --</option>
+                                    <option value="Komodo">Komodo</option>
+                                    <option value="Boleng">Boleng</option>
+                                    <option value="Mbeliling">Mbeliling</option>
+                                    <option value="Sano Nggoang">Sano Nggoang</option>
+                                    <option value="Lembor">Lembor</option>
+                                    <option value="Lembor Selatan">Lembor Selatan</option>
+                                    <option value="Welak">Welak</option>
+                                    <option value="Pacar">Pacar</option>
+                                    <option value="Macang Pacar">Macang Pacar</option>
+                                    <option value="Ndoso">Ndoso</option>
+                                    <option value="Kuwus">Kuwus</option>
+                                    <option value="Kuwus Barat">Kuwus Barat</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Alamat Lengkap</label>
+                                <input type="text" id="prf_alamat" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Bagian Peta & Koordinat -->
+                        <div class="border-t border-slate-200 pt-5 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">Titik Koordinat Peta Sekolah</h4>
+                                    <p class="text-xs text-slate-500">Geser marker merah pada peta atau gunakan GPS untuk mengambil koordinat presisi.</p>
+                                </div>
+                                <button type="button" onclick="app.getGpsLocation()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 border">
+                                    <i class="fa-solid fa-location-crosshairs text-brand-600"></i> Deteksi GPS Saya
+                                </button>
+                            </div>
+                            <div id="map"></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-slate-500 mb-1">Latitude</label>
+                                    <input type="text" id="prf_lat" readonly class="w-full rounded-lg border bg-slate-50 px-3 py-2 text-xs font-mono">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Berdiri</label>
-                                    <input type="number" id="prof_tahun_berdiri" placeholder="Contoh: 1980" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Telepon Sekolah</label>
-                                    <input type="text" id="prof_telp_sekolah" placeholder="Contoh: 0385-XXXXX" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                                    <label class="block text-xs text-slate-500 mb-1">Longitude</label>
+                                    <input type="text" id="prf_lng" readonly class="w-full rounded-lg border bg-slate-50 px-3 py-2 text-xs font-mono">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Data Kepala Sekolah Section -->
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                            <h3 class="text-lg font-semibold text-brand-700 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-user-tie mr-2"></i>Kepala Sekolah</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Kepala Sekolah <span class="text-red-500">*</span></label>
-                                    <input type="text" id="prof_nama_kepsek" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">NIP Kepala Sekolah</label>
-                                    <input type="text" id="prof_nip_kepsek" placeholder="Kosongkan jika non-PNS" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Status Kepala Sekolah <span class="text-red-500">*</span></label>
-                                    <select id="prof_status_kepsek" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white">
-                                        <option value="">-- Pilih Status --</option>
-                                        <option value="Definitif">Definitif</option>
-                                        <option value="Plt">Plt (Pelaksana Tugas)</option>
-                                        <option value="Plh">Plh (Pelaksana Harian)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">No. HP / WhatsApp <span class="text-red-500">*</span></label>
-                                    <input type="text" id="prof_hp_kepsek" required placeholder="Contoh: 0812xxxxxx" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Lokasi & Peta Section -->
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                            <h3 class="text-lg font-semibold text-brand-700 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-map-location-dot mr-2"></i>Alamat & Titik Koordinat</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Kecamatan <span class="text-red-500">*</span></label>
-                                    <select id="prof_kecamatan" required class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white">
-                                        <option value="">-- Memuat Kecamatan... --</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Alamat Jalan / Dusun <span class="text-red-500">*</span></label>
-                                    <input type="text" id="prof_alamat" required placeholder="Contoh: Jl. Lintas Flores KM 10, Desa Wae Kelambu" class="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Latitude (Garis Lintang) <span class="text-red-500">*</span></label>
-                                    <input type="number" step="any" id="prof_lat" required class="w-full rounded-lg border border-slate-300 px-4 py-2 bg-slate-50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Geser pin pada peta">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Longitude (Garis Bujur) <span class="text-red-500">*</span></label>
-                                    <input type="number" step="any" id="prof_lng" required class="w-full rounded-lg border border-slate-300 px-4 py-2 bg-slate-50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Geser pin pada peta">
-                                </div>
-                            </div>
-                            
-                            <!-- Leaflet Map Container -->
-                            <div class="w-full">
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="block text-sm font-medium text-slate-700">Peta Lokasi Sekolah</label>
-                                    <button type="button" onclick="app.getLocationGPS()" id="btn-get-location" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 py-1.5 px-3 rounded-md font-medium transition-colors">
-                                        <i class="fa-solid fa-location-crosshairs"></i> Deteksi GPS Saya
-                                    </button>
-                                </div>
-                                <div class="p-1 border border-slate-300 rounded-lg bg-slate-100">
-                                    <div id="map-container" class="w-full h-80 rounded-md z-0 relative"></div>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> <i>Tips: Geser pin merah (marker) pada peta ke titik lokasi gedung sekolah Anda dengan akurat.</i></p>
-                            </div>
-                        </div>
-
-                        <!-- Form Actions -->
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-                            <button type="button" onclick="app.initDashboard()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                                Batal
-                            </button>
-                            <button type="submit" id="btn-save-profil" class="bg-brand-600 hover:bg-brand-500 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-save"></i> Simpan Profil Sekolah
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" id="btn-save-profil" class="bg-brand-600 hover:bg-brand-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-md text-sm transition">
+                                Simpan Profil Sekolah
                             </button>
                         </div>
                     </form>
-                </div>
+                </main>
 
-                <!-- Modul Data Sarana -->
-                <div id="content-sarana" class="hidden p-4 md:p-6 max-w-7xl mx-auto space-y-6 pb-20">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
+                <!-- CONTENT AREA: MODUL SARANA (PHASE 4) -->
+                <main id="content-sarana" class="hidden flex-1 p-6 space-y-6 max-w-7xl mx-auto w-full pb-20">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                         <div>
-                            <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-chair text-brand-600 mr-2"></i>Data Sarana & Inventaris</h2>
-                            <p class="text-slate-500 text-sm mt-1">Kelola data meubeler, IT, buku, dan peralatan lainnya di sekolah Anda.</p>
+                            <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-boxes-stacked text-brand-600 mr-2"></i>Data Sarana Sekolah</h2>
+                            <p class="text-slate-500 text-sm mt-1">Kelola data inventaris sarana (Meubeler, IT, Pembelajaran, Buku, dll).</p>
                         </div>
-                        <button onclick="app.openFormSarana()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors flex items-center gap-2">
+                        <button onclick="app.openFormSarana()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-sm flex items-center gap-2">
                             <i class="fa-solid fa-plus"></i> Tambah Data Sarana
                         </button>
                     </div>
 
-                    <!-- Panel Form Input (Hidden by default) -->
-                    <div id="panel-form-sarana" class="hidden bg-white p-5 rounded-xl shadow-md border border-slate-200 mb-6 relative">
-                        <button type="button" onclick="app.closeFormSarana()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 hover:bg-red-50 p-2 rounded-full transition-colors">
-                            <i class="fa-solid fa-times"></i>
-                        </button>
-                        <h3 class="text-lg font-bold text-slate-700 mb-4 pb-2 border-b border-slate-100">Form Input Sarana Baru</h3>
-                        
-                        <form id="form-sarana" onsubmit="app.handleSaveSarana(event)">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                
-                                <!-- Klasifikasi -->
-                                <div class="space-y-4 lg:col-span-1 border-r-0 lg:border-r border-slate-200 pr-0 lg:pr-5">
-                                    <h4 class="font-semibold text-brand-700 text-sm uppercase tracking-wider mb-2">1. Klasifikasi Barang</h4>
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Sarana <span class="text-red-500">*</span></label>
-                                        <select id="sar_jenis" required onchange="app.updateKategoriSarana()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 bg-white">
-                                            <option value="">-- Pilih Jenis --</option>
-                                            <option value="Meubeler">Meubeler</option>
-                                            <option value="Peralatan IT">Peralatan IT</option>
-                                            <option value="Peralatan Pembelajaran">Peralatan Pembelajaran</option>
-                                            <option value="Buku">Buku & Bahan Bacaan</option>
-                                            <option value="Peralatan Olahraga">Peralatan Olahraga</option>
-                                            <option value="Peralatan UKS">Peralatan UKS</option>
-                                            <option value="Lainnya">Lainnya</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Kategori <span class="text-red-500">*</span></label>
-                                        <select id="sar_kategori" required onchange="app.updateSubkategoriSarana()" disabled class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 bg-slate-50 cursor-not-allowed">
-                                            <option value="">-- Pilih Kategori --</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Subkategori / Item <span class="text-red-500">*</span></label>
-                                        <!-- Select for predefined, Input for 'Lainnya' -->
-                                        <select id="sar_subkategori_select" required disabled class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 bg-slate-50 cursor-not-allowed">
-                                            <option value="">-- Pilih Item --</option>
-                                        </select>
-                                        <input type="text" id="sar_subkategori_input" placeholder="Ketik nama item..." class="hidden w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                    </div>
+                    <!-- Form Input Sarana (Hidden by default) -->
+                    <div id="panel-form-sarana" class="hidden bg-white rounded-2xl shadow-lg border border-slate-200 p-6 relative">
+                        <button type="button" onclick="document.getElementById('panel-form-sarana').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b">Form Inventaris Sarana</h3>
+
+                        <form id="form-sarana" onsubmit="app.saveSarana(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Jenis Sarana <span class="text-red-500">*</span></label>
+                                    <select id="srn_jenis" required onchange="app.onChangeJenisSarana()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white">
+                                        <option value="">-- Pilih Jenis --</option>
+                                        <option value="Meubeler">Meubeler</option>
+                                        <option value="Peralatan IT">Peralatan IT</option>
+                                        <option value="Peralatan Pembelajaran">Peralatan Pembelajaran</option>
+                                        <option value="Buku">Buku & Bahan Bacaan</option>
+                                        <option value="Peralatan Olahraga">Peralatan Olahraga</option>
+                                        <option value="Peralatan UKS">Peralatan UKS</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </select>
                                 </div>
-
-                                <!-- Field Khusus Buku (Hidden By Default) -->
-                                <div id="panel-khusus-buku" class="hidden lg:col-span-2 space-y-4 col-span-1 md:col-span-2 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-                                    <h4 class="font-semibold text-blue-700 text-sm uppercase tracking-wider mb-2"><i class="fa-solid fa-book mr-1"></i>2. Identitas Buku</h4>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div class="sm:col-span-2">
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Judul Buku <span class="text-red-500">*</span></label>
-                                            <input type="text" id="sar_buku_judul" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Kode / ISBN</label>
-                                            <input type="text" id="sar_buku_isbn" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Terbit</label>
-                                            <input type="number" id="sar_buku_tahun" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Pengarang</label>
-                                            <input type="text" id="sar_buku_pengarang" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Penerbit</label>
-                                            <input type="text" id="sar_buku_penerbit" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                        </div>
-                                    </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                    <select id="srn_kategori" required onchange="app.onChangeKategoriSarana()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white">
+                                        <option value="">-- Pilih Kategori Dulu --</option>
+                                    </select>
                                 </div>
-
-                                <!-- Kondisi & Upload -->
-                                <div id="panel-kondisi-sarana" class="space-y-4 lg:col-span-2 col-span-1 md:col-span-2">
-                                    <h4 class="font-semibold text-brand-700 text-sm uppercase tracking-wider mb-2" id="label-section-kondisi">2. Kondisi & Jumlah Barang</h4>
-                                    
-                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                                        <div>
-                                            <label class="block text-xs font-semibold text-slate-500 mb-1">Baik</label>
-                                            <input type="number" id="sar_baik" value="0" min="0" oninput="app.calcSaranaTotal()" required class="w-full rounded border border-emerald-300 px-2 py-1.5 text-sm focus:ring-2 focus:ring-emerald-500 bg-white font-bold text-slate-700">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-semibold text-slate-500 mb-1">Rusak Ringan</label>
-                                            <input type="number" id="sar_rr" value="0" min="0" oninput="app.calcSaranaTotal()" required class="w-full rounded border border-amber-300 px-2 py-1.5 text-sm focus:ring-2 focus:ring-amber-500 bg-white font-bold text-slate-700">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-semibold text-slate-500 mb-1">Rusak Berat</label>
-                                            <input type="number" id="sar_rb" value="0" min="0" oninput="app.calcSaranaTotal()" required class="w-full rounded border border-red-300 px-2 py-1.5 text-sm focus:ring-2 focus:ring-red-500 bg-white font-bold text-slate-700">
-                                        </div>
-                                        <div class="bg-brand-50 rounded border border-brand-200 p-2 text-center flex flex-col justify-center">
-                                            <label class="block text-[10px] font-bold text-brand-700 uppercase">Total Auto</label>
-                                            <span id="sar_total" class="text-xl font-bold text-brand-700 leading-none mt-1">0</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Usulan Kebutuhan Baru</label>
-                                            <div class="relative">
-                                                <input type="number" id="sar_kebutuhan" value="0" min="0" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 bg-white">
-                                                <span class="absolute inset-y-0 right-3 flex items-center text-xs text-slate-400">Unit</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-slate-700 mb-1">Bukti Foto (Max 5MB) <span class="text-red-500">*</span></label>
-                                            <input type="file" id="sar_foto" accept="image/jpeg, image/png, image/jpg" class="w-full text-sm text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
-                                            <p id="sar_foto_error" class="text-xs text-red-500 mt-1 hidden"></p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Tambahan</label>
-                                        <textarea id="sar_catatan" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 bg-white" placeholder="Contoh: Bantuan BOS 2023"></textarea>
-                                    </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Subkategori <span class="text-red-500">*</span></label>
+                                    <select id="srn_subkategori" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white">
+                                        <option value="">-- Pilih Subkategori Dulu --</option>
+                                    </select>
                                 </div>
                             </div>
-                            
-                            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
-                                <button type="submit" id="btn-save-sarana" class="bg-brand-600 hover:bg-brand-500 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Sarana
-                                </button>
+
+                            <!-- Blok Khusus Buku -->
+                            <div id="blok-buku" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div><label class="block text-xs font-semibold mb-1">ISBN / Kode</label><input type="text" id="srn_isbn" class="w-full border rounded-lg px-3 py-1.5 text-sm"></div>
+                                <div class="md:col-span-2"><label class="block text-xs font-semibold mb-1">Judul Buku</label><input type="text" id="srn_judul" class="w-full border rounded-lg px-3 py-1.5 text-sm"></div>
+                                <div><label class="block text-xs font-semibold mb-1">Pengarang</label><input type="text" id="srn_pengarang" class="w-full border rounded-lg px-3 py-1.5 text-sm"></div>
+                            </div>
+
+                            <!-- Kondisi Barang (Kalkulasi Otomatis Total) -->
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div>
+                                    <label class="block text-xs font-bold text-emerald-700 mb-1">Kondisi Baik</label>
+                                    <input type="number" id="srn_baik" min="0" value="0" required oninput="app.calcSaranaTotal()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-amber-700 mb-1">Rusak Ringan</label>
+                                    <input type="number" id="srn_rr" min="0" value="0" required oninput="app.calcSaranaTotal()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-red-700 mb-1">Rusak Berat</label>
+                                    <input type="number" id="srn_rb" min="0" value="0" required oninput="app.calcSaranaTotal()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-brand-700 mb-1">Total (Auto)</label>
+                                    <input type="number" id="srn_total" readonly class="w-full border rounded-lg px-3 py-2 text-sm bg-brand-50 font-bold text-brand-700" value="0">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Kebutuhan Baru</label>
+                                    <input type="number" id="srn_kebutuhan" min="0" value="0" required class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Foto / Dokumen (Max 5MB)</label>
+                                    <input type="file" id="srn_file" accept="image/*,.pdf" class="w-full border border-slate-300 rounded-lg text-xs file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Catatan</label>
+                                    <input type="text" id="srn_catatan" placeholder="Keterangan tambahan..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-2">
+                                <button type="submit" id="btn-save-sarana" class="bg-brand-600 hover:bg-brand-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-md">Simpan Data Sarana</button>
                             </div>
                         </form>
                     </div>
 
                     <!-- Tabel Data Sarana -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                            <h3 class="font-bold text-slate-700">Daftar Inventaris Terinput</h3>
-                            <div class="relative">
-                                <input type="text" placeholder="Cari barang..." class="pl-8 pr-3 py-1.5 rounded-md border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 w-48 sm:w-64">
-                                <i class="fa-solid fa-search absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider">
-                                        <th class="p-3 font-semibold border-b border-slate-200">Jenis & Kategori</th>
-                                        <th class="p-3 font-semibold border-b border-slate-200">Nama Item / Buku</th>
-                                        <th class="p-3 font-semibold border-b border-slate-200 text-center text-emerald-600">B (Baik)</th>
-                                        <th class="p-3 font-semibold border-b border-slate-200 text-center text-amber-600">RR (Ringan)</th>
-                                        <th class="p-3 font-semibold border-b border-slate-200 text-center text-red-600">RB (Berat)</th>
-                                        <th class="p-3 font-semibold border-b border-slate-200 text-center">Total</th>
-                                        <th class="p-3 font-semibold border-b border-slate-200 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabel-sarana-body" class="text-sm divide-y divide-slate-100">
-                                    <!-- Populated via JS -->
-                                    <tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-3 border-b">Jenis & Kategori</th>
+                                    <th class="p-3 border-b">Subkategori / Detail</th>
+                                    <th class="p-3 border-b text-center">Baik</th>
+                                    <th class="p-3 border-b text-center">Rusak Ringan</th>
+                                    <th class="p-3 border-b text-center">Rusak Berat</th>
+                                    <th class="p-3 border-b text-center">Total</th>
+                                    <th class="p-3 border-b text-center">Kebutuhan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-sarana-body" class="text-sm divide-y divide-slate-100">
+                                <tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data sarana...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </main>
-        </div>
-    </div>
-                <div>
-                    <h1 class="font-bold text-slate-800 leading-tight">SIPRAS MABAR</h1>
-                    <p class="text-xs text-slate-500" id="dash-user-role">Role: Loading...</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <span id="dash-user-name" class="text-sm font-medium text-slate-700 hidden sm:block">User Name</span>
-                <button onclick="app.handleLogout()" class="text-slate-500 hover:text-red-600 transition-colors flex items-center gap-2 text-sm font-medium">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Keluar</span>
-                </button>
-            </div>
-        </header>
+                </main>
 
-        <!-- Content Placeholder -->
-        <div class="p-6 flex-grow flex items-center justify-center">
-            <div class="text-center space-y-4 max-w-md">
-                <div class="text-6xl text-brand-200"><i class="fa-solid fa-building-columns"></i></div>
-                <h2 class="text-2xl font-bold text-slate-700">Selamat Datang di Dashboard!</h2>
-                <p class="text-slate-500">Anda berhasil login. Dashboard lengkap sesuai role Anda (Superadmin/Admin/Operator) akan dikembangkan pada <b>PHASE 6</b>.</p>
-                <div class="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm text-left border border-blue-100 mt-4">
-                    <p class="font-semibold mb-2">Sesi Aktif Anda:</p>
-                    <ul class="list-disc pl-5 space-y-1" id="dash-session-info">
-                        <!-- Populated by JS -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        // ==========================================
-        // KONFIGURASI SUPABASE (Ubah dengan kredensial asli Anda)
-        // ==========================================
-        var SUPABASE_URL = 'https://jiruttcarflcoepuhkiw.supabase.co'; // <--- UBAH INI
-        var SUPABASE_ANON_KEY = 'sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f'; // <--- UBAH INI
-
-        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // ==========================================
-        // APPLICATION LOGIC (Controller)
-        // ==========================================
-        var app = {
-            currentUser: null,
-            userProfile: null,
-            currentSchool: null, // Data sekolah khusus operator
-            refKecamatan: [], // Data master kecamatan
-            mapInstance: null,
-            mapMarker: null,
-
-            // --- MASTER DATA LOKAL UNTUK SARANA ---
-            masterSarana: {
-                'Meubeler': {
-                    'Meja': ['Meja siswa', 'Meja guru', 'Meja kepala sekolah', 'Meja TU', 'Meja laboratorium'],
-                    'Kursi': ['Kursi siswa', 'Kursi guru', 'Kursi kepala sekolah', 'Kursi tamu'],
-                    'Lemari': ['Lemari kelas', 'Lemari guru', 'Lemari arsip', 'Lemari perpustakaan', 'Lemari alat laboratorium'],
-                    'Rak': ['Rak buku', 'Rak dokumen', 'Rak alat'],
-                    'Papan': ['Papan tulis', 'Whiteboard', 'Papan pengumuman', 'Papan nama sekolah'],
-                    'Perabot Lainnya': ['Sofa', 'Bangku', 'Tempat duduk tunggu']
-                },
-                'Peralatan IT': {
-                    'Komputer': ['PC Desktop', 'Laptop', 'Server', 'Tablet'],
-                    'Perangkat Tampilan': ['Proyektor', 'Layar Proyektor', 'TV Cerdas (Smart TV)'],
-                    'Printer & Scanner': ['Printer Inkjet', 'Printer Laser', 'Scanner'],
-                    'Jaringan': ['Router WiFi', 'Switch/Hub'],
-                    'Audio': ['Speaker Aktif', 'Microphone', 'Sound System']
-                },
-                'Peralatan Pembelajaran': {
-                    'IPA': ['Mikroskop', 'Alat Peraga Torso', 'Kit Fisika', 'Kit Kimia', 'Globe'],
-                    'Matematika': ['Alat Peraga Bangun Ruang', 'Alat Peraga Pecahan'],
-                    'IPS': ['Peta Dunia', 'Peta Indonesia', 'Atlas']
-                },
-                'Buku': {
-                    'Buku Teks Utama': ['Buku Siswa', 'Buku Guru'],
-                    'Buku Referensi': ['Kamus', 'Ensiklopedia'],
-                    'Buku Pengayaan': ['Buku Fiksi', 'Buku Non-Fiksi']
-                },
-                'Peralatan Olahraga': {
-                    'Permainan Bola': ['Bola Sepak', 'Bola Basket', 'Bola Voli', 'Net Voli'],
-                    'Atletik': ['Matras', 'Lembing', 'Cakram', 'Tolak Peluru'],
-                    'Senam': ['Pita Senam', 'Simpai'],
-                    'Permainan Raket': ['Raket Bulutangkis', 'Net Bulutangkis', 'Shuttlecock', 'Bet Tenis Meja', 'Meja Tenis Meja']
-                },
-                'Peralatan UKS': {
-                    'Perabot UKS': ['Tempat Tidur Periksa', 'Lemari Obat', 'Timbangan Badan & Pengukur Tinggi'],
-                    'Alat Kesehatan': ['Tensimeter', 'Termometer', 'Stetoskop'],
-                    'P3K': ['Kotak P3K Lengkap', 'Tandu']
-                },
-                'Lainnya': {
-                    'Transportasi': ['Lainnya'],
-                    'Peralatan Kesenian': ['Lainnya'],
-                    'Utilitas': ['Lainnya'],
-                    'Peralatan Dapur': ['Lainnya'],
-                    'Peralatan Keselamatan': ['APAR', 'Lainnya'],
-                    'Peralatan Kebersihan': ['Lainnya'],
-                    'Kategori Lain': ['Lainnya']
-                }
-            },
-
-            // View Router sederhana
-            showView: (viewId) => {
-                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-                document.getElementById(viewId).classList.add('active');
-            },
-
-            // Utilities
-            setLoading: (btnId, isLoading, originalText) => {
-                const btn = document.getElementById(btnId);
-                if (isLoading) {
-                    btn.disabled = true;
-                    btn.innerHTML = `<div class="spinner"></div>`;
-                    btn.classList.add('opacity-75', 'cursor-not-allowed');
-                } else {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                }
-            },
-
-            showError: (elId, textId, message) => {
-                const el = document.getElementById(elId);
-                const text = document.getElementById(textId);
-                if (message) {
-                    text.textContent = message;
-                    el.classList.remove('hidden');
-                } else {
-                    el.classList.add('hidden');
-                }
-            },
-
-            togglePassword: (inputId, iconId) => {
-                const input = document.getElementById(inputId);
-                const icon = document.getElementById(iconId);
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.replace('fa-eye', 'fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.replace('fa-eye-slash', 'fa-eye');
-                }
-            },
-
-            <!-- ... existing code ... -->
-                    <!-- Menu Sarpras -->
-                    <button id="menu-btn-sarana" onclick="app.showSarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-chair w-5 text-center"></i> Data Sarana
-                        </div>
-                        <i class="fa-solid fa-lock text-xs"></i>
-                    </button>
-                    <button id="menu-btn-prasarana" onclick="app.showPrasarana()" class="menu-sarpras w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-slate-400 bg-slate-50 cursor-not-allowed border border-transparent mt-1">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-house-chimney w-5 text-center"></i> Data Prasarana
-                        </div>
-                        <i class="fa-solid fa-lock text-xs"></i>
-                    </button>
-                </nav>
-<!-- ... existing code ... -->
-                                <tbody id="tabel-sarana-body" class="text-sm divide-y divide-slate-100">
-                                    <!-- Populated via JS -->
-                                    <tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modul Data Prasarana -->
-                <div id="content-prasarana" class="hidden p-4 md:p-6 max-w-7xl mx-auto space-y-6 pb-20">
-                    <div class="flex justify-between items-center border-b border-slate-200 pb-4">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-house-chimney text-brand-600 mr-2"></i>Data Prasarana</h2>
-                            <p class="text-slate-500 text-sm mt-1">Kelola data lahan, bangunan, dan ruang milik sekolah Anda.</p>
-                        </div>
+                <!-- CONTENT AREA: MODUL PRASARANA (PHASE 5) -->
+                <main id="content-prasarana" class="hidden flex-1 p-6 space-y-6 max-w-7xl mx-auto w-full pb-20">
+                    <div class="border-b border-slate-200 pb-4">
+                        <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-house-chimney text-brand-600 mr-2"></i>Data Prasarana</h2>
+                        <p class="text-slate-500 text-sm mt-1">Kelola data bangunan, ruangan, dan fasilitas fisik sekolah.</p>
                     </div>
 
-                    <!-- Prasarana Tabs -->
-                    <div class="border-b border-slate-200">
-                        <nav class="-mb-px flex space-x-6">
-                            <button onclick="app.switchPrasaranaTab('bangunan')" id="tab-btn-bangunan" class="tab-btn border-brand-500 text-brand-600 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-building"></i> Bangunan
-                            </button>
-                            <button onclick="app.switchPrasaranaTab('ruang')" id="tab-btn-ruang" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-door-open"></i> Ruang
-                            </button>
-                            <!-- Tab Lahan & Fasilitas (Placeholder untuk MVP) -->
-                            <button onclick="app.showToast('Modul Lahan dalam pengembangan', 'info')" class="border-transparent text-slate-400 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2 cursor-not-allowed">
-                                <i class="fa-solid fa-map"></i> Lahan (Segera)
-                            </button>
-                        </nav>
+                    <!-- Navigasi Tab Prasarana -->
+                    <div class="border-b border-slate-200 flex gap-6">
+                        <button onclick="app.switchPrasaranaTab('bangunan')" id="tab-btn-bangunan" class="tab-btn border-brand-500 text-brand-600 pb-3 border-b-2 font-bold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-building"></i> Bangunan Sekolah
+                        </button>
+                        <button onclick="app.switchPrasaranaTab('ruang')" id="tab-btn-ruang" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 pb-3 border-b-2 font-semibold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-door-open"></i> Ruangan
+                        </button>
                     </div>
 
-                    <!-- TAB CONTENT: BANGUNAN -->
+                    <!-- TAB KONTEN: BANGUNAN -->
                     <div id="tab-content-bangunan" class="space-y-6">
                         <div class="flex justify-end">
-                            <button onclick="app.openFormBangunan()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2">
+                            <button onclick="app.openFormBangunan()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm flex items-center gap-2">
                                 <i class="fa-solid fa-plus"></i> Tambah Bangunan
                             </button>
                         </div>
 
-                        <!-- Form Input Bangunan -->
-                        <div id="panel-form-bangunan" class="hidden bg-white p-5 rounded-xl shadow-md border border-slate-200 relative">
-                            <button type="button" onclick="document.getElementById('panel-form-bangunan').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
-                            <h3 class="text-lg font-bold text-slate-700 mb-4 pb-2 border-b">Form Bangunan Baru</h3>
-                            
-                            <form id="form-bangunan" onsubmit="app.saveBangunan(event)">
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                    <!-- Identitas Bangunan -->
-                                    <div class="space-y-4">
-                                        <h4 class="font-semibold text-brand-700 text-xs uppercase tracking-wider">1. Identitas</h4>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Nama Bangunan <span class="text-red-500">*</span></label>
-                                            <input type="text" id="bgn_nama" required class="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label class="block text-sm font-medium mb-1">Kode</label>
-                                                <input type="text" id="bgn_kode" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium mb-1">Tahun</label>
-                                                <input type="number" id="bgn_tahun" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                            </div>
-                                        </div>
+                        <!-- Form Bangunan -->
+                        <div id="panel-form-bangunan" class="hidden bg-white p-6 rounded-2xl shadow-lg border border-slate-200 relative">
+                            <button type="button" onclick="document.getElementById('panel-form-bangunan').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b">Form Bangunan Baru</h3>
+                            <form id="form-bangunan" onsubmit="app.saveBangunan(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase mb-1">Nama Bangunan <span class="text-red-500">*</span></label>
+                                        <input type="text" id="bgn_nama" required class="w-full border rounded-lg px-3 py-2 text-sm">
                                     </div>
-                                    
-                                    <!-- Dimensi -->
-                                    <div class="space-y-4">
-                                        <h4 class="font-semibold text-brand-700 text-xs uppercase tracking-wider">2. Dimensi (Meter)</h4>
-                                        <div class="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label class="block text-sm font-medium mb-1">Panjang <span class="text-red-500">*</span></label>
-                                                <input type="number" step="0.01" id="bgn_p" required oninput="app.calcDimensi('bgn_p','bgn_l','bgn_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium mb-1">Lebar <span class="text-red-500">*</span></label>
-                                                <input type="number" step="0.01" id="bgn_l" required oninput="app.calcDimensi('bgn_p','bgn_l','bgn_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Luas (Auto - m²)</label>
-                                            <input type="text" id="bgn_luas" readonly class="w-full rounded-lg border bg-slate-100 px-3 py-2 text-sm font-bold text-brand-700" value="0">
-                                        </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase mb-1">Panjang (Meter) <span class="text-red-500">*</span></label>
+                                        <input type="number" step="0.01" id="bgn_p" required oninput="app.calcDimensi('bgn_p','bgn_l','bgn_luas')" class="w-full border rounded-lg px-3 py-2 text-sm">
                                     </div>
-
-                                    <!-- Kerusakan -->
-                                    <div class="space-y-4">
-                                        <h4 class="font-semibold text-brand-700 text-xs uppercase tracking-wider">3. Kondisi</h4>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label>
-                                            <input type="number" step="0.01" max="100" min="0" id="bgn_kerusakan" required oninput="app.previewKondisi('bgn_kerusakan','bgn_kondisi_preview')" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Prediksi Kondisi (Auto Sistem)</label>
-                                            <div id="bgn_kondisi_preview" class="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm font-bold text-slate-500 text-center">-</div>
-                                        </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase mb-1">Lebar (Meter) <span class="text-red-500">*</span></label>
+                                        <input type="number" step="0.01" id="bgn_l" required oninput="app.calcDimensi('bgn_p','bgn_l','bgn_luas')" class="w-full border rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase mb-1">Luas (Auto - m²)</label>
+                                        <input type="text" id="bgn_luas" readonly class="w-full border bg-slate-100 font-bold text-brand-700 px-3 py-2 text-sm" value="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase mb-1">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label>
+                                        <input type="number" step="0.01" min="0" max="100" id="bgn_kerusakan" required oninput="app.previewKondisi('bgn_kerusakan','bgn_kondisi_preview')" class="w-full border rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase mb-1">Prediksi Kondisi (Sistem)</label>
+                                        <div id="bgn_kondisi_preview" class="w-full border rounded-lg px-3 py-2 text-sm font-bold text-center bg-slate-50 text-slate-500">-</div>
                                     </div>
                                 </div>
-                                <div class="mt-4 flex justify-end">
-                                    <button type="submit" id="btn-save-bangunan" class="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md">Simpan Bangunan</button>
+                                <div class="flex justify-end pt-2">
+                                    <button type="submit" id="btn-save-bangunan" class="bg-brand-600 text-white font-bold px-6 py-2 rounded-xl text-sm shadow-md">Simpan Bangunan</button>
                                 </div>
                             </form>
                         </div>
 
                         <!-- Tabel Bangunan -->
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                             <table class="w-full text-left">
-                                <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+                                <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase tracking-wider">
                                     <tr>
                                         <th class="p-3 border-b">Nama Bangunan</th>
                                         <th class="p-3 border-b text-center">Luas (m²)</th>
-                                        <th class="p-3 border-b text-center">Kerusakan (%)</th>
-                                        <th class="p-3 border-b text-center">Kondisi (DB)</th>
-                                        <th class="p-3 border-b text-center">Aksi</th>
+                                        <th class="p-3 border-b text-center">Kerusakan</th>
+                                        <th class="p-3 border-b text-center">Kondisi (DB Trigger)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabel-bangunan-body" class="text-sm divide-y divide-slate-100">
-                                    <tr><td colspan="5" class="p-8 text-center text-slate-400">Belum ada data bangunan.</td></tr>
+                                    <tr><td colspan="4" class="p-6 text-center text-slate-400">Belum ada data bangunan.</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- TAB CONTENT: RUANG -->
+                    <!-- TAB KONTEN: RUANG -->
                     <div id="tab-content-ruang" class="hidden space-y-6">
-                         <div class="flex justify-end">
-                            <button onclick="app.openFormRuang()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                        <div class="flex justify-end">
+                            <button onclick="app.openFormRuang()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm flex items-center gap-2">
                                 <i class="fa-solid fa-plus"></i> Tambah Ruang
                             </button>
                         </div>
-                        
-                        <!-- Form Input Ruang -->
-                        <div id="panel-form-ruang" class="hidden bg-white p-5 rounded-xl shadow-md border border-slate-200 relative">
-                            <button type="button" onclick="document.getElementById('panel-form-ruang').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
-                            <h3 class="text-lg font-bold text-slate-700 mb-4 pb-2 border-b">Form Ruangan Baru</h3>
-                            
-                            <form id="form-ruang" onsubmit="app.saveRuang(event)">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Form Ruang -->
+                        <div id="panel-form-ruang" class="hidden bg-white p-6 rounded-2xl shadow-lg border border-slate-200 relative">
+                            <button type="button" onclick="document.getElementById('panel-form-ruang').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b">Form Ruangan Baru</h3>
+                            <form id="form-ruang" onsubmit="app.saveRuang(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-medium mb-1">Pilih Bangunan Induk <span class="text-red-500">*</span></label>
-                                        <select id="rng_bangunan_id" required class="w-full rounded-lg border px-3 py-2 text-sm bg-white">
+                                        <label class="block text-xs font-bold uppercase mb-1">Pilih Bangunan Induk <span class="text-red-500">*</span></label>
+                                        <select id="rng_bangunan_id" required class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
                                             <option value="">-- Memuat Bangunan... --</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium mb-1">Jenis Ruang <span class="text-red-500">*</span></label>
-                                        <select id="rng_jenis" required class="w-full rounded-lg border px-3 py-2 text-sm bg-white">
+                                        <label class="block text-xs font-bold uppercase mb-1">Jenis Ruangan <span class="text-red-500">*</span></label>
+                                        <select id="rng_jenis" required class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
                                             <option value="">-- Pilih Jenis Ruang --</option>
                                             <option value="Ruang Kelas">Ruang Kelas</option>
                                             <option value="Perpustakaan">Perpustakaan</option>
                                             <option value="Laboratorium IPA">Laboratorium IPA</option>
                                             <option value="Ruang Guru">Ruang Guru</option>
-                                            <option value="Toilet">Toilet / WC</option>
+                                            <option value="Toilet / WC">Toilet / WC</option>
                                         </select>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Panjang (m)</label>
-                                            <input type="number" step="0.01" id="rng_p" required oninput="app.calcDimensi('rng_p','rng_l','rng_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Lebar (m)</label>
-                                            <input type="number" step="0.01" id="rng_l" required oninput="app.calcDimensi('rng_p','rng_l','rng_luas')" class="w-full rounded-lg border px-3 py-2 text-sm">
-                                        </div>
+                                        <div><label class="block text-xs font-bold mb-1">Panjang (m)</label><input type="number" step="0.01" id="rng_p" required oninput="app.calcDimensi('rng_p','rng_l','rng_luas')" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+                                        <div><label class="block text-xs font-bold mb-1">Lebar (m)</label><input type="number" step="0.01" id="rng_l" required oninput="app.calcDimensi('rng_p','rng_l','rng_luas')" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Luas (Auto - m²)</label>
-                                            <input type="text" id="rng_luas" readonly class="w-full rounded-lg border bg-slate-100 px-3 py-2 text-sm font-bold text-brand-700" value="0">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Tingkat Kerusakan (%)</label>
-                                            <input type="number" step="0.01" max="100" min="0" id="rng_kerusakan" required class="w-full rounded-lg border px-3 py-2 text-sm">
-                                        </div>
+                                        <div><label class="block text-xs font-bold mb-1">Luas (Auto - m²)</label><input type="text" id="rng_luas" readonly class="w-full border bg-slate-100 font-bold text-brand-700 px-3 py-2 text-sm" value="0"></div>
+                                        <div><label class="block text-xs font-bold mb-1">Kerusakan (%)</label><input type="number" step="0.01" min="0" max="100" id="rng_kerusakan" required class="w-full border rounded-lg px-3 py-2 text-sm"></div>
                                     </div>
                                 </div>
-                                <div class="mt-4 flex justify-end">
-                                    <button type="submit" id="btn-save-ruang" class="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md">Simpan Ruang</button>
+                                <div class="flex justify-end pt-2">
+                                    <button type="submit" id="btn-save-ruang" class="bg-brand-600 text-white font-bold px-6 py-2 rounded-xl text-sm shadow-md">Simpan Ruangan</button>
                                 </div>
                             </form>
                         </div>
+
                         <!-- Tabel Ruang -->
-                        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                             <table class="w-full text-left">
-                                <thead class="bg-slate-100 text-xs uppercase">
+                                <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase tracking-wider">
                                     <tr>
-                                        <th class="p-3 border-b">Induk Bangunan</th>
+                                        <th class="p-3 border-b">Bangunan Induk</th>
                                         <th class="p-3 border-b">Jenis Ruang</th>
                                         <th class="p-3 border-b text-center">Luas</th>
-                                        <th class="p-3 border-b text-center">Kondisi (DB)</th>
+                                        <th class="p-3 border-b text-center">Kondisi (DB Trigger)</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabel-ruang-body" class="text-sm divide-y">
-                                    <tr><td colspan="4" class="p-8 text-center text-slate-400">Belum ada data ruang.</td></tr>
+                                <tbody id="tabel-ruang-body" class="text-sm divide-y divide-slate-100">
+                                    <tr><td colspan="4" class="p-6 text-center text-slate-400">Belum ada data ruangan.</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
+
+            </div>
         </div>
     </div>
 
-    <!-- Toast Notification Container (Custom UI instead of Alert) -->
+    <!-- TOAST NOTIFICATION CONTAINER (Custom UI replacement for alerts) -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
-<!-- ... existing code ... -->
-                    // Kembalikan event klik asli untuk menu sarana
-                    document.getElementById('menu-btn-sarana').onclick = () => app.showSarana();
-                    document.getElementById('menu-btn-prasarana').onclick = () => app.showPrasarana();
+
+    <!-- MAIN JAVASCRIPT APP LOGIC -->
+    <script>
+        // Konfigurasi Supabase Anda (Harap sesuaikan jika diperlukan)
+        var SUPABASE_URL = "https://YOUR_SUPABASE_URL.supabase.co";
+        var SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        var app = {
+            currentUser: null,
+            currentSchool: null,
+            map: null,
+            marker: null,
+
+            init: async () => {
+                // Periksa sesi aktif pada local storage supabase
+                var session = await supabaseClient.auth.getSession();
+                if(session.data.session) {
+                    await app.fetchUserProfile(session.data.session.user.id);
+                } else {
+                    app.switchView('landing');
                 }
             },
-<!-- ... existing code ... -->
-            // --- FUNGSI BARU PHASE 5: MODUL PRASARANA --- //
+
+            switchView: (viewName) => {
+                document.getElementById('view-landing').classList.add('hidden');
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-change-password').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.add('hidden');
+
+                if(viewName === 'landing') document.getElementById('view-landing').classList.remove('hidden');
+                if(viewName === 'login') document.getElementById('view-login').classList.remove('hidden');
+                if(viewName === 'change-password') document.getElementById('view-change-password').classList.remove('hidden');
+                if(viewName === 'dashboard') {
+                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    // Inisialisasi peta jika view dashboard aktif
+                    setTimeout(() => { app.initMap(); }, 200);
+                }
+            },
+
+            showLoginModal: () => document.getElementById('view-login').classList.remove('hidden'),
+            hideLoginModal: () => document.getElementById('view-login').classList.add('hidden'),
+            toggleSidebar: () => {
+                var sidebar = document.getElementById('sidebar');
+                var overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            },
 
             showToast: (message, type = 'success') => {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                const colors = type === 'success' ? 'bg-emerald-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
-                const icon = type === 'success' ? 'fa-check' : (type === 'error' ? 'fa-xmark' : 'fa-info');
+                var container = document.getElementById('toast-container');
+                var toast = document.createElement('div');
+                var colors = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+                var icon = type === 'success' ? 'fa-check' : (type === 'error' ? 'fa-xmark' : 'fa-info');
                 
-                toast.className = `${colors} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0`;
-                toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="text-sm font-medium">${message}</span>`;
-                
+                toast.className = `${colors} text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 text-sm font-medium`;
+                toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
                 container.appendChild(toast);
                 
-                // Animate In
                 setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
-                
-                // Animate Out & Remove
                 setTimeout(() => {
                     toast.classList.add('opacity-0', 'translate-x-10');
                     setTimeout(() => { toast.remove(); }, 300);
                 }, 3500);
             },
 
-            showPrasarana: () => {
-                if(!app.currentSchool?.profil_lengkap) return; 
-                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
+            // --- AUTHENTICATION ---
+            handleLogin: async (e) => {
+                e.preventDefault();
+                var username = document.getElementById('login-username').value.trim();
+                var password = document.getElementById('login-password').value;
+                var errBox = document.getElementById('login-error');
+                errBox.classList.add('hidden');
 
+                try {
+                    // Workaround login menggunakan username lewat email dummy
+                    var emailDummy = username + "@sipras.local";
+                    var { data, error } = await supabaseClient.auth.signInWithPassword({ email: emailDummy, password: password });
+                    if(error) throw error;
+
+                    await app.fetchUserProfile(data.user.id);
+                } catch(err) {
+                    errBox.innerText = "Login Gagal: Periksa kembali username dan password Anda.";
+                    errBox.classList.remove('hidden');
+                }
+            },
+
+            fetchUserProfile: async (authUserId) => {
+                try {
+                    var { data: userProfile, error } = await supabaseClient.from('users').select('*').eq('id', authUserId).single();
+                    if(error) throw error;
+                    app.currentUser = userProfile;
+
+                    if(userProfile.must_change_password) {
+                        app.switchView('change-password');
+                        return;
+                    }
+
+                    if(userProfile.school_id) {
+                        var { data: schoolData } = await supabaseClient.from('schools').select('*').eq('id', userProfile.school_id).single();
+                        app.currentSchool = schoolData;
+                    }
+
+                    app.switchView('dashboard');
+                    app.renderDashboardHome();
+                } catch(err) {
+                    app.showToast("Gagal memuat profil pengguna: " + err.message, "error");
+                }
+            },
+
+            handleUpdatePassword: async (e) => {
+                e.preventDefault();
+                var newPwd = document.getElementById('new-password').value;
+                try {
+                    var { error } = await supabaseClient.auth.updateUser({ password: newPwd });
+                    if(error) throw error;
+                    
+                    await supabaseClient.from('users').update({ must_change_password: false }).eq('id', app.currentUser.id);
+                    app.showToast("Password berhasil diperbarui!");
+                    await app.fetchUserProfile(app.currentUser.id);
+                } catch(err) {
+                    app.showToast("Gagal mengubah password: " + err.message, "error");
+                }
+            },
+
+            handleLogout: async () => {
+                await supabaseClient.auth.signOut();
+                app.currentUser = null;
+                app.currentSchool = null;
+                app.switchView('landing');
+                app.showToast("Berhasil keluar sistem", "info");
+            },
+
+            // --- DASHBOARD RENDER & NAVIGATION ---
+            renderDashboardHome: () => {
+                if(!app.currentSchool) return;
+                document.getElementById('sidebar-user-name').innerText = app.currentUser.nama;
+                document.getElementById('sidebar-school-name').innerText = app.currentSchool.nama_sekolah;
+                document.getElementById('topbar-school-label').innerText = app.currentSchool.nama_sekolah;
+                
+                document.getElementById('welcome-school-title').innerText = app.currentSchool.nama_sekolah;
+                document.getElementById('welcome-school-subtitle').innerText = `NPSN: ${app.currentSchool.npsn} | Jenjang: ${app.currentSchool.jenjang} | Kec. ${app.currentSchool.kecamatan || '-'}`;
+                
+                var isComplete = app.currentSchool.profil_lengkap;
+                var statusLbl = document.getElementById('lbl-status-profil');
+                var warningBanner = document.getElementById('banner-warning-profil');
+                
+                if(isComplete) {
+                    statusLbl.innerText = "LENGKAP (100%)";
+                    warningBanner.classList.add('hidden');
+                    app.unlockMenuSarpras(true);
+                } else {
+                    statusLbl.innerText = "BELUM LENGKAP";
+                    warningBanner.classList.remove('hidden');
+                    app.unlockMenuSarpras(false);
+                }
+            },
+
+            unlockMenuSarpras: (isUnlocked) => {
+                var menuBtns = document.querySelectorAll('.menu-sarpras');
+                menuBtns.forEach(btn => {
+                    if(isUnlocked) {
+                        btn.classList.remove('cursor-not-allowed', 'text-slate-400', 'bg-slate-800/40');
+                        btn.classList.add('text-slate-200', 'hover:bg-slate-800');
+                        var lockIcon = btn.querySelector('.fa-lock');
+                        if(lockIcon) lockIcon.remove();
+                    }
+                });
+                
+                // Set click event handler
+                document.getElementById('menu-btn-sarana').onclick = () => app.showSarana();
+                document.getElementById('menu-btn-prasarana').onclick = () => app.showPrasarana();
+            },
+
+            showDashboardHome: () => {
+                document.getElementById('content-profil-sekolah').classList.add('hidden');
+                document.getElementById('content-sarana').classList.add('hidden');
+                document.getElementById('content-prasarana').classList.add('hidden');
+                document.getElementById('content-dashboard-home').classList.remove('hidden');
+            },
+
+            // --- PROFIL SEKOLAH & MAPS (PHASE 3) ---
+            showProfilSekolah: () => {
+                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
+                document.getElementById('content-dashboard-home').classList.add('hidden');
+                document.getElementById('content-sarana').classList.add('hidden');
+                document.getElementById('content-prasarana').classList.add('hidden');
+                document.getElementById('content-profil-sekolah').classList.remove('hidden');
+
+                if(app.currentSchool) {
+                    document.getElementById('prf_nama').value = app.currentSchool.nama_sekolah || '';
+                    document.getElementById('prf_npsn').value = app.currentSchool.npsn || '';
+                    document.getElementById('prf_jenjang').value = app.currentSchool.jenjang || '';
+                    document.getElementById('prf_kepsek').value = app.currentSchool.nama_kepala_sekolah || '';
+                    document.getElementById('prf_nip').value = app.currentSchool.nip_kepala_sekolah || '';
+                    document.getElementById('prf_kecamatan').value = app.currentSchool.kecamatan || '';
+                    document.getElementById('prf_alamat').value = app.currentSchool.alamat || '';
+                    document.getElementById('prf_lat').value = app.currentSchool.latitude || '-8.55';
+                    document.getElementById('prf_lng').value = app.currentSchool.longitude || '120.01';
+                }
+                setTimeout(() => { if(app.map) app.map.invalidateSize(); }, 300);
+            },
+
+            initMap: () => {
+                if(app.map) return;
+                var lat = app.currentSchool?.latitude || -8.5515;
+                var lng = app.currentSchool?.longitude || 120.0125;
+
+                app.map = L.map('map').setView([lat, lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(app.map);
+
+                app.marker = L.marker([lat, lng], { draggable: true }).addTo(app.map);
+                app.marker.on('dragend', (e) => {
+                    var pos = app.marker.getLatLng();
+                    document.getElementById('prf_lat').value = pos.lat.toFixed(6);
+                    document.getElementById('prf_lng').value = pos.lng.toFixed(6);
+                });
+            },
+
+            getGpsLocation: () => {
+                if(navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        var lat = pos.coords.latitude;
+                        var lng = pos.coords.longitude;
+                        document.getElementById('prf_lat').value = lat.toFixed(6);
+                        document.getElementById('prf_lng').value = lng.toFixed(6);
+                        if(app.map) {
+                            app.map.setView([lat, lng], 16);
+                            app.marker.setLatLng([lat, lng]);
+                        }
+                        app.showToast("GPS berhasil dideteksi!");
+                    }, () => { app.showToast("Gagal mengambil GPS browser.", "error"); });
+                } else { app.showToast("GPS tidak didukung browser Anda.", "error"); }
+            },
+
+            saveProfilSekolah: async (e) => {
+                e.preventDefault();
+                var btn = document.getElementById('btn-save-profil');
+                btn.innerText = "Menyimpan...";
+
+                var payload = {
+                    nama_sekolah: document.getElementById('prf_nama').value,
+                    nama_kepala_sekolah: document.getElementById('prf_kepsek').value,
+                    nip_kepala_sekolah: document.getElementById('prf_nip').value,
+                    kecamatan: document.getElementById('prf_kecamatan').value,
+                    alamat: document.getElementById('prf_alamat').value,
+                    latitude: parseFloat(document.getElementById('prf_lat').value) || null,
+                    longitude: parseFloat(document.getElementById('prf_lng').value) || null,
+                    profil_lengkap: true
+                };
+
+                try {
+                    var { error } = await supabaseClient.from('schools').update(payload).eq('id', app.currentSchool.id);
+                    if(error) throw error;
+                    
+                    app.currentSchool = { ...app.currentSchool, ...payload };
+                    app.showToast("Profil sekolah berhasil disimpan!");
+                    app.renderDashboardHome();
+                    app.showDashboardHome();
+                } catch(err) {
+                    app.showToast("Gagal menyimpan profil: " + err.message, "error");
+                } finally {
+                    btn.innerText = "Simpan Profil Sekolah";
+                }
+            },
+
+            // --- MODUL SARANA (PHASE 4) ---
+            masterSarana: {
+                "Meubeler": {
+                    "Meja": ["Meja siswa", "Meja guru", "Meja kepala sekolah", "Meja TU", "Meja laboratorium"],
+                    "Kursi": ["Kursi siswa", "Kursi guru", "Kursi kepala sekolah", "Kursi tamu"],
+                    "Lemari": ["Lemari kelas", "Lemari guru", "Lemari arsip", "Lemari perpustakaan"],
+                    "Papan": ["Papan tulis", "Whiteboard", "Papan pengumuman"]
+                },
+                "Peralatan IT": {
+                    "Komputer": ["Komputer PC Desktop", "Laptop Guru", "Laptop Siswa", "Server Sekolah"],
+                    "Perangkat Tampilan": ["Proyektor / Infocus", "Smart TV", "Layar Projektor"],
+                    "Printer": ["Printer Standard", "Printer All-in-One", "Scanner"]
+                },
+                "Peralatan Pembelajaran": {
+                    "IPA": ["Kit Fisika", "Kit Biologi", "Kit Kimia", "Model Kerangka Manusia"],
+                    "Matematika": ["Alat Peraga Geometri", "Mistar Ukur Besar", "Abakus"],
+                    "IPS": ["Peta Dunia / Indonesia", "Globe Bola Dunia"]
+                },
+                "Buku": {
+                    "Buku Teks Utama": ["Buku Paket Siswa Kelas 1", "Buku Paket Siswa Kelas 2", "Buku Paket Siswa Kelas 3", "Buku Paket Siswa Kelas 4", "Buku Paket Siswa Kelas 5", "Buku Paket Siswa Kelas 6"],
+                    "Buku Referensi": ["Ensiklopedia", "Kamus Bahasa", "Atlas Indonesia"]
+                }
+            },
+
+            showSarana: () => {
+                if(!app.currentSchool?.profil_lengkap) return;
+                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
+                document.getElementById('content-dashboard-home').classList.add('hidden');
+                document.getElementById('content-profil-sekolah').classList.add('hidden');
+                document.getElementById('content-prasarana').classList.add('hidden');
+                document.getElementById('content-sarana').classList.remove('hidden');
+                app.loadSarana();
+            },
+
+            onChangeJenisSarana: () => {
+                var jenis = document.getElementById('srn_jenis').value;
+                var katSelect = document.getElementById('srn_kategori');
+                katSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+                
+                var blokBuku = document.getElementById('blok-buku');
+                if(jenis === 'Buku') blokBuku.classList.remove('hidden');
+                else blokBuku.classList.add('hidden');
+
+                var cats = app.masterSarana[jenis];
+                if(cats) {
+                    for(var k in cats) {
+                        katSelect.innerHTML += `<option value="${k}">${k}</option>`;
+                    }
+                } else {
+                    katSelect.innerHTML += `<option value="Lainnya">Lainnya</option>`;
+                }
+                app.onChangeKategoriSarana();
+            },
+
+            onChangeKategoriSarana: () => {
+                var jenis = document.getElementById('srn_jenis').value;
+                var kat = document.getElementById('srn_kategori').value;
+                var subSelect = document.getElementById('srn_subkategori');
+                subSelect.innerHTML = '<option value="">-- Pilih Subkategori --</option>';
+
+                if(app.masterSarana[jenis]?.[kat]) {
+                    app.masterSarana[jenis][kat].forEach(sub => {
+                        subSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+                    });
+                } else {
+                    subSelect.innerHTML += `<option value="Umum">Umum</option>`;
+                }
+            },
+
+            calcSaranaTotal: () => {
+                var b = parseInt(document.getElementById('srn_baik').value) || 0;
+                var rr = parseInt(document.getElementById('srn_rr').value) || 0;
+                var rb = parseInt(document.getElementById('srn_rb').value) || 0;
+                document.getElementById('srn_total').value = b + rr + rb;
+            },
+
+            openFormSarana: () => {
+                document.getElementById('panel-form-sarana').classList.remove('hidden');
+                document.getElementById('form-sarana').reset();
+                document.getElementById('srn_total').value = '0';
+            },
+
+            saveSarana: async (e) => {
+                e.preventDefault();
+                var btn = document.getElementById('btn-save-sarana');
+                btn.innerText = "Menyimpan...";
+
+                var fileInput = document.getElementById('srn_file');
+                var fotoUrl = null;
+
+                try {
+                    if(fileInput.files.length > 0) {
+                        var file = fileInput.files[0];
+                        if(file.size > 5 * 1024 * 1024) throw new Error("Ukuran file maksimal 5 MB!");
+                        var filePath = `${app.currentSchool.id}/sarana/${Date.now()}_${file.name}`;
+                        var uploadRes = await supabaseClient.storage.from('school-photos').upload(filePath, file);
+                        if(uploadRes.error) throw uploadRes.error;
+                        
+                        var publicUrlRes = supabaseClient.storage.from('school-photos').getPublicUrl(filePath);
+                        fotoUrl = publicUrlRes.data.publicUrl;
+                    }
+
+                    var payload = {
+                        school_id: app.currentSchool.id,
+                        jenis: document.getElementById('srn_jenis').value,
+                        kategori: document.getElementById('srn_kategori').value,
+                        subkategori: document.getElementById('srn_subkategori').value,
+                        kondisi_baik: parseInt(document.getElementById('srn_baik').value) || 0,
+                        rusak_ringan: parseInt(document.getElementById('srn_rr').value) || 0,
+                        rusak_berat: parseInt(document.getElementById('srn_rb').value) || 0,
+                        kebutuhan_baru: parseInt(document.getElementById('srn_kebutuhan').value) || 0,
+                        foto_url: fotoUrl,
+                        catatan: document.getElementById('srn_catatan').value
+                    };
+
+                    if(payload.jenis === 'Buku') {
+                        payload.buku_isbn = document.getElementById('srn_isbn').value;
+                        payload.buku_judul = document.getElementById('srn_judul').value;
+                        payload.buku_pengarang = document.getElementById('srn_pengarang').value;
+                    }
+
+                    var { error } = await supabaseClient.from('sarana').insert([payload]);
+                    if(error) throw error;
+
+                    app.showToast("Data sarana berhasil disimpan!");
+                    document.getElementById('panel-form-sarana').classList.add('hidden');
+                    app.loadSarana();
+                } catch(err) {
+                    app.showToast("Gagal simpan sarana: " + err.message, "error");
+                } finally {
+                    btn.innerText = "Simpan Data Sarana";
+                }
+            },
+
+            loadSarana: async () => {
+                var tbody = document.getElementById('tabel-sarana-body');
+                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
+                try {
+                    var { data, error } = await supabaseClient.from('sarana').select('*').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
+                    if(error) throw error;
+
+                    if(data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">Belum ada data sarana.</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    data.forEach(s => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 border-b font-medium text-slate-800">${s.jenis} <br><span class="text-xs font-normal text-slate-500">${s.kategori}</span></td>
+                                <td class="p-3 border-b text-slate-600 text-xs">${s.subkategori} ${s.buku_judul ? '<br><b>Judul:</b> ' + s.buku_judul : ''}</td>
+                                <td class="p-3 border-b text-center font-semibold text-emerald-600">${s.kondisi_baik}</td>
+                                <td class="p-3 border-b text-center font-semibold text-amber-600">${s.rusak_ringan}</td>
+                                <td class="p-3 border-b text-center font-semibold text-red-600">${s.rusak_berat}</td>
+                                <td class="p-3 border-b text-center font-bold text-slate-800 bg-slate-50">${s.total}</td>
+                                <td class="p-3 border-b text-center font-semibold text-brand-600">${s.kebutuhan_baru}</td>
+                            </tr>
+                        `;
+                    });
+                } catch(err) { console.error(err); }
+            },
+
+            // --- MODUL PRASARANA (PHASE 5) ---
+            showPrasarana: () => {
+                if(!app.currentSchool?.profil_lengkap) return;
+                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
                 document.getElementById('content-dashboard-home').classList.add('hidden');
                 document.getElementById('content-profil-sekolah').classList.add('hidden');
                 document.getElementById('content-sarana').classList.add('hidden');
                 document.getElementById('content-prasarana').classList.remove('hidden');
-
-                // Load default tab (Bangunan)
                 app.switchPrasaranaTab('bangunan');
             },
 
             switchPrasaranaTab: (tabId) => {
-                // UI Tab Buttons
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.remove('border-brand-500', 'text-brand-600');
-                    btn.classList.add('border-transparent', 'text-slate-500');
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('border-brand-500', 'text-brand-600', 'font-bold');
+                    b.classList.add('border-transparent', 'text-slate-500', 'font-semibold');
                 });
-                const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-                if(activeBtn) {
-                    activeBtn.classList.remove('border-transparent', 'text-slate-500');
-                    activeBtn.classList.add('border-brand-500', 'text-brand-600');
-                }
-
-                // UI Tab Content
+                document.getElementById(`tab-btn-${tabId}`).classList.add('border-brand-500', 'text-brand-600', 'font-bold');
                 document.getElementById('tab-content-bangunan').classList.add('hidden');
                 document.getElementById('tab-content-ruang').classList.add('hidden');
-                
                 document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
 
-                // Fetch Data berdasarkan tab aktif
                 if(tabId === 'bangunan') app.loadBangunan();
                 if(tabId === 'ruang') { app.loadBangunanDropdown(); app.loadRuang(); }
             },
 
-            calcDimensi: (idP, idL, idHasil) => {
-                const p = parseFloat(document.getElementById(idP).value) || 0;
-                const l = parseFloat(document.getElementById(idL).value) || 0;
-                document.getElementById(idHasil).value = (p * l).toFixed(2);
+            calcDimensi: (idP, idL, idOut) => {
+                var p = parseFloat(document.getElementById(idP).value) || 0;
+                var l = parseFloat(document.getElementById(idL).value) || 0;
+                document.getElementById(idOut).value = (p * l).toFixed(2);
             },
 
-            previewKondisi: (idPersen, idHasil) => {
-                const val = parseFloat(document.getElementById(idPersen).value) || 0;
-                const el = document.getElementById(idHasil);
-                if(val <= 0) { el.innerText = "Baik"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-emerald-50 text-emerald-600 border-emerald-200"; }
-                else if(val <= 30) { el.innerText = "Rusak Ringan"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-amber-50 text-amber-600 border-amber-200"; }
-                else if(val <= 46) { el.innerText = "Rusak Sedang"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-orange-50 text-orange-600 border-orange-200"; }
-                else if(val <= 85) { el.innerText = "Rusak Berat"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-red-50 text-red-600 border-red-200"; }
-                else { el.innerText = "Rusak Total"; el.className = "w-full rounded-lg border px-3 py-2 text-sm font-bold text-center bg-red-100 text-red-700 border-red-300"; }
+            previewKondisi: (idPersen, idOut) => {
+                var val = parseFloat(document.getElementById(idPersen).value) || 0;
+                var el = document.getElementById(idOut);
+                if(val === 0) { el.innerText = "Baik"; el.className = "w-full border rounded-lg px-3 py-2 text-sm font-bold text-center bg-emerald-50 text-emerald-600"; }
+                else if(val <= 30) { el.innerText = "Rusak Ringan"; el.className = "w-full border rounded-lg px-3 py-2 text-sm font-bold text-center bg-amber-50 text-amber-600"; }
+                else if(val <= 46) { el.innerText = "Rusak Sedang"; el.className = "w-full border rounded-lg px-3 py-2 text-sm font-bold text-center bg-orange-50 text-orange-600"; }
+                else if(val <= 85) { el.innerText = "Rusak Berat"; el.className = "w-full border rounded-lg px-3 py-2 text-sm font-bold text-center bg-red-50 text-red-600"; }
+                else { el.innerText = "Rusak Total"; el.className = "w-full border rounded-lg px-3 py-2 text-sm font-bold text-center bg-red-100 text-red-700"; }
             },
 
             openFormBangunan: () => {
@@ -988,64 +1056,56 @@
 
             saveBangunan: async (e) => {
                 e.preventDefault();
-                app.setLoading('btn-save-bangunan', true, 'Menyimpan...');
+                var btn = document.getElementById('btn-save-bangunan');
+                btn.innerText = "Menyimpan...";
 
-                const payload = {
+                var payload = {
                     school_id: app.currentSchool.id,
                     nama_bangunan: document.getElementById('bgn_nama').value,
-                    kode_bangunan: document.getElementById('bgn_kode').value,
-                    tahun_pembangunan: document.getElementById('bgn_tahun').value || null,
                     panjang: parseFloat(document.getElementById('bgn_p').value) || 0,
                     lebar: parseFloat(document.getElementById('bgn_l').value) || 0,
                     tingkat_kerusakan: parseFloat(document.getElementById('bgn_kerusakan').value) || 0
-                    // Catatan: 'luas_bangunan' dan 'kondisi' tidak kita kirim. Mereka dihitung OTOMATIS oleh DB!
                 };
 
                 try {
-                    const { error } = await supabase.from('prasarana_bangunan').insert([payload]);
-                    if (error) throw error;
-                    app.showToast("Data Bangunan berhasil disimpan!");
+                    var { error } = await supabaseClient.from('prasarana_bangunan').insert([payload]);
+                    if(error) throw error;
+                    app.showToast("Data bangunan berhasil disimpan!");
                     document.getElementById('panel-form-bangunan').classList.add('hidden');
                     app.loadBangunan();
-                } catch (error) {
-                    app.showToast("Gagal menyimpan DB: " + error.message, "error");
+                } catch(err) {
+                    app.showToast("Gagal simpan bangunan: " + err.message, "error");
                 } finally {
-                    app.setLoading('btn-save-bangunan', false, 'Simpan Bangunan');
+                    btn.innerText = "Simpan Bangunan";
                 }
             },
 
             loadBangunan: async () => {
-                const tbody = document.getElementById('tabel-bangunan-body');
-                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
+                var tbody = document.getElementById('tabel-bangunan-body');
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
                 try {
-                    const { data, error } = await supabase.from('prasarana_bangunan').select('*').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
-                    if (error) throw error;
-                    
-                    if(data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400">Belum ada data bangunan.</td></tr>';
-                        return;
-                    }
+                    var { data, error } = await supabaseClient.from('prasarana_bangunan').select('*').eq('school_id', app.currentSchool.id);
+                    if(error) throw error;
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400">Belum ada data bangunan.</td></tr>'; return; }
                     
                     tbody.innerHTML = '';
                     data.forEach(b => {
-                        // Perhatikan bahwa b.luas_bangunan dan b.kondisi berasal murni dari Database (bukan kalkulasi UI)
                         tbody.innerHTML += `
                             <tr class="hover:bg-slate-50">
-                                <td class="p-3 border-b font-medium">${b.nama_bangunan}<br><span class="text-xs text-slate-400">Kode: ${b.kode_bangunan || '-'}</span></td>
+                                <td class="p-3 border-b font-medium text-slate-800">${b.nama_bangunan}</td>
                                 <td class="p-3 border-b text-center font-bold text-slate-700">${b.luas_bangunan}</td>
                                 <td class="p-3 border-b text-center">${b.tingkat_kerusakan}%</td>
-                                <td class="p-3 border-b text-center"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">${b.kondisi}</span></td>
-                                <td class="p-3 border-b text-center"><button class="text-red-500 hover:text-red-700" onclick="app.showToast('Fitur hapus dinonaktifkan di demo','info')"><i class="fa-solid fa-trash"></i></button></td>
+                                <td class="p-3 border-b text-center"><span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg font-semibold border border-blue-200">${b.kondisi}</span></td>
                             </tr>
                         `;
                     });
-                } catch (error) { console.error(error); }
+                } catch(err) { console.error(err); }
             },
 
             loadBangunanDropdown: async () => {
-                const select = document.getElementById('rng_bangunan_id');
+                var select = document.getElementById('rng_bangunan_id');
                 try {
-                    const { data } = await supabase.from('prasarana_bangunan').select('id, nama_bangunan').eq('school_id', app.currentSchool.id);
+                    var { data } = await supabaseClient.from('prasarana_bangunan').select('id, nama_bangunan').eq('school_id', app.currentSchool.id);
                     select.innerHTML = '<option value="">-- Pilih Bangunan Induk --</option>';
                     if(data) data.forEach(b => { select.innerHTML += `<option value="${b.id}">${b.nama_bangunan}</option>`; });
                 } catch(e) {}
@@ -1059,9 +1119,10 @@
 
             saveRuang: async (e) => {
                 e.preventDefault();
-                app.setLoading('btn-save-ruang', true, 'Menyimpan...');
+                var btn = document.getElementById('btn-save-ruang');
+                btn.innerText = "Menyimpan...";
 
-                const payload = {
+                var payload = {
                     school_id: app.currentSchool.id,
                     bangunan_id: document.getElementById('rng_bangunan_id').value,
                     jenis_ruang: document.getElementById('rng_jenis').value,
@@ -1071,755 +1132,45 @@
                 };
 
                 try {
-                    const { error } = await supabase.from('prasarana_ruang').insert([payload]);
-                    if (error) throw error;
-                    app.showToast("Data Ruang berhasil disimpan!");
+                    var { error } = await supabaseClient.from('prasarana_ruang').insert([payload]);
+                    if(error) throw error;
+                    app.showToast("Data ruangan berhasil disimpan!");
                     document.getElementById('panel-form-ruang').classList.add('hidden');
                     app.loadRuang();
-                } catch (error) { app.showToast(error.message, "error"); } 
-                finally { app.setLoading('btn-save-ruang', false, 'Simpan Ruang'); }
+                } catch(err) {
+                    app.showToast("Gagal simpan ruangan: " + err.message, "error");
+                } finally {
+                    btn.innerText = "Simpan Ruangan";
+                }
             },
 
             loadRuang: async () => {
-                const tbody = document.getElementById('tabel-ruang-body');
+                var tbody = document.getElementById('tabel-ruang-body');
                 tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
                 try {
-                    // Gunakan Relasi Foreign Key untuk mengambil nama bangunan induk sekaligus
-                    const { data, error } = await supabase.from('prasarana_ruang').select('*, prasarana_bangunan(nama_bangunan)').eq('school_id', app.currentSchool.id);
-                    if (error) throw error;
-                    
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400">Belum ada data ruang.</td></tr>'; return; }
+                    var { data, error } = await supabaseClient.from('prasarana_ruang').select('*, prasarana_bangunan(nama_bangunan)').eq('school_id', app.currentSchool.id);
+                    if(error) throw error;
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400">Belum ada data ruangan.</td></tr>'; return; }
                     
                     tbody.innerHTML = '';
                     data.forEach(r => {
                         tbody.innerHTML += `
                             <tr class="hover:bg-slate-50">
-                                <td class="p-3 border-b text-slate-500 text-xs"><i class="fa-solid fa-level-up-alt fa-rotate-90 mr-1"></i> ${r.prasarana_bangunan?.nama_bangunan || 'Bangunan Terhapus'}</td>
-                                <td class="p-3 border-b font-medium">${r.jenis_ruang}</td>
+                                <td class="p-3 border-b text-slate-500 text-xs"><i class="fa-solid fa-arrow-turn-up fa-rotate-90 mr-1 text-brand-600"></i> ${r.prasarana_bangunan?.nama_bangunan || '-'}</td>
+                                <td class="p-3 border-b font-medium text-slate-800">${r.jenis_ruang}</td>
                                 <td class="p-3 border-b text-center font-bold text-slate-700">${r.luas} m²</td>
-                                <td class="p-3 border-b text-center"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border">${r.kondisi}</span></td>
+                                <td class="p-3 border-b text-center"><span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg font-semibold border border-blue-200">${r.kondisi}</span></td>
                             </tr>
                         `;
                     });
-                } catch (error) { console.error(error); }
-            },
-
-            // --- END FUNGSI PHASE 5 --- //
-<!-- ... existing code ... -->
-                
-            // Proses Login
-            handleLogin: async (e) => {
-                e.preventDefault();
-                app.showError('login-error', 'login-error-text', null);
-                app.setLoading('btn-login', true, 'Masuk');
-
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value;
-
-                // WORKAROUND: Supabase Auth wajib menggunakan format email. 
-                // Kita akali dengan menambahkan domain dummy di belakang layar.
-                const authEmail = `${username}@sipras.local`;
-
-                try {
-                    // 1. Authenticate with Supabase
-                    const { data, error } = await supabase.auth.signInWithPassword({
-                        email: authEmail,
-                        password: password,
-                    });
-
-                    if (error) throw error;
-
-                    app.currentUser = data.user;
-                    
-                    // 2. Fetch User Profile from public.users to get Role & must_change_password flag
-                    const { data: profile, error: profileError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', data.user.id)
-                        .single();
-
-                    if (profileError) {
-                        console.error("Profile fetch error:", profileError);
-                        throw new Error("Gagal mengambil data profil pengguna.");
-                    }
-
-                    app.userProfile = profile;
-
-                    // 3. Routing berdasarkan status must_change_password
-                    if (profile.must_change_password) {
-                        app.showView('view-change-password');
-                    } else {
-                        app.initDashboard();
-                    }
-
-                } catch (error) {
-                    let msg = "Email atau password salah.";
-                    if(error.message.includes("Invalid login")) msg = "Kredensial tidak valid.";
-                    else if(error.message) msg = error.message;
-                    app.showError('login-error', 'login-error-text', msg);
-                } finally {
-                    app.setLoading('btn-login', false, '<span>Masuk</span>');
-                }
-            },
-
-            // Proses Paksa Ganti Password
-            handleChangePassword: async (e) => {
-                e.preventDefault();
-                app.showError('pwd-error', 'pwd-error-text', null);
-                
-                const newPwd = document.getElementById('new_password').value;
-                const confirmPwd = document.getElementById('confirm_password').value;
-
-                if (newPwd !== confirmPwd) {
-                    app.showError('pwd-error', 'pwd-error-text', "Password baru dan konfirmasi tidak cocok.");
-                    return;
-                }
-
-                app.setLoading('btn-change-pwd', true, 'Simpan Password & Lanjutkan');
-
-                try {
-                    // 1. Update password di Supabase Auth
-                    const { error: updateAuthError } = await supabase.auth.updateUser({
-                        password: newPwd
-                    });
-
-                    if (updateAuthError) throw updateAuthError;
-
-                    // 2. Update flag must_change_password = false di tabel public.users
-                    const { error: updateProfileError } = await supabase
-                        .from('users')
-                        .update({ must_change_password: false })
-                        .eq('id', app.currentUser.id);
-
-                    if (updateProfileError) throw updateProfileError;
-
-                    // 3. Sukses, lanjut ke dashboard
-                    app.userProfile.must_change_password = false;
-                    
-                    // Reset form
-                    document.getElementById('form-change-password').reset();
-                    
-                    alert("Password berhasil diubah! Selamat datang di aplikasi.");
-                    app.initDashboard();
-
-                } catch (error) {
-                    app.showError('pwd-error', 'pwd-error-text', error.message || "Gagal mengubah password.");
-                } finally {
-                    app.setLoading('btn-change-pwd', false, '<span>Simpan Password & Lanjutkan</span>');
-                }
-            },
-
-            // Inisialisasi Dashboard
-            initDashboard: async () => {
-                app.showView('view-dashboard');
-                
-                // Set Header Info
-                document.getElementById('dash-user-name').textContent = app.userProfile.nama || app.userProfile.username;
-                document.getElementById('dash-user-role').textContent = `Role: ${app.userProfile.role.toUpperCase()}`;
-
-                // Set Mobile Sidebar events
-                document.getElementById('btn-mobile-menu').onclick = app.toggleSidebar;
-
-                // Load Data Spesifik Role
-                if (app.userProfile.role === 'operator' && app.userProfile.school_id) {
-                    await app.loadSchoolData();
-                }
-
-                // Tampilkan Konten Beranda
-                document.getElementById('content-dashboard-home').classList.remove('hidden');
-                document.getElementById('content-profil-sekolah').classList.add('hidden');
-
-                // Update Session Info UI
-                const infoList = document.getElementById('dash-session-info');
-                infoList.innerHTML = `
-                    <li><b>Nama:</b> ${app.userProfile.nama}</li>
-                    <li><b>Username:</b> ${app.userProfile.username}</li>
-                    <li><b>Role:</b> <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">${app.userProfile.role}</span></li>
-                    <li><b>Jenjang:</b> ${app.userProfile.jenjang || '-'}</li>
-                `;
-            },
-
-            // --- FUNGSI BARU PHASE 3 --- //
-
-            toggleSidebar: () => {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebar-overlay');
-                sidebar.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
-            },
-
-            // Mengambil data sekolah dari database (khusus Operator)
-            loadSchoolData: async () => {
-                try {
-                    const { data, error } = await supabase
-                        .from('schools')
-                        .select('*')
-                        .eq('id', app.userProfile.school_id)
-                        .single();
-
-                    if (error) throw error;
-                    app.currentSchool = data;
-
-                    // Update UI Sidebar
-                    document.getElementById('sidebar-school-name').textContent = data.nama_sekolah || "Nama Sekolah Belum Diatur";
-                    document.getElementById('sidebar-npsn').textContent = `NPSN: ${data.npsn}`;
-
-                    // Cek kelengkapan profil
-                    app.checkProfilStatus();
-
-                } catch (error) {
-                    console.error("Error loading school data:", error);
-                }
-            },
-
-            // Mengecek apakah profil sekolah sudah lengkap (Logic Penguncian Menu)
-            checkProfilStatus: () => {
-                const bannerWarning = document.getElementById('banner-lengkapi-profil');
-                const menuSarpras = document.querySelectorAll('.menu-sarpras');
-
-                if (app.currentSchool && !app.currentSchool.profil_lengkap) {
-                    // Profil belum lengkap: Tampilkan banner, kunci menu
-                    bannerWarning.classList.remove('hidden');
-                    menuSarpras.forEach(btn => {
-                        btn.classList.add('opacity-50', 'cursor-not-allowed');
-                        btn.classList.remove('hover:bg-slate-100', 'hover:text-brand-600', 'text-slate-600');
-                        
-                        // Override onclick spesifik untuk sarana agar tidak bentrok
-                        btn.onclick = (e) => { e.preventDefault(); alert("Silakan lengkapi Profil Sekolah dan Titik Koordinat terlebih dahulu!"); };
-                        btn.querySelector('.fa-lock').classList.remove('hidden');
-                    });
-                } else {
-                    // Profil sudah lengkap: Sembunyikan banner, buka menu
-                    bannerWarning.classList.add('hidden');
-                    menuSarpras.forEach(btn => {
-                        btn.classList.remove('opacity-50', 'cursor-not-allowed', 'text-slate-400', 'bg-slate-50', 'border-transparent');
-                        btn.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-brand-600', 'cursor-pointer');
-                        btn.querySelector('.fa-lock').classList.add('hidden');
-                    });
-                    
-                    // Kembalikan event klik asli untuk menu sarana
-                    document.getElementById('menu-btn-sarana').onclick = () => app.showSarana();
-                }
-            },
-
-            // Mengambil master data Kecamatan
-            loadMasterKecamatan: async () => {
-                if (app.refKecamatan.length > 0) return; // cache
-                const { data, error } = await supabase.from('ref_kecamatan').select('*').order('nama_kecamatan', { ascending: true });
-                if (!error && data) {
-                    app.refKecamatan = data;
-                    const select = document.getElementById('prof_kecamatan');
-                    select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-                    data.forEach(kec => {
-                        select.innerHTML += `<option value="${kec.id}">${kec.nama_kecamatan}</option>`;
-                    });
-                }
-            },
-
-            // Menampilkan halaman Form Profil Sekolah
-            showProfilSekolah: async () => {
-                // Hanya operator yang bisa akses form ini di Phase 3
-                if(app.userProfile.role !== 'operator' || !app.currentSchool) {
-                    alert("Menu ini khusus untuk Operator Sekolah.");
-                    return;
-                }
-
-                // Tutup sidebar mobile jika terbuka
-                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
-
-                document.getElementById('content-dashboard-home').classList.add('hidden');
-                document.getElementById('content-profil-sekolah').classList.remove('hidden');
-
-                // Load opsi dropdown kecamatan
-                await app.loadMasterKecamatan();
-
-                // Isi Form dengan data dari database
-                const s = app.currentSchool;
-                document.getElementById('prof_npsn').value = s.npsn || '';
-                document.getElementById('prof_jenjang').value = s.jenjang || '';
-                document.getElementById('prof_nama_sekolah').value = s.nama_sekolah || '';
-                document.getElementById('prof_tahun_berdiri').value = s.tahun_berdiri || '';
-                document.getElementById('prof_telp_sekolah').value = s.no_telp_sekolah || '';
-                document.getElementById('prof_nama_kepsek').value = s.nama_kepala_sekolah || '';
-                document.getElementById('prof_nip_kepsek').value = s.nip_kepala_sekolah || '';
-                document.getElementById('prof_status_kepsek').value = s.status_kepala_sekolah || '';
-                document.getElementById('prof_hp_kepsek').value = s.no_hp_kepala_sekolah || '';
-                document.getElementById('prof_kecamatan').value = s.kecamatan_id || '';
-                document.getElementById('prof_alamat').value = s.alamat || '';
-                document.getElementById('prof_lat').value = s.latitude || '';
-                document.getElementById('prof_lng').value = s.longitude || '';
-
-                // Inisialisasi Peta Leaflet
-                app.initMap(s.latitude, s.longitude);
-            },
-
-            // Inisialisasi Peta Leaflet.js
-            initMap: (lat, lng) => {
-                // Default center (Kab. Manggarai Barat jika kosong)
-                const startLat = lat || -8.6449;
-                const startLng = lng || 119.8821;
-                const zoomLevel = lat ? 15 : 10; // Zoom in jika sudah ada koordinat spesifik
-
-                if (!app.mapInstance) {
-                    // Buat instance baru
-                    app.mapInstance = L.map('map-container').setView([startLat, startLng], zoomLevel);
-                    
-                    // Tambahkan tile layer dari OpenStreetMap
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(app.mapInstance);
-
-                    // Tambahkan marker (Bisa didrag/digeser)
-                    app.mapMarker = L.marker([startLat, startLng], { draggable: true }).addTo(app.mapInstance);
-
-                    // Event saat marker selesai digeser -> Update nilai input teks form
-                    app.mapMarker.on('dragend', function (event) {
-                        const position = app.mapMarker.getLatLng();
-                        document.getElementById('prof_lat').value = position.lat.toFixed(6);
-                        document.getElementById('prof_lng').value = position.lng.toFixed(6);
-                    });
-
-                    // Event saat form diubah manual -> Update posisi marker
-                    ['prof_lat', 'prof_lng'].forEach(id => {
-                        document.getElementById(id).addEventListener('input', () => {
-                            const newLat = parseFloat(document.getElementById('prof_lat').value);
-                            const newLng = parseFloat(document.getElementById('prof_lng').value);
-                            if(!isNaN(newLat) && !isNaN(newLng)) {
-                                app.mapMarker.setLatLng([newLat, newLng]);
-                                app.mapInstance.panTo([newLat, newLng]);
-                            }
-                        });
-                    });
-
-                } else {
-                    // Jika map sudah ada, cukup update view dan marker
-                    app.mapInstance.setView([startLat, startLng], zoomLevel);
-                    app.mapMarker.setLatLng([startLat, startLng]);
-                }
-
-                // WORKAROUND: Perbaiki ukuran peta setelah div ditampilkan (Bug Leaflet pada div tersembunyi)
-                setTimeout(() => { app.mapInstance.invalidateSize(); }, 300);
-            },
-
-            // Fitur Geolocation GPS Browser
-            getLocationGPS: () => {
-                if (navigator.geolocation) {
-                    app.setLoading('btn-get-location', true, '<i class="fa-solid fa-spinner fa-spin"></i> Mendeteksi...');
-                    
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            
-                            // Isi ke form
-                            document.getElementById('prof_lat').value = lat.toFixed(6);
-                            document.getElementById('prof_lng').value = lng.toFixed(6);
-                            
-                            // Update peta
-                            app.initMap(lat, lng);
-                            
-                            app.setLoading('btn-get-location', false, '<i class="fa-solid fa-location-crosshairs"></i> Deteksi GPS Saya');
-                            alert("Lokasi GPS berhasil ditemukan!");
-                        },
-                        (error) => {
-                            let msg = "Gagal mengambil lokasi. ";
-                            if (error.code === 1) msg += "Izin akses lokasi ditolak oleh Anda.";
-                            else if (error.code === 2) msg += "Lokasi tidak tersedia (jaringan/satelit tidak aktif).";
-                            else msg += "Terjadi kesalahan (Timeout).";
-                            
-                            alert(msg);
-                            app.setLoading('btn-get-location', false, '<i class="fa-solid fa-location-crosshairs"></i> Deteksi GPS Saya');
-                        },
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Opsi untuk akurasi tinggi (Mobile)
-                    );
-                } else {
-                    alert("Browser Anda tidak mendukung fitur Geolocation/GPS.");
-                }
-            },
-
-            // Menyimpan Update Data Profil Sekolah ke Supabase
-            handleSaveProfil: async (e) => {
-                e.preventDefault();
-                
-                const lat = parseFloat(document.getElementById('prof_lat').value);
-                const lng = parseFloat(document.getElementById('prof_lng').value);
-
-                if (isNaN(lat) || isNaN(lng)) {
-                    alert("Latitude dan Longitude harus berupa angka valid. Silakan gunakan peta.");
-                    return;
-                }
-
-                app.setLoading('btn-save-profil', true, '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...');
-
-                // Buat Payload
-                const payload = {
-                    nama_sekolah: document.getElementById('prof_nama_sekolah').value.trim(),
-                    tahun_berdiri: document.getElementById('prof_tahun_berdiri').value ? parseInt(document.getElementById('prof_tahun_berdiri').value) : null,
-                    nama_kepala_sekolah: document.getElementById('prof_nama_kepsek').value.trim(),
-                    nip_kepala_sekolah: document.getElementById('prof_nip_kepsek').value.trim() || null,
-                    status_kepala_sekolah: document.getElementById('prof_status_kepsek').value,
-                    no_hp_kepala_sekolah: document.getElementById('prof_hp_kepsek').value.trim(),
-                    no_telp_sekolah: document.getElementById('prof_telp_sekolah').value.trim() || null,
-                    kecamatan_id: document.getElementById('prof_kecamatan').value,
-                    alamat: document.getElementById('prof_alamat').value.trim(),
-                    latitude: lat,
-                    longitude: lng,
-                    profil_lengkap: true // Begitu disimpan form ini, kita anggap profil sudah diselesaikan
-                };
-
-                try {
-                    const { data, error } = await window.supabase
-                        .from('schools')
-                        .update(payload)
-                        .eq('id', app.currentSchool.id);
-                    
-                    if (error) throw error;
-
-                    alert("Profil Sekolah berhasil disimpan dan diperbarui!");
-                    
-                    // Update cache local & reload Dashboard
-                    app.currentSchool = { ...app.currentSchool, ...payload };
-                    app.initDashboard();
-
-                } catch(error) {
-                    console.error(error);
-                    alert("Gagal menyimpan data: " + (error.message || "Terjadi kesalahan server."));
-                } finally {
-                    app.setLoading('btn-save-profil', false, '<i class="fa-solid fa-save"></i> Simpan Profil Sekolah');
-                }
-            },
-
-            // --- FUNGSI BARU PHASE 4: MODUL SARANA --- //
-
-            showSarana: () => {
-                if(!app.currentSchool?.profil_lengkap) return; // Guard
-                
-                if(!document.getElementById('sidebar-overlay').classList.contains('hidden')) app.toggleSidebar();
-
-                // Sembunyikan semua konten, tampilkan sarana
-                document.getElementById('content-dashboard-home').classList.add('hidden');
-                document.getElementById('content-profil-sekolah').classList.add('hidden');
-                document.getElementById('content-sarana').classList.remove('hidden');
-
-                app.loadSaranaList();
-            },
-
-            openFormSarana: () => {
-                document.getElementById('panel-form-sarana').classList.remove('hidden');
-                document.getElementById('form-sarana').reset();
-                app.calcSaranaTotal();
-                
-                // Reset Dropdown
-                document.getElementById('sar_kategori').disabled = true;
-                document.getElementById('sar_kategori').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-                document.getElementById('sar_subkategori_select').disabled = true;
-                
-                document.getElementById('panel-khusus-buku').classList.add('hidden');
-                document.getElementById('label-section-kondisi').innerText = "2. Kondisi & Jumlah Barang";
-            },
-
-            closeFormSarana: () => {
-                document.getElementById('panel-form-sarana').classList.add('hidden');
-            },
-
-            // Logika Dropdown Dinamis Berjenjang
-            updateKategoriSarana: () => {
-                const jenis = document.getElementById('sar_jenis').value;
-                const katSelect = document.getElementById('sar_kategori');
-                const subSelect = document.getElementById('sar_subkategori_select');
-                const panelBuku = document.getElementById('panel-khusus-buku');
-                const lblKondisi = document.getElementById('label-section-kondisi');
-
-                katSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-                subSelect.innerHTML = '<option value="">-- Pilih Item --</option>';
-                subSelect.disabled = true;
-
-                // Tampil/Sembunyi Panel Khusus Buku
-                if (jenis === 'Buku') {
-                    panelBuku.classList.remove('hidden');
-                    lblKondisi.innerText = "3. Kondisi & Eksemplar";
-                    document.getElementById('sar_buku_judul').required = true;
-                } else {
-                    panelBuku.classList.add('hidden');
-                    lblKondisi.innerText = "2. Kondisi & Jumlah Barang";
-                    document.getElementById('sar_buku_judul').required = false;
-                }
-
-                if (jenis && app.masterSarana[jenis]) {
-                    katSelect.disabled = false;
-                    katSelect.classList.remove('bg-slate-50', 'cursor-not-allowed');
-                    katSelect.classList.add('bg-white');
-                    
-                    Object.keys(app.masterSarana[jenis]).forEach(kat => {
-                        katSelect.innerHTML += `<option value="${kat}">${kat}</option>`;
-                    });
-                } else {
-                    katSelect.disabled = true;
-                    katSelect.classList.add('bg-slate-50', 'cursor-not-allowed');
-                }
-                app.updateSubkategoriSarana();
-            },
-
-            updateSubkategoriSarana: () => {
-                const jenis = document.getElementById('sar_jenis').value;
-                const kategori = document.getElementById('sar_kategori').value;
-                const select = document.getElementById('sar_subkategori_select');
-                const input = document.getElementById('sar_subkategori_input');
-
-                select.innerHTML = '<option value="">-- Pilih Item --</option>';
-
-                if (jenis && kategori && app.masterSarana[jenis][kategori]) {
-                    const items = app.masterSarana[jenis][kategori];
-                    
-                    if(items.length === 1 && items[0] === 'Lainnya') {
-                        // Jika hanya ada opsi "Lainnya", tampilkan text input
-                        select.classList.add('hidden');
-                        select.required = false;
-                        input.classList.remove('hidden');
-                        input.required = true;
-                        input.value = '';
-                    } else {
-                        // Tampilkan dropdown reguler
-                        select.classList.remove('hidden');
-                        select.required = true;
-                        input.classList.add('hidden');
-                        input.required = false;
-                        
-                        select.disabled = false;
-                        select.classList.remove('bg-slate-50', 'cursor-not-allowed');
-                        select.classList.add('bg-white');
-
-                        items.forEach(item => {
-                            select.innerHTML += `<option value="${item}">${item}</option>`;
-                        });
-                        select.innerHTML += `<option value="Lainnya">Lain-lain (Tulis Manual)</option>`;
-                    }
-                } else {
-                    select.disabled = true;
-                    select.classList.add('bg-slate-50', 'cursor-not-allowed');
-                    select.classList.remove('hidden');
-                    input.classList.add('hidden');
-                }
-            },
-
-            calcSaranaTotal: () => {
-                const b = parseInt(document.getElementById('sar_baik').value) || 0;
-                const rr = parseInt(document.getElementById('sar_rr').value) || 0;
-                const rb = parseInt(document.getElementById('sar_rb').value) || 0;
-                document.getElementById('sar_total').innerText = b + rr + rb;
-            },
-
-            // Load Data ke Tabel
-            loadSaranaList: async () => {
-                const tbody = document.getElementById('tabel-sarana-body');
-                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>';
-
-                try {
-                    const { data, error } = await supabase
-                        .from('sarana')
-                        .select('*')
-                        .eq('school_id', app.currentSchool.id)
-                        .order('created_at', { ascending: false });
-
-                    if (error) throw error;
-
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fa-solid fa-inbox text-2xl mb-2 block"></i>Belum ada data sarana. Tambahkan data pertama Anda.</td></tr>';
-                        return;
-                    }
-
-                    tbody.innerHTML = '';
-                    data.forEach(item => {
-                        const namaItem = item.jenis === 'Buku' ? `<span class="font-bold text-brand-700">${item.buku_judul}</span><br><span class="text-xs text-slate-500">ISBN: ${item.buku_isbn || '-'}</span>` : `<span class="font-semibold text-slate-700">${item.subkategori}</span>`;
-                        
-                        tbody.innerHTML += `
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-3 border-b border-slate-100">
-                                    <span class="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-[10px] rounded mb-1 border border-slate-200">${item.jenis}</span><br>
-                                    <span class="text-xs text-slate-500">${item.kategori}</span>
-                                </td>
-                                <td class="p-3 border-b border-slate-100">${namaItem}</td>
-                                <td class="p-3 border-b border-slate-100 text-center font-medium text-emerald-600">${item.kondisi_baik}</td>
-                                <td class="p-3 border-b border-slate-100 text-center font-medium text-amber-600">${item.rusak_ringan}</td>
-                                <td class="p-3 border-b border-slate-100 text-center font-medium text-red-600">${item.rusak_berat}</td>
-                                <td class="p-3 border-b border-slate-100 text-center font-bold text-slate-800 bg-slate-50/50">${item.total}</td>
-                                <td class="p-3 border-b border-slate-100 text-center">
-                                    <button class="text-blue-500 hover:text-blue-700 p-1 mx-1" title="Lihat Foto" ${!item.foto_url ? 'disabled class="text-slate-300 mx-1 p-1"' : `onclick="window.open('${item.foto_url}', '_blank')"`}><i class="fa-solid fa-image"></i></button>
-                                    <button onclick="app.deleteSarana('${item.id}')" class="text-red-500 hover:text-red-700 p-1 mx-1" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-
-                } catch (error) {
-                    console.error(error);
-                    tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-500">Gagal memuat data.</td></tr>';
-                }
-            },
-
-            // Simpan Data Baru
-            handleSaveSarana: async (e) => {
-                e.preventDefault();
-                app.setLoading('btn-save-sarana', true, '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...');
-                
-                const fileInput = document.getElementById('sar_foto');
-                const fileError = document.getElementById('sar_foto_error');
-                let fotoUrl = null;
-                
-                // 1. Validasi File & Upload
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                        fileError.textContent = "Ukuran file maksimal 5 MB.";
-                        fileError.classList.remove('hidden');
-                        app.setLoading('btn-save-sarana', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Sarana');
-                        return;
-                    }
-                    fileError.classList.add('hidden');
-
-                    try {
-                        const fileExt = file.name.split('.').pop();
-                        const fileName = `${app.currentSchool.id}/sarana/${Date.now()}.${fileExt}`;
-                        
-                        const { data, error } = await supabase.storage.from('school-photos').upload(fileName, file);
-                        if (error) throw error;
-                        
-                        // Dapatkan Public URL
-                        const { data: urlData } = supabase.storage.from('school-photos').getPublicUrl(fileName);
-                        fotoUrl = urlData.publicUrl;
-                        
-                    } catch (err) {
-                        alert("Gagal mengupload foto: " + err.message);
-                        app.setLoading('btn-save-sarana', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Sarana');
-                        return;
-                    }
-                } else {
-                    alert("Anda wajib melampirkan foto barang/sarana!");
-                    app.setLoading('btn-save-sarana', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Sarana');
-                    return;
-                }
-
-                // 2. Tentukan Subkategori (dari Dropdown atau Text Input manual)
-                const sel = document.getElementById('sar_subkategori_select');
-                const inp = document.getElementById('sar_subkategori_input');
-                let subkatValue = !sel.classList.contains('hidden') ? sel.value : inp.value;
-                if (subkatValue === 'Lainnya') {
-                    // Fitur tambahan jika kedepan mau di prompt manual, untuk skrg pakai value nya saja.
-                    subkatValue = prompt("Sebutkan nama spesifik item ini:");
-                    if(!subkatValue) {
-                        app.setLoading('btn-save-sarana', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Sarana');
-                        return;
-                    }
-                }
-
-                // 3. Susun Payload Insert
-                const payload = {
-                    school_id: app.currentSchool.id,
-                    jenis: document.getElementById('sar_jenis').value,
-                    kategori: document.getElementById('sar_kategori').value,
-                    subkategori: subkatValue,
-                    
-                    buku_judul: document.getElementById('sar_buku_judul').value || null,
-                    buku_isbn: document.getElementById('sar_buku_isbn').value || null,
-                    buku_tahun: document.getElementById('sar_buku_tahun').value ? parseInt(document.getElementById('sar_buku_tahun').value) : null,
-                    buku_pengarang: document.getElementById('sar_buku_pengarang').value || null,
-                    buku_penerbit: document.getElementById('sar_buku_penerbit').value || null,
-                    
-                    kondisi_baik: parseInt(document.getElementById('sar_baik').value) || 0,
-                    rusak_ringan: parseInt(document.getElementById('sar_rr').value) || 0,
-                    rusak_berat: parseInt(document.getElementById('sar_rb').value) || 0,
-                    kebutuhan_baru: parseInt(document.getElementById('sar_kebutuhan').value) || 0,
-                    
-                    foto_url: fotoUrl,
-                    catatan: document.getElementById('sar_catatan').value || null
-                };
-
-                // 4. Eksekusi DB Insert
-                try {
-                    const { error } = await supabase.from('sarana').insert([payload]);
-                    if (error) throw error;
-                    
-                    alert("Data Sarana berhasil ditambahkan!");
-                    app.closeFormSarana();
-                    app.loadSaranaList(); // Refresh tabel
-
-                } catch (error) {
-                    console.error(error);
-                    alert("Terjadi kesalahan DB: " + error.message);
-                } finally {
-                    app.setLoading('btn-save-sarana', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Sarana');
-                }
-            },
-
-            // Hapus Sarana
-            deleteSarana: async (id) => {
-                if(confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-                    try {
-                        // Note: idealnya foto di bucket juga dihapus, tapi untuk MVP kita hapus row DB dulu
-                        const { error } = await supabase.from('sarana').delete().eq('id', id);
-                        if (error) throw error;
-                        app.loadSaranaList(); // Refresh Table
-                    } catch (error) {
-                        alert("Gagal menghapus data: " + error.message);
-                    }
-                }
-            },
-
-            // --- END FUNGSI PHASE 4 --- //
-
-            // Proses Logout
-            handleLogout: async () => {
-                try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) throw error;
-                    
-                    app.currentUser = null;
-                    app.userProfile = null;
-                    document.getElementById('form-login').reset();
-                    app.showView('view-landing');
-                } catch (error) {
-                    console.error("Logout error:", error);
-                    alert("Gagal keluar aplikasi. Silakan coba lagi.");
-                }
-            },
-
-            // Cek Sesi Aktif saat reload halaman
-            checkSession: async () => {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    app.currentUser = session.user;
-                    
-                    // Fetch profile
-                    const { data: profile } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', session.user.id)
-                        .single();
-                        
-                    if (profile) {
-                        app.userProfile = profile;
-                        if (profile.must_change_password) {
-                            app.showView('view-change-password');
-                        } else {
-                            app.initDashboard();
-                        }
-                    } else {
-                        app.showView('view-landing');
-                    }
-                } else {
-                    app.showView('view-landing');
-                }
+                } catch(err) { console.error(err); }
             }
         };
 
-        // Inisialisasi saat load
-        window.addEventListener('DOMContentLoaded', () => {
-            // Karena ini preview dummy, kita tampilkan landing page. 
-            // Jika Anda sudah memasukkan URL dan KEY asli, jalankan app.checkSession()
-            // app.checkSession();
-        });
-
+        // Jalankan inisialisasi aplikasi saat jendela dimuat
+        window.onload = function() {
+            app.init();
+        }
     </script>
 </body>
 </html>
