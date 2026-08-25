@@ -116,6 +116,39 @@
             </div>
         </div>
 
+        <!-- MODAL VALIDASI DINAS -->
+        <div id="modal-validasi" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 relative mx-4 animate-[slideInRight_0.2s_ease-out]">
+                <button onclick="document.getElementById('modal-validasi').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+                <div class="mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Proses Validasi Data</h3>
+                    <p class="text-sm text-gray-500" id="val-item-name">Nama Entitas: -</p>
+                </div>
+                <input type="hidden" id="val-item-id">
+                <input type="hidden" id="val-item-type"> <!-- 'bangunan' atau 'ruang' -->
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Keputusan Validasi <span class="text-red-500">*</span></label>
+                        <select id="val-keputusan" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none">
+                            <option value="">-- Pilih Keputusan --</option>
+                            <option value="Disetujui">Disetujui (Data Valid)</option>
+                            <option value="Perlu Perbaikan">Perlu Perbaikan (Kembalikan ke Operator)</option>
+                            <option value="Ditolak">Ditolak (Data Tidak Sah)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Validasi</label>
+                        <textarea id="val-catatan" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none" placeholder="Wajib diisi jika menolak atau meminta perbaikan..."></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button onclick="document.getElementById('modal-validasi').classList.add('hidden')" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">Batal</button>
+                    <button onclick="app.prosesValidasi()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition flex items-center gap-2"><i class="fas fa-check"></i> Simpan Keputusan</button>
+                </div>
+            </div>
+        </div>
+
         <!-- ================= DASHBOARD LAYOUT ================= -->
         <div id="view-dashboard" class="hidden h-screen flex overflow-hidden bg-gray-100">
             <!-- Sidebar Desktop -->
@@ -556,7 +589,7 @@
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-sm text-left text-gray-600">
                                         <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                                            <tr><th class="px-4 py-3">Nama Bangunan</th><th class="px-4 py-3">Tahun</th><th class="px-4 py-3 text-center">Luas (m²)</th><th class="px-4 py-3 text-center">Kerusakan</th><th class="px-4 py-3 text-center">Kondisi</th></tr>
+                                            <tr><th class="px-4 py-3">Nama Bangunan</th><th class="px-4 py-3">Tahun</th><th class="px-4 py-3 text-center">Luas (m²)</th><th class="px-4 py-3 text-center">Kondisi</th><th class="px-4 py-3 text-center">Status Validasi</th><th class="px-4 py-3 text-center">Aksi</th></tr>
                                         </thead>
                                         <tbody id="table-body-bangunan" class="divide-y divide-gray-100"></tbody>
                                     </table>
@@ -624,7 +657,7 @@
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-sm text-left text-gray-600">
                                         <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                                            <tr><th class="px-4 py-3">Bangunan Induk</th><th class="px-4 py-3">Jenis Ruang</th><th class="px-4 py-3 text-center">Luas (m²)</th><th class="px-4 py-3 text-center">Kerusakan</th><th class="px-4 py-3 text-center">Kondisi</th></tr>
+                                            <tr><th class="px-4 py-3">Bangunan Induk</th><th class="px-4 py-3">Jenis Ruang</th><th class="px-4 py-3 text-center">Luas (m²)</th><th class="px-4 py-3 text-center">Kondisi</th><th class="px-4 py-3 text-center">Status Validasi</th><th class="px-4 py-3 text-center">Aksi</th></tr>
                                         </thead>
                                         <tbody id="table-body-ruang" class="divide-y divide-gray-100"></tbody>
                                     </table>
@@ -649,30 +682,30 @@
                                                 </select>
                                             </div>
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Luas (m²)</label><input type="number" step="0.01" id="fasilitas-luas" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                            <div class="col-span-1 md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Tahun Rehabilitasi Terakhir</label><input type="date" id="fasilitas-rehab" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                        </div>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                                            <div>
-                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label>
-                                                <input type="number" step="0.01" id="fasilitas-rusak" required min="0" max="100" value="0" oninput="app.calcFasilitas()" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-2xl font-bold text-center focus:ring-2 focus:ring-teal-500">
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Kondisi Fasilitas</label>
-                                                <div id="fasilitas-kondisi-wrapper" class="px-3 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-center items-center">
-                                                    <span id="fasilitas-kondisi" class="font-bold text-lg text-emerald-700">Baik</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Foto Fasilitas (Maks 5MB)</label><input type="file" id="fasilitas-foto" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-xs"></div>
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Keterangan / Catatan</label><input type="text" id="fasilitas-keterangan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                        </div>
-                                        <div class="flex justify-end pt-2"><button type="submit" id="btn-save-fasilitas" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium text-sm transition">Simpan Fasilitas</button></div>
-                                    </form>
-                                </div>
+                    <!-- VIEW: VALIDASI DATA (ADMIN) -->
+                    <div id="content-validasi" class="dashboard-content hidden space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h2 class="text-lg font-bold text-gray-800 mb-2">Pusat Validasi Data Sarpras</h2>
+                            <p class="text-sm text-gray-500 mb-4">Tinjau data Bangunan dan Ruangan yang diajukan oleh Operator Sekolah.</p>
+                            
+                            <div class="border-b border-gray-200 mb-4">
+                                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                                    <button onclick="app.loadDataValidasiDinas('bangunan')" class="border-teal-500 text-teal-600 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition">Validasi Bangunan</button>
+                                    <button onclick="app.loadDataValidasiDinas('ruang')" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition">Validasi Ruangan</button>
+                                </nav>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-gray-600">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                        <tr><th class="px-4 py-3">NPSN & Sekolah</th><th class="px-4 py-3">Objek Diajukan</th><th class="px-4 py-3 text-center">Kerusakan</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Tindakan</th></tr>
+                                    </thead>
+                                    <tbody id="table-body-validasi" class="divide-y divide-gray-100">
+                                        <tr><td colspan="5" class="text-center py-4 text-gray-400">Pilih tab untuk memuat data.</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-
                     </div>
 
                 </main>
@@ -801,7 +834,7 @@
                     return;
                 }
 
-                if(contentName === 'data-sekolah' || contentName === 'peta-sebaran' || contentName === 'validasi') {
+                if(contentName === 'data-sekolah' || contentName === 'peta-sebaran') {
                     app.showToast("Fitur khusus admin/dinas akan diimplementasikan di fase berikutnya.", "warning");
                     document.getElementById('content-home').style.display = 'block';
                     return;
@@ -809,13 +842,14 @@
 
                 document.getElementById(`content-${contentName}`).style.display = 'block';
 
-                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana' };
+                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana', 'validasi':'Validasi Data' };
                 document.getElementById('topbar-title').innerText = titles[contentName];
 
                 if(contentName === 'profil') { app.loadSchoolProfile(); } 
                 else if(contentName === 'sarana') { app.loadSarana(); } 
                 else if(contentName === 'prasarana') { app.switchPrasaranaTab('lahan'); }
                 else if(contentName === 'home') { app.loadDashboardData(); }
+                else if(contentName === 'validasi') { app.loadDataValidasiDinas('bangunan'); }
             },
 
             showLoginModal: () => document.getElementById('modal-login').classList.remove('hidden'),
@@ -1370,17 +1404,23 @@
 
             loadBangunan: async () => {
                 var tbody = document.getElementById('table-body-bangunan');
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>';
                 try {
                     var { data, error } = await supabaseClient.from('prasarana_bangunan').select('*').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
                     if(error) throw error;
                     tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada data bangunan.</td></tr>'; return; }
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data bangunan.</td></tr>'; return; }
                     data.forEach(item => {
                         var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan);
-                        tbody.innerHTML += `<tr><td class="px-4 py-2 font-semibold text-gray-800">${item.nama_bangunan} <span class="text-xs text-gray-400">(${item.konstruksi||'-'})</span></td><td class="px-4 py-2">${item.tahun_pembangunan || '-'}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas_bangunan}</td><td class="px-4 py-2 text-center">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${cUI.t}</td></tr>`;
+                        var statusUI = app.getValidasiBadge(item.status_validasi);
+                        var btnAksi = (item.status_validasi === 'Draft' || item.status_validasi === 'Perlu Perbaikan') 
+                            ? `<button onclick="app.ajukanValidasi('bangunan', '${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">Ajukan Validasi</button>` 
+                            : `<span class="text-xs text-gray-400"><i class="fas fa-lock"></i> Terkunci</span>`;
+                        var noteUI = item.validation_note ? `<br><span class="text-[10px] text-red-500 block mt-1">Catatan: ${item.validation_note}</span>` : '';
+                        
+                        tbody.innerHTML += `<tr><td class="px-4 py-2 font-semibold text-gray-800">${item.nama_bangunan} <span class="text-xs text-gray-400">(${item.konstruksi||'-'})</span></td><td class="px-4 py-2">${item.tahun_pembangunan || '-'}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas_bangunan}</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${item.tingkat_kerusakan}%<br><span class="text-[10px]">${cUI.t}</span></td><td class="px-4 py-2 text-center">${statusUI} ${noteUI}</td><td class="px-4 py-2 text-center">${btnAksi}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
             },
 
             populateBangunanDropdown: async () => {
@@ -1422,18 +1462,118 @@
 
             loadRuang: async () => {
                 var tbody = document.getElementById('table-body-ruang');
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>';
                 try {
                     var { data, error } = await supabaseClient.from('prasarana_ruang').select('*, bangunan:prasarana_bangunan(nama_bangunan)').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
                     if(error) throw error;
                     tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada data ruangan.</td></tr>'; return; }
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data ruangan.</td></tr>'; return; }
                     data.forEach(item => {
                         var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan);
                         var bangName = item.bangunan ? item.bangunan.nama_bangunan : 'Tidak Diketahui';
-                        tbody.innerHTML += `<tr><td class="px-4 py-2 text-gray-500">${bangName}</td><td class="px-4 py-2 font-semibold text-gray-800">${item.jenis_ruang} <br><span class="text-[10px] bg-gray-100 rounded px-1">${item.status_ruang||''}</span></td><td class="px-4 py-2 text-center bg-gray-50">${item.luas}</td><td class="px-4 py-2 text-center">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${cUI.t}</td></tr>`;
+                        var statusUI = app.getValidasiBadge(item.status_validasi);
+                        var btnAksi = (item.status_validasi === 'Draft' || item.status_validasi === 'Perlu Perbaikan') 
+                            ? `<button onclick="app.ajukanValidasi('ruang', '${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">Ajukan Validasi</button>` 
+                            : `<span class="text-xs text-gray-400"><i class="fas fa-lock"></i> Terkunci</span>`;
+                        var noteUI = item.validation_note ? `<br><span class="text-[10px] text-red-500 block mt-1">Catatan: ${item.validation_note}</span>` : '';
+
+                        tbody.innerHTML += `<tr><td class="px-4 py-2 text-gray-500">${bangName}</td><td class="px-4 py-2 font-semibold text-gray-800">${item.jenis_ruang} <br><span class="text-[10px] bg-gray-100 rounded px-1">${item.status_ruang||''}</span></td><td class="px-4 py-2 text-center bg-gray-50">${item.luas}</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${item.tingkat_kerusakan}%<br><span class="text-[10px]">${cUI.t}</span></td><td class="px-4 py-2 text-center">${statusUI} ${noteUI}</td><td class="px-4 py-2 text-center">${btnAksi}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
+            },
+
+            // ================== MODUL VALIDASI ================== //
+            getValidasiBadge: (status) => {
+                var s = status || 'Draft';
+                if(s === 'Draft') return `<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">DRAFT</span>`;
+                if(s === 'Diajukan') return `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold"><i class="fas fa-clock"></i> DIAJUKAN</span>`;
+                if(s === 'Disetujui') return `<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold"><i class="fas fa-check"></i> DISETUJUI</span>`;
+                if(s === 'Ditolak') return `<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-bold"><i class="fas fa-times"></i> DITOLAK</span>`;
+                if(s === 'Perlu Perbaikan') return `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-[10px] font-bold"><i class="fas fa-exclamation-triangle"></i> REVISI</span>`;
+                return `<span>${s}</span>`;
+            },
+
+            ajukanValidasi: async (type, id) => {
+                // Untuk Operator: Mengubah status dari Draft ke Diajukan
+                var table = type === 'bangunan' ? 'prasarana_bangunan' : 'prasarana_ruang';
+                try {
+                    var { error } = await supabaseClient.from(table).update({ status_validasi: 'Diajukan' }).eq('id', id);
+                    if(error) throw error;
+                    app.showToast("Data berhasil diajukan ke Dinas!", "success");
+                    if(type === 'bangunan') app.loadBangunan(); else app.loadRuang();
+                } catch (err) { app.showToast("Gagal mengajukan validasi.", "error"); }
+            },
+
+            loadDataValidasiDinas: async (type) => {
+                // Untuk Admin Dinas: Memuat daftar data yang berstatus 'Diajukan' (Sesuai Jenjang)
+                var tbody = document.getElementById('table-body-validasi');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
+                
+                var jenjangAdmin = app.currentUser.role === 'admin_sd' ? 'SD' : (app.currentUser.role === 'admin_smp' ? 'SMP' : null);
+                var table = type === 'bangunan' ? 'prasarana_bangunan' : 'prasarana_ruang';
+                
+                try {
+                    // Gunakan Inner Join ke schools untuk memfilter jenjang (PostgREST syntax)
+                    var query = supabaseClient.from(table).select('*, schools!inner(nama_sekolah, npsn, jenjang)').eq('status_validasi', 'Diajukan');
+                    if(jenjangAdmin) query = query.eq('schools.jenjang', jenjangAdmin);
+                    
+                    var { data, error } = await query;
+                    if(error) throw error;
+                    
+                    tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Tidak ada pengajuan validasi baru.</td></tr>'; return; }
+                    
+                    data.forEach(item => {
+                        var objekNama = type === 'bangunan' ? item.nama_bangunan : item.jenis_ruang;
+                        var btn = `<button onclick="app.bukaModalValidasi('${type}', '${item.id}', '${objekNama}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded text-xs transition">Proses</button>`;
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="px-4 py-2"><span class="font-bold text-gray-800">${item.schools.nama_sekolah}</span><br><span class="text-xs text-gray-500">NPSN: ${item.schools.npsn}</span></td>
+                                <td class="px-4 py-2 font-medium text-gray-700">${objekNama} <br><span class="text-[10px] bg-gray-200 px-1 rounded uppercase">${type}</span></td>
+                                <td class="px-4 py-2 text-center font-bold text-red-500">${item.tingkat_kerusakan}%</td>
+                                <td class="px-4 py-2 text-center">${app.getValidasiBadge(item.status_validasi)}</td>
+                                <td class="px-4 py-2 text-center">${btn}</td>
+                            </tr>
+                        `;
+                    });
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Gagal memuat antrean validasi.</td></tr>'; }
+            },
+
+            bukaModalValidasi: (type, id, name) => {
+                document.getElementById('val-item-id').value = id;
+                document.getElementById('val-item-type').value = type;
+                document.getElementById('val-item-name').innerText = name;
+                document.getElementById('val-keputusan').value = '';
+                document.getElementById('val-catatan').value = '';
+                document.getElementById('modal-validasi').classList.remove('hidden');
+            },
+
+            prosesValidasi: async () => {
+                var id = document.getElementById('val-item-id').value;
+                var type = document.getElementById('val-item-type').value;
+                var keputusan = document.getElementById('val-keputusan').value;
+                var catatan = document.getElementById('val-catatan').value;
+
+                if(!keputusan) return app.showToast("Pilih keputusan validasi terlebih dahulu!", "error");
+                if((keputusan === 'Ditolak' || keputusan === 'Perlu Perbaikan') && !catatan) {
+                    return app.showToast("Catatan wajib diisi jika Ditolak / Revisi!", "warning");
+                }
+
+                var table = type === 'bangunan' ? 'prasarana_bangunan' : 'prasarana_ruang';
+                try {
+                    var { error } = await supabaseClient.from(table).update({
+                        status_validasi: keputusan,
+                        validation_note: catatan,
+                        validator_id: app.currentUser.id,
+                        validated_at: new Date().toISOString()
+                    }).eq('id', id);
+
+                    if(error) throw error;
+                    
+                    app.showToast("Validasi berhasil disimpan!", "success");
+                    document.getElementById('modal-validasi').classList.add('hidden');
+                    app.loadDataValidasiDinas(type); // Refresh tabel
+                } catch(err) { app.showToast("Gagal menyimpan validasi.", "error"); }
             }
         };
 
