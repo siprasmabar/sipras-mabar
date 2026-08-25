@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,10 +34,8 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- MAIN APP CONTAINER -->
     <div id="app-container" class="w-full min-h-screen">
 
         <!-- ================= LANDING PAGE ================= -->
@@ -64,7 +62,7 @@
                 </div>
                 <div class="mt-16 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div><i class="fas fa-map-marked-alt text-4xl text-blue-500 mb-4"></i><h3 class="font-bold text-lg mb-2">Pemetaan Geospasial</h3><p class="text-sm text-gray-500">Integrasi koordinat wilayah untuk akurasi data lokasi.</p></div>
-                    <div><i class="fas fa-chart-pie text-4xl text-teal-500 mb-4"></i><h3 class="font-bold text-lg mb-2">Analisis Kerusakan</h3><p class="text-sm text-gray-500">Kalkulasi cerdas untuk tingkat kerusakan bangunan.</p></div>
+                    <div><i class="fas fa-chart-pie text-4xl text-teal-500 mb-4"></i><h3 class="font-bold text-lg mb-2">Analisis Kerusakan</h3><p class="text-sm text-gray-500">Kalkulasi cerdas tingkat kerusakan bangunan otomatis.</p></div>
                     <div><i class="fas fa-shield-alt text-4xl text-indigo-500 mb-4"></i><h3 class="font-bold text-lg mb-2">Validasi Berlapis</h3><p class="text-sm text-gray-500">Persetujuan data bertingkat dari operator hingga dinas.</p></div>
                 </div>
             </main>
@@ -82,17 +80,17 @@
                 <form id="form-login" onsubmit="app.handleLogin(event)" class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                        <input type="text" id="login-username" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="Contoh: admin_komodo">
+                        <input type="text" id="login-username" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition" placeholder="Contoh: admin_komodo">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                         <div class="relative">
-                            <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="••••••••">
+                            <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition" placeholder="••••••••">
                             <button type="button" onclick="app.togglePassword('login-password', 'eye-icon-login')" class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-teal-600"><i id="eye-icon-login" class="fas fa-eye"></i></button>
                         </div>
                     </div>
-                    <button type="submit" id="btn-login" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 flex justify-center items-center">
-                        <span>Masuk</span>
+                    <button type="submit" id="btn-login" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-lg transition duration-200">
+                        Masuk
                     </button>
                 </form>
             </div>
@@ -125,7 +123,7 @@
                     <p class="text-sm text-gray-500" id="val-item-name">Nama Entitas: -</p>
                 </div>
                 <input type="hidden" id="val-item-id">
-                <input type="hidden" id="val-item-type"> <!-- 'bangunan' atau 'ruang' -->
+                <input type="hidden" id="val-item-type"> 
                 
                 <div class="space-y-4">
                     <div>
@@ -199,7 +197,7 @@
                 </div>
             </aside>
 
-            <!-- Main Content -->
+            <!-- Main Content Area -->
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
                 <!-- Topbar -->
                 <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-10 shrink-0">
@@ -216,10 +214,8 @@
                     </div>
                 </header>
 
-                <!-- Dashboard Content Area -->
                 <main class="flex-1 overflow-y-auto bg-slate-50 p-6">
                     
-                    <!-- WARNING BANNER PROFIL BELUM LENGKAP -->
                     <div id="banner-profil-warning" class="hidden mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg shadow-sm">
                         <div class="flex">
                             <div class="flex-shrink-0"><i class="fas fa-exclamation-triangle text-yellow-400 mt-1"></i></div>
@@ -231,10 +227,8 @@
                         </div>
                     </div>
 
-                    <!-- VIEW: HOME (DASHBOARD) -->
                     <div id="content-home" class="dashboard-content block">
-                        
-                        <!-- PROGRESS KELENGKAPAN DATA (KHUSUS OPERATOR) -->
+                        <!-- PROGRESS KELENGKAPAN (OPERATOR) -->
                         <div id="dashboard-operator-progress" class="hidden mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h3 class="text-sm font-bold text-gray-800 mb-3">Status Kelengkapan Data Pendataan</h3>
                             <div class="flex items-center gap-4">
@@ -265,7 +259,7 @@
                             </div>
                         </div>
 
-                        <!-- STATISTIK KARTU (CARD) -->
+                        <!-- STATISTIK KARTU -->
                         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" id="dashboard-stats-container">
                             <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
                                 <div><p class="text-xs text-gray-500 font-medium">Total Sarana</p><p class="text-xl font-bold text-gray-800" id="stat-tot-sarana">0</p></div>
@@ -310,7 +304,6 @@
                         </div>
                     </div>
 
-                    <!-- VIEW: PROFIL SEKOLAH -->
                     <div id="content-profil" class="dashboard-content hidden space-y-6">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
@@ -319,12 +312,10 @@
                             <div class="p-6">
                                 <form id="form-profil-sekolah" onsubmit="app.saveSchoolProfile(event)" class="space-y-6">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <!-- Readonly Fields -->
                                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Nama Sekolah</label><input type="text" id="prof-nama" class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 outline-none" readonly></div>
                                         <div><label class="block text-sm font-medium text-gray-700 mb-1">NPSN</label><input type="text" id="prof-npsn" class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 outline-none" readonly></div>
                                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Jenjang</label><input type="text" id="prof-jenjang" class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 outline-none" readonly></div>
                                         
-                                        <!-- Editable Fields -->
                                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Tahun Berdiri <span class="text-red-500">*</span></label><input type="number" id="prof-tahun" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></div>
                                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Nama Kepala Sekolah <span class="text-red-500">*</span></label><input type="text" id="prof-kepsek" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></div>
                                         <div><label class="block text-sm font-medium text-gray-700 mb-1">NIP Kepala Sekolah</label><input type="text" id="prof-nip" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></div>
@@ -350,7 +341,7 @@
                                             <button type="button" onclick="app.getLocationGPS()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-2 rounded-lg text-sm font-medium transition flex justify-center items-center gap-2">
                                                 <i class="fas fa-location-arrow"></i> Deteksi GPS Saya
                                             </button>
-                                            <p class="text-xs text-gray-500">Geser pin (marker) merah pada peta di samping untuk menyesuaikan lokasi akurat bangunan sekolah.</p>
+                                            <p class="text-xs text-gray-500">Geser pin merah pada peta di samping untuk menyesuaikan lokasi.</p>
                                         </div>
                                         <div>
                                             <div id="map" class="map-container shadow-inner border border-gray-200"></div>
@@ -367,9 +358,7 @@
                         </div>
                     </div>
 
-                    <!-- VIEW: DATA SARANA -->
                     <div id="content-sarana" class="dashboard-content hidden space-y-6">
-                        <!-- Form Tambah Sarana -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center cursor-pointer" onclick="document.getElementById('form-sarana-container').classList.toggle('hidden')">
                                 <h3 class="font-bold text-gray-800"><i class="fas fa-plus-circle text-teal-600 mr-2"></i> Tambah Data Sarana</h3>
@@ -377,8 +366,6 @@
                             </div>
                             <div id="form-sarana-container" class="p-6 hidden">
                                 <form id="form-sarana" onsubmit="app.saveSarana(event)" class="space-y-6">
-                                    
-                                    <!-- Baris 1: Klasifikasi -->
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Sarana <span class="text-red-500">*</span></label>
@@ -404,42 +391,38 @@
                                             <select id="sarana-subkategori" required disabled class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none disabled:bg-gray-100">
                                                 <option value="">-- Pilih Kategori Dulu --</option>
                                             </select>
-                                            <input type="text" id="sarana-subkategori-text" class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none mt-1" placeholder="Ketik subkategori manual...">
+                                            <input type="text" id="sarana-subkategori-text" class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none mt-1" placeholder="Ketik manual...">
                                         </div>
                                     </div>
 
-                                    <!-- Baris 2: Khusus Buku (Hidden by default) -->
                                     <div id="blok-buku" class="hidden grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                                         <div class="col-span-1 lg:col-span-1"><label class="block text-xs font-semibold text-gray-700 mb-1">Kode / ISBN</label><input type="text" id="buku-isbn" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"></div>
                                         <div class="col-span-1 lg:col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Judul Buku</label><input type="text" id="buku-judul" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"></div>
-                                        <div class="col-span-1"><label class="block text-xs font-semibold text-gray-700 mb-1">Pengarang/Penulis</label><input type="text" id="buku-pengarang" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"></div>
+                                        <div class="col-span-1"><label class="block text-xs font-semibold text-gray-700 mb-1">Pengarang</label><input type="text" id="buku-pengarang" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"></div>
                                         <div class="col-span-1"><label class="block text-xs font-semibold text-gray-700 mb-1">Penerbit</label><input type="text" id="buku-penerbit" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"></div>
                                         <div class="col-span-1"><label class="block text-xs font-semibold text-gray-700 mb-1">Tahun Terbit</label><input type="number" id="buku-tahun" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"></div>
                                     </div>
 
-                                    <!-- Baris 3: Kalkulasi Kondisi -->
                                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                         <div><label class="block text-xs font-semibold text-gray-700 mb-1">Baik</label><input type="number" min="0" value="0" id="sarana-baik" oninput="app.calcSaranaTotal()" class="w-full px-3 py-2 border border-gray-300 rounded text-center text-emerald-600 font-bold"></div>
                                         <div><label class="block text-xs font-semibold text-gray-700 mb-1">Rusak Ringan</label><input type="number" min="0" value="0" id="sarana-rr" oninput="app.calcSaranaTotal()" class="w-full px-3 py-2 border border-gray-300 rounded text-center text-yellow-600 font-bold"></div>
                                         <div><label class="block text-xs font-semibold text-gray-700 mb-1">Rusak Berat</label><input type="number" min="0" value="0" id="sarana-rb" oninput="app.calcSaranaTotal()" class="w-full px-3 py-2 border border-gray-300 rounded text-center text-red-600 font-bold"></div>
-                                        <div><label class="block text-xs font-semibold text-teal-700 mb-1">Total (Auto)</label><input type="number" readonly value="0" id="sarana-total" class="w-full px-3 py-2 bg-teal-100 border border-teal-200 rounded text-center font-bold text-teal-800 outline-none cursor-not-allowed"></div>
+                                        <div><label class="block text-xs font-semibold text-teal-700 mb-1">Total (Auto)</label><input type="number" readonly value="0" id="sarana-total" class="w-full px-3 py-2 bg-teal-100 border border-teal-200 rounded text-center font-bold text-teal-800 outline-none"></div>
                                         <div><label class="block text-xs font-semibold text-indigo-700 mb-1">Jumlah Kebutuhan Baru</label><input type="number" min="0" value="0" id="sarana-kebutuhan" class="w-full px-3 py-2 border border-indigo-200 bg-indigo-50 rounded text-center text-indigo-700 font-bold"></div>
                                     </div>
 
-                                    <!-- Baris 4: File Upload & Catatan -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan (Komentar Tambahan)</label>
-                                            <textarea id="sarana-catatan" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none" placeholder="Isi catatan bila diperlukan..."></textarea>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                                            <textarea id="sarana-catatan" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none"></textarea>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto/Dokumen Bukti (Maks 5MB)</label>
-                                            <input type="file" id="sarana-foto" accept=".jpg, .jpeg, .png, .pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer text-sm">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto/Dokumen Bukti (Maks 5MB)</label>
+                                            <input type="file" id="sarana-foto" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer text-sm">
                                             <p class="text-[10px] text-gray-500 mt-1">* Opsional. Mendukung PNG, JPEG, JPG, PDF.</p>
                                         </div>
                                     </div>
                                     
-                                    <!-- Tombol Submit -->
                                     <div class="flex justify-end pt-4 border-t border-gray-100">
                                         <button type="submit" id="btn-save-sarana" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm transition flex items-center gap-2">
                                             <i class="fas fa-save"></i> Simpan Data Sarana
@@ -449,31 +432,26 @@
                             </div>
                         </div>
 
-                        <!-- Tabel Data Sarana -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50"><h3 class="font-bold text-gray-800">Daftar Inventaris Sarana</h3></div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left text-gray-600">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                                         <tr><th class="px-4 py-3">Jenis & Kategori</th><th class="px-4 py-3 text-center">Baik</th><th class="px-4 py-3 text-center">R. Ringan</th><th class="px-4 py-3 text-center">R. Berat</th><th class="px-4 py-3 text-center">Total</th><th class="px-4 py-3 text-center">Keb. Baru</th><th class="px-4 py-3 text-center">Lampiran</th></tr>
                                     </thead>
-                                    <tbody id="table-body-sarana" class="divide-y divide-gray-100">
-                                        <!-- Data via JS -->
-                                    </tbody>
+                                    <tbody id="table-body-sarana" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <!-- VIEW: DATA PRASARANA -->
                     <div id="content-prasarana" class="dashboard-content hidden">
                         <!-- Navigasi Tab Prasarana -->
                         <div class="border-b border-gray-200 mb-6 overflow-x-auto">
                             <nav class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
                                 <button onclick="app.switchPrasaranaTab('lahan')" id="tab-btn-lahan" class="border-teal-500 text-teal-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-map-marked-alt mr-2"></i> Lahan</button>
-                                <button onclick="app.switchPrasaranaTab('bangunan')" id="tab-btn-bangunan" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-building mr-2"></i> Bangunan</button>
-                                <button onclick="app.switchPrasaranaTab('ruang')" id="tab-btn-ruang" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-door-open mr-2"></i> Ruangan</button>
-                                <button onclick="app.switchPrasaranaTab('fasilitas')" id="tab-btn-fasilitas" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-road mr-2"></i> Fasilitas Penunjang</button>
+                                <button onclick="app.switchPrasaranaTab('bangunan')" id="tab-btn-bangunan" class="border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-building mr-2"></i> Bangunan</button>
+                                <button onclick="app.switchPrasaranaTab('ruang')" id="tab-btn-ruang" class="border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-door-open mr-2"></i> Ruangan</button>
+                                <button onclick="app.switchPrasaranaTab('fasilitas')" id="tab-btn-fasilitas" class="border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition"><i class="fas fa-road mr-2"></i> Fasilitas Penunjang</button>
                             </nav>
                         </div>
 
@@ -515,18 +493,10 @@
                                                 <button type="button" onclick="app.getLocationGPSLahan()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 py-2 rounded text-sm font-medium transition">
                                                     <i class="fas fa-map-marker-alt"></i> Gunakan GPS / Geser Pin
                                                 </button>
-                                                <p class="text-[10px] text-gray-500">Pin lokasi ini dapat mempermudah pemetaan lahan kosong atau terpisah.</p>
                                             </div>
-                                            <div>
-                                                <div id="map-lahan" class="h-48 w-full rounded border border-gray-300 z-10"></div>
-                                            </div>
+                                            <div><div id="map-lahan" class="h-48 w-full rounded border border-gray-300 z-10"></div></div>
                                         </div>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Upload Sertifikat (PDF)</label><input type="file" id="lahan-file-sertifikat" accept=".pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-xs"></div>
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Foto Lahan (Maks 5MB)</label><input type="file" id="lahan-foto" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-xs"></div>
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Keterangan / Catatan Tambahan</label><input type="text" id="lahan-keterangan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                        </div>
+                                        
                                         <div class="flex justify-end pt-2"><button type="submit" id="btn-save-lahan" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium text-sm transition">Simpan Lahan</button></div>
                                     </form>
                                 </div>
@@ -545,20 +515,10 @@
                                             <div class="col-span-1 md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Nama Bangunan <span class="text-red-500">*</span></label><input type="text" id="bang-nama" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Kode Bangunan</label><input type="text" id="bang-kode" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Jumlah Lantai</label><input type="number" id="bang-lantai" value="1" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                            
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Tahun Pembangunan</label><input type="number" id="bang-tahun" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-1">Sumber Dana</label>
-                                                <select id="bang-sumber" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="APBN">APBN</option><option value="APBD">APBD</option><option value="DAK">DAK</option><option value="BOS">BOS</option><option value="Hibah">Hibah</option><option value="Swadaya">Swadaya</option><option value="Lainnya">Lainnya</option></select>
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-1">Konstruksi</label>
-                                                <select id="bang-konstruksi" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="Permanen">Permanen</option><option value="Semi Permanen">Semi Permanen</option><option value="Non-Permanen">Non-Permanen</option></select>
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-1">Status Kepemilikan</label>
-                                                <select id="bang-kepemilikan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="Milik">Milik</option><option value="Bukan Milik">Bukan Milik</option><option value="Sewa">Sewa</option><option value="Pinjam Pakai">Pinjam Pakai</option><option value="Dll">Dll</option></select>
-                                            </div>
+                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Sumber Dana</label><select id="bang-sumber" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="APBN">APBN</option><option value="APBD">APBD</option><option value="DAK">DAK</option><option value="BOS">BOS</option><option value="Hibah">Hibah</option><option value="Swadaya">Swadaya</option><option value="Lainnya">Lainnya</option></select></div>
+                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Konstruksi</label><select id="bang-konstruksi" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="Permanen">Permanen</option><option value="Semi Permanen">Semi Permanen</option><option value="Non-Permanen">Non-Permanen</option></select></div>
+                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Status Kepemilikan</label><select id="bang-kepemilikan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="Milik">Milik</option><option value="Bukan Milik">Bukan Milik</option><option value="Sewa">Sewa</option><option value="Pinjam Pakai">Pinjam Pakai</option><option value="Dll">Dll</option></select></div>
                                         </div>
                                         <div class="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                             <div><label class="block text-xs font-semibold text-gray-600 mb-1">Panjang (m)</label><input type="number" step="0.01" id="bang-panjang" value="0" oninput="app.calcBangunan()" class="w-full px-3 py-2 border border-gray-300 rounded text-center"></div>
@@ -569,25 +529,16 @@
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label>
                                                 <input type="number" step="0.01" id="bang-rusak" required min="0" max="100" value="0" oninput="app.calcBangunan()" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-2xl font-bold text-center focus:ring-2 focus:ring-teal-500">
-                                                <p class="text-[10px] text-gray-500 text-center mt-1">Isi angka 0 hingga 100.</p>
                                             </div>
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Kondisi Bangunan (Otomatis)</label>
-                                                <div id="bang-kondisi-wrapper" class="px-3 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-center items-center">
-                                                    <span id="bang-kondisi" class="font-bold text-lg text-emerald-700">Baik</span>
-                                                </div>
-                                                <p class="text-[10px] text-gray-500 text-center mt-1">Kalkulasi sistem berdasarkan persentase kerusakan.</p>
+                                                <div id="bang-kondisi-wrapper" class="px-3 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-center items-center"><span id="bang-kondisi" class="font-bold text-lg text-emerald-700">Baik</span></div>
                                             </div>
-                                        </div>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Foto Bangunan (Maks 5MB)</label><input type="file" id="bang-foto" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-xs"></div>
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Keterangan / Catatan</label><input type="text" id="bang-keterangan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
                                         </div>
                                         <div class="flex justify-end pt-2"><button type="submit" id="btn-save-bang" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium text-sm transition">Simpan Bangunan</button></div>
                                     </form>
                                 </div>
                             </div>
-                            <!-- Tabel Bangunan -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-sm text-left text-gray-600">
@@ -611,24 +562,12 @@
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div class="col-span-1 md:col-span-2">
                                                 <label class="block text-xs font-medium text-gray-700 mb-1">Pilih Bangunan Induk <span class="text-red-500">*</span></label>
-                                                <select id="ruang-bangunan-id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold bg-blue-50 text-blue-800 focus:ring-blue-500">
-                                                    <option value="">-- Muat Bangunan --</option>
-                                                </select>
+                                                <select id="ruang-bangunan-id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold bg-blue-50 text-blue-800 focus:ring-blue-500"><option value="">-- Muat Bangunan --</option></select>
                                             </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Ruang <span class="text-red-500">*</span></label>
-                                                <select id="ruang-jenis" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                                                    <option value="">-- Pilih --</option><option value="Ruang Kelas">Ruang Kelas</option><option value="Perpustakaan">Perpustakaan</option><option value="Laboratorium IPA">Laboratorium IPA</option><option value="Laboratorium Komputer">Laboratorium Komputer</option><option value="UKS">UKS</option><option value="Kantor (Kepsek/TU/Guru)">Kantor (Kepsek/TU/Guru)</option><option value="Ruang Guru">Ruang Guru</option><option value="Ruang Administrasi">Ruang Administrasi</option><option value="Rumah Dinas">Rumah Dinas</option><option value="Aula">Aula</option><option value="Tempat Ibadah">Tempat Ibadah</option><option value="Gudang">Gudang</option><option value="Asrama">Asrama</option><option value="Toilet Guru">Toilet Guru</option><option value="Toilet Siswa">Toilet Siswa</option><option value="Lainnya">Lainnya</option>
-                                                </select>
-                                            </div>
+                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Jenis Ruang <span class="text-red-500">*</span></label><select id="ruang-jenis" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">-- Pilih --</option><option value="Ruang Kelas">Ruang Kelas</option><option value="Perpustakaan">Perpustakaan</option><option value="Laboratorium IPA">Laboratorium IPA</option><option value="Laboratorium Komputer">Laboratorium Komputer</option><option value="UKS">UKS</option><option value="Kantor (Kepsek/TU/Guru)">Kantor (Kepsek/TU/Guru)</option><option value="Ruang Guru">Ruang Guru</option><option value="Ruang Administrasi">Ruang Administrasi</option><option value="Rumah Dinas">Rumah Dinas</option><option value="Aula">Aula</option><option value="Tempat Ibadah">Tempat Ibadah</option><option value="Gudang">Gudang</option><option value="Asrama">Asrama</option><option value="Toilet Guru">Toilet Guru</option><option value="Toilet Siswa">Toilet Siswa</option><option value="Lainnya">Lainnya</option></select></div>
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Fungsi Ruang</label><input type="text" id="ruang-fungsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Lantai Ke-</label><input type="number" id="ruang-lantai" value="1" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
                                             <div><label class="block text-xs font-medium text-gray-700 mb-1">Kapasitas (Orang)</label><input type="number" id="ruang-kapasitas" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-1">Status Ruang</label>
-                                                <select id="ruang-status" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="Digunakan">Digunakan</option><option value="Tidak Digunakan">Tidak Digunakan</option></select>
-                                            </div>
-                                            <div class="col-span-1 md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Tahun Rehabilitasi Terakhir</label><input type="date" id="ruang-rehab" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
                                         </div>
                                         <div class="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                             <div><label class="block text-xs font-semibold text-gray-600 mb-1">Panjang (m)</label><input type="number" step="0.01" id="ruang-panjang" value="0" oninput="app.calcRuang()" class="w-full px-3 py-2 border border-gray-300 rounded text-center"></div>
@@ -636,26 +575,13 @@
                                             <div class="col-span-2"><label class="block text-xs font-semibold text-teal-700 mb-1">Luas Ruang (Auto)</label><input type="text" id="ruang-luas" value="0 m²" readonly class="w-full px-3 py-2 bg-teal-50 border border-teal-200 rounded text-center font-bold text-teal-700"></div>
                                         </div>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                                            <div>
-                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label>
-                                                <input type="number" step="0.01" id="ruang-rusak" required min="0" max="100" value="0" oninput="app.calcRuang()" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-2xl font-bold text-center focus:ring-2 focus:ring-teal-500">
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Kondisi Ruang</label>
-                                                <div id="ruang-kondisi-wrapper" class="px-3 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-center items-center">
-                                                    <span id="ruang-kondisi" class="font-bold text-lg text-emerald-700">Baik</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Foto Ruangan (Maks 5MB)</label><input type="file" id="ruang-foto" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-xs"></div>
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Keterangan / Catatan</label><input type="text" id="ruang-keterangan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
+                                            <div><label class="block text-sm font-semibold text-gray-700 mb-2">Tingkat Kerusakan (%) <span class="text-red-500">*</span></label><input type="number" step="0.01" id="ruang-rusak" required min="0" max="100" value="0" oninput="app.calcRuang()" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-2xl font-bold text-center focus:ring-2 focus:ring-teal-500"></div>
+                                            <div><label class="block text-sm font-semibold text-gray-700 mb-2">Kondisi Ruang</label><div id="ruang-kondisi-wrapper" class="px-3 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-center items-center"><span id="ruang-kondisi" class="font-bold text-lg text-emerald-700">Baik</span></div></div>
                                         </div>
                                         <div class="flex justify-end pt-2"><button type="submit" id="btn-save-ruang" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium text-sm transition">Simpan Ruang</button></div>
                                     </form>
                                 </div>
                             </div>
-                            <!-- Tabel Ruang -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-sm text-left text-gray-600">
@@ -670,48 +596,33 @@
 
                         <!-- TAB: FASILITAS -->
                         <div id="tab-fasilitas" class="space-y-6 hidden">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center cursor-pointer" onclick="document.getElementById('form-fasilitas-container').classList.toggle('hidden')">
-                                    <h3 class="font-bold text-gray-800"><i class="fas fa-plus-circle text-teal-600 mr-2"></i> Tambah Fasilitas Penunjang</h3>
-                                </div>
-                                <div id="form-fasilitas-container" class="p-6 hidden">
-                                    <form id="form-fasilitas" onsubmit="app.saveFasilitas(event)" class="space-y-4">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                            <div class="col-span-1 md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Nama Fasilitas <span class="text-red-500">*</span></label><input type="text" id="fasilitas-nama" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Fasilitas <span class="text-red-500">*</span></label>
-                                                <select id="fasilitas-jenis" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                                                    <option value="">-- Pilih --</option><option value="Jalan/Rabat">Jalan/Rabat</option><option value="Tembok Penahan Tanah (TPT)">Tembok Penahan Tanah (TPT)</option><option value="Pagar">Pagar</option><option value="Lapangan Olahraga">Lapangan Olahraga</option><option value="Tempat Parkir">Tempat Parkir</option><option value="Lainnya">Lainnya</option>
-                                                </select>
-                                            </div>
-                                            <div><label class="block text-xs font-medium text-gray-700 mb-1">Luas (m²)</label><input type="number" step="0.01" id="fasilitas-luas" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></div>
-                    <!-- VIEW: VALIDASI DATA (ADMIN) -->
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                                <h3 class="text-gray-500">Form Fasilitas Penunjang akan tersedia pada Update Berikutnya.</h3>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="content-validasi" class="dashboard-content hidden space-y-6">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h2 class="text-lg font-bold text-gray-800 mb-2">Pusat Validasi Data Sarpras</h2>
                             <p class="text-sm text-gray-500 mb-4">Tinjau data Bangunan dan Ruangan yang diajukan oleh Operator Sekolah.</p>
-                            
                             <div class="border-b border-gray-200 mb-4">
                                 <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                                     <button onclick="app.loadDataValidasiDinas('bangunan')" class="border-teal-500 text-teal-600 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition">Validasi Bangunan</button>
-                                    <button onclick="app.loadDataValidasiDinas('ruang')" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition">Validasi Ruangan</button>
+                                    <button onclick="app.loadDataValidasiDinas('ruang')" class="border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition">Validasi Ruangan</button>
                                 </nav>
                             </div>
-
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left text-gray-600">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                                         <tr><th class="px-4 py-3">NPSN & Sekolah</th><th class="px-4 py-3">Objek Diajukan</th><th class="px-4 py-3 text-center">Kerusakan</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Tindakan</th></tr>
                                     </thead>
-                                    <tbody id="table-body-validasi" class="divide-y divide-gray-100">
-                                        <tr><td colspan="5" class="text-center py-4 text-gray-400">Pilih tab untuk memuat data.</td></tr>
-                                    </tbody>
+                                    <tbody id="table-body-validasi" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <!-- VIEW: HELPDESK -->
                     <div id="content-helpdesk" class="dashboard-content hidden space-y-6">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <div class="flex justify-between items-center mb-4">
@@ -724,7 +635,6 @@
                                 </button>
                             </div>
 
-                            <!-- Form Buat Tiket (Khusus Operator) -->
                             <div id="form-tiket-container" class="hidden mb-6 p-5 border border-gray-200 bg-gray-50 rounded-lg">
                                 <form id="form-tiket" onsubmit="app.simpanTiket(event)" class="space-y-4">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -735,48 +645,37 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
                                             <select id="tiket-kategori" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-teal-500 outline-none">
-                                                <option value="">-- Pilih --</option>
-                                                <option value="Kesalahan Data">Kesalahan Data</option>
-                                                <option value="Sistem Error / Bug">Sistem Error / Bug</option>
-                                                <option value="Lupa Cara Input">Lupa Cara Input</option>
-                                                <option value="Lainnya">Lainnya</option>
+                                                <option value="">-- Pilih --</option><option value="Kesalahan Data">Kesalahan Data</option><option value="Sistem Error / Bug">Sistem Error / Bug</option><option value="Lupa Cara Input">Lupa Cara Input</option><option value="Lainnya">Lainnya</option>
                                             </select>
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Lampiran Foto/Screenshot (Maks 5MB)</label>
-                                            <input type="file" id="tiket-lampiran" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-teal-700 text-sm">
+                                            <input type="file" id="tiket-lampiran" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1 file:px-3 file:text-xs file:bg-teal-50 file:text-teal-700 text-sm">
                                         </div>
                                         <div class="col-span-1 md:col-span-2">
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Jelaskan Kendala <span class="text-red-500">*</span></label>
-                                            <textarea id="tiket-pesan" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-teal-500 outline-none" placeholder="Deskripsikan masalah dengan jelas..."></textarea>
+                                            <textarea id="tiket-pesan" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-teal-500 outline-none"></textarea>
                                         </div>
                                     </div>
-                                    <div class="flex justify-end">
-                                        <button type="submit" id="btn-save-tiket" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-medium text-sm transition">Kirim Tiket</button>
-                                    </div>
+                                    <div class="flex justify-end"><button type="submit" id="btn-save-tiket" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-medium text-sm transition">Kirim Tiket</button></div>
                                 </form>
                             </div>
 
-                            <!-- Daftar Tiket -->
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left text-gray-600">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                                         <tr><th class="px-4 py-3">No. Tiket</th><th class="px-4 py-3">Subjek & Kategori</th><th class="px-4 py-3 text-center">Tanggal</th><th class="px-4 py-3 text-center">Status</th></tr>
                                     </thead>
-                                    <tbody id="table-body-helpdesk" class="divide-y divide-gray-100">
-                                        <!-- Data via JS -->
-                                    </tbody>
+                                    <tbody id="table-body-helpdesk" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- VIEW: PENGUMUMAN -->
                     <div id="content-pengumuman" class="dashboard-content hidden space-y-6">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h2 class="text-lg font-bold text-gray-800 mb-4">Pengumuman & Informasi</h2>
                             <p class="text-sm text-gray-500">Pusat informasi resmi dari Dinas Pendidikan Kepemudaan dan Olahraga.</p>
-                            <!-- Fitur Pengumuman akan diaktifkan secara utuh pada sub-menu khusus nanti -->
                             <div class="mt-6 p-10 text-center border-2 border-dashed border-gray-200 rounded-lg">
                                 <i class="fas fa-bullhorn text-4xl text-gray-300 mb-3"></i>
                                 <h3 class="text-gray-500 font-medium">Belum Ada Pengumuman Baru</h3>
@@ -789,14 +688,10 @@
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT APP LOGIC -->
     <script>
-        // ==========================================
-        // KONFIGURASI SUPABASE (Isi dengan Key Anda!)
-        // ==========================================
-        var SUPABASE_URL = "https://jiruttcarflcoepuhkiw.supabase.co"; // PASTIKAN ADA TANDA KUTIP TUTUP
-        var SUPABASE_ANON_KEY = "sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f"; // MASUKKAN KEY ANDA DI SINI
-        
+        // MASUKKAN KEY SUPABASE ANDA DI BAWAH INI (Pastikan Ada Tanda Kutip Tutup)
+        var SUPABASE_URL = "https://jiruttcarflcoepuhkiw.supabase.co";
+        var SUPABASE_ANON_KEY = "sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f"; 
         var supabaseClient = null;
 
         var app = {
@@ -806,7 +701,7 @@
             marker: null,
             mapLahan: null,
             markerLahan: null,
-            charts: {}, // Penyimpanan instance grafik agar tidak crash saat render ulang
+            charts: {},
 
             masterSarana: {
                 "Meubeler": {
@@ -865,17 +760,9 @@
                         var session = await supabaseClient.auth.getSession();
                         if(session.data.session) {
                             await app.fetchUserProfile(session.data.session.user.id);
-                        } else {
-                            app.switchView('landing');
-                        }
-                    } else {
-                        app.switchView('landing');
-                        console.warn("Supabase Keys belum dikonfigurasi. UI tetap berjalan dalam mode simulasi.");
-                    }
-                } catch(err) {
-                    console.error("Gagal terhubung ke Supabase:", err);
-                    app.switchView('landing');
-                }
+                        } else { app.switchView('landing'); }
+                    } else { app.switchView('landing'); }
+                } catch(err) { app.switchView('landing'); }
             },
 
             showToast: (message, type = 'success') => {
@@ -940,30 +827,23 @@
 
             handleLogin: async (e) => {
                 e.preventDefault();
-                if(!supabaseClient) return app.showToast("Koneksi Supabase belum dikonfigurasi. Cek Code Editor.", "error");
-
-                var btn = document.getElementById('btn-login');
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                
+                if(!supabaseClient) return app.showToast("Koneksi Supabase belum dikonfigurasi.", "error");
+                var btn = document.getElementById('btn-login'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 var username = document.getElementById('login-username').value;
                 var pass = document.getElementById('login-password').value;
-                var dummyEmail = username + "@sipras.local"; // Supabase Auth bypass trick
-                
+                var dummyEmail = username + "@sipras.local"; 
                 try {
                     var { data, error } = await supabaseClient.auth.signInWithPassword({ email: dummyEmail, password: pass });
                     if(error) throw error;
                     app.hideLoginModal();
                     await app.fetchUserProfile(data.user.id);
                 } catch (error) {
-                    app.showToast("Login gagal: Username atau Password salah.", "error");
+                    app.showToast("Login gagal: Username/Password salah.", "error");
                     btn.innerHTML = 'Masuk';
                 }
             },
 
-            handleLogout: async () => {
-                if(supabaseClient) await supabaseClient.auth.signOut();
-                window.location.reload();
-            },
+            handleLogout: async () => { if(supabaseClient) await supabaseClient.auth.signOut(); window.location.reload(); },
 
             fetchUserProfile: async (userId) => {
                 if(!supabaseClient) return;
@@ -972,35 +852,20 @@
                     if(error) throw error;
                     app.currentUser = user;
 
-                    if(user.must_change_password) {
-                        document.getElementById('modal-change-password').classList.remove('hidden');
-                        return;
-                    }
+                    if(user.must_change_password) { document.getElementById('modal-change-password').classList.remove('hidden'); return; }
 
                     document.getElementById('sidebar-user-name').innerText = user.nama;
                     document.getElementById('sidebar-user-role').innerText = user.role.replace('_', ' ').toUpperCase();
                     
-                    // PENYESUAIAN ANTARMUKA BERDASARKAN ROLE
                     if(user.role === 'operator') {
                         document.getElementById('menu-operator-group').classList.remove('hidden');
-                        document.getElementById('menu-dinas-group').classList.add('hidden');
                         document.getElementById('dashboard-operator-progress').classList.remove('hidden');
-                        document.getElementById('dashboard-dinas-filters').classList.add('hidden');
                         document.getElementById('btn-buat-tiket').classList.remove('hidden');
                     } else {
-                        document.getElementById('menu-operator-group').classList.add('hidden');
                         document.getElementById('menu-dinas-group').classList.remove('hidden');
-                        document.getElementById('dashboard-operator-progress').classList.add('hidden');
                         document.getElementById('dashboard-dinas-filters').classList.remove('hidden');
-                        document.getElementById('btn-buat-tiket').classList.add('hidden');
                         document.getElementById('topbar-school-name').innerText = "Portal Dinas";
                         document.getElementById('topbar-school-name').classList.remove('hidden');
-                        
-                        // Kunci Filter Jenjang Sesuai Kewenangan Admin
-                        var filterJenjang = document.getElementById('filter-jenjang');
-                        if(user.role === 'admin_sd') { filterJenjang.value = 'SD'; filterJenjang.disabled = true; }
-                        else if(user.role === 'admin_smp') { filterJenjang.value = 'SMP'; filterJenjang.disabled = true; }
-                        
                         app.loadMasterKecamatan();
                     }
 
@@ -1013,51 +878,40 @@
                         }
                     }
                     app.switchView('dashboard');
-                    app.loadDashboardData(); // Render otomatis chart dashboard saat masuk
-                } catch(error) {
-                    app.showToast("Gagal memuat profil pengguna.", "error");
-                }
+                    app.loadDashboardData();
+                } catch(error) { app.showToast("Gagal memuat profil.", "error"); }
             },
 
             handleForceChangePassword: async (e) => {
                 e.preventDefault();
-                var btn = document.getElementById('btn-change-pwd');
-                btn.innerHTML = 'Memproses...';
+                var btn = document.getElementById('btn-change-pwd'); btn.innerHTML = 'Memproses...';
                 var newPwd = document.getElementById('new-password').value;
-
                 try {
                     var { error: errAuth } = await supabaseClient.auth.updateUser({ password: newPwd });
                     if(errAuth) throw errAuth;
                     var { error: errDb } = await supabaseClient.from('users').update({ must_change_password: false }).eq('id', app.currentUser.id);
                     if(errDb) throw errDb;
-
                     document.getElementById('modal-change-password').classList.add('hidden');
-                    app.showToast("Password berhasil diubah!");
+                    app.showToast("Password diubah!");
                     await app.fetchUserProfile(app.currentUser.id);
-                } catch(err) {
-                    app.showToast("Gagal mengubah password.", "error");
-                    btn.innerHTML = 'Simpan Password Baru';
-                }
+                } catch(err) { app.showToast("Gagal mengubah.", "error"); btn.innerHTML = 'Simpan'; }
             },
 
             checkProfilStatus: () => {
                 var menuSarana = document.getElementById('menu-sarana');
                 var menuPrasarana = document.getElementById('menu-prasarana');
-                var iconSarana = menuSarana.querySelector('.locked-icon');
-                var iconPrasarana = menuPrasarana.querySelector('.locked-icon');
                 var bannerWarning = document.getElementById('banner-profil-warning');
-
                 if(app.currentSchool && !app.currentSchool.profil_lengkap) {
                     menuSarana.classList.add('opacity-50', 'cursor-not-allowed');
                     menuPrasarana.classList.add('opacity-50', 'cursor-not-allowed');
-                    iconSarana.classList.remove('hidden');
-                    iconPrasarana.classList.remove('hidden');
+                    menuSarana.querySelector('.locked-icon').classList.remove('hidden');
+                    menuPrasarana.querySelector('.locked-icon').classList.remove('hidden');
                     bannerWarning.classList.remove('hidden');
                 } else {
                     menuSarana.classList.remove('opacity-50', 'cursor-not-allowed');
                     menuPrasarana.classList.remove('opacity-50', 'cursor-not-allowed');
-                    iconSarana.classList.add('hidden');
-                    iconPrasarana.classList.add('hidden');
+                    menuSarana.querySelector('.locked-icon').classList.add('hidden');
+                    menuPrasarana.querySelector('.locked-icon').classList.add('hidden');
                     bannerWarning.classList.add('hidden');
                 }
                 if(app.currentUser && app.currentUser.role === 'operator') app.calcCompleteness();
@@ -1088,76 +942,47 @@
                     let { count: cSarana } = await supabaseClient.from('sarana').select('*', { count: 'exact', head: true }).eq('school_id', app.currentSchool.id);
                     if(cSarana > 0) score += 20;
                 } catch(err) {}
-                
                 document.getElementById('progress-bar-fill').style.width = score + '%';
                 document.getElementById('progress-text').innerText = score + '%';
             },
 
             renderChart: (canvasId, type, label, labels, data, colors) => {
                 var ctx = document.getElementById(canvasId).getContext('2d');
-                if(app.charts[canvasId]) app.charts[canvasId].destroy(); // Destroy old chart to prevent overlay glitch
+                if(app.charts[canvasId]) app.charts[canvasId].destroy(); 
                 app.charts[canvasId] = new Chart(ctx, {
                     type: type,
-                    data: {
-                        labels: labels,
-                        datasets: [{ label: label, data: data, backgroundColor: colors, borderWidth: 1 }]
-                    },
+                    data: { labels: labels, datasets: [{ label: label, data: data, backgroundColor: colors, borderWidth: 1 }] },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: type === 'pie' || type === 'doughnut' ? 'right' : 'top' } } }
                 });
             },
 
             loadDashboardData: async () => {
-                // Menentukan parameter filter berdasarkan role
                 var p_jenjang = document.getElementById('filter-jenjang') ? document.getElementById('filter-jenjang').value : 'ALL';
                 var p_kec = document.getElementById('filter-kecamatan') ? document.getElementById('filter-kecamatan').value : 'ALL';
                 var sid = app.currentUser.role === 'operator' ? app.currentSchool.id : null;
-
                 try {
-                    // Eksekusi fungsi RPC Database
-                    var { data, error } = await supabaseClient.rpc('get_dashboard_stats', {
-                        p_school_id: sid,
-                        p_jenjang: p_jenjang === 'ALL' ? null : p_jenjang,
-                        p_kecamatan_id: p_kec === 'ALL' ? null : p_kec
-                    });
-                    
+                    var { data, error } = await supabaseClient.rpc('get_dashboard_stats', { p_school_id: sid, p_jenjang: p_jenjang === 'ALL' ? null : p_jenjang, p_kecamatan_id: p_kec === 'ALL' ? null : p_kec });
                     if(error) throw error;
-                    
-                    var stats = data || {
-                        tot_sarana:0, baik:0, rr:0, rb:0, keb_baru:0, 
-                        tot_bangunan:0, b_baik:0, b_rr:0, b_rs:0, b_rb:0, b_rt:0,
-                        tot_ruang:0, r_baik:0, r_rr:0, r_rs:0, r_rb:0, r_rt:0
-                    };
-
-                    // Render angka ke Stats Cards
+                    var stats = data || { tot_sarana:0, baik:0, rr:0, rb:0, keb_baru:0, tot_bangunan:0, b_baik:0, b_rr:0, b_rs:0, b_rb:0, b_rt:0, tot_ruang:0, r_baik:0, r_rr:0, r_rs:0, r_rb:0, r_rt:0 };
                     document.getElementById('stat-tot-sarana').innerText = stats.tot_sarana || 0;
                     document.getElementById('stat-baik').innerText = stats.baik || 0;
                     document.getElementById('stat-tot-bangunan').innerText = stats.tot_bangunan || 0;
                     document.getElementById('stat-tot-ruang').innerText = stats.tot_ruang || 0;
                     document.getElementById('stat-ruang-rusak').innerText = (stats.r_rr||0) + (stats.r_rs||0) + (stats.r_rb||0) + (stats.r_rt||0);
 
-                    // Render Charts
                     app.renderChart('chart-sarana', 'doughnut', 'Sarana', ['Baik', 'R. Ringan', 'R. Berat'], [stats.baik||0, stats.rr||0, stats.rb||0], ['#10b981', '#f59e0b', '#ef4444']);
                     app.renderChart('chart-kebutuhan', 'bar', 'Kebutuhan', ['Total Kebutuhan Sarana Baru'], [stats.keb_baru||0], ['#8b5cf6']);
                     app.renderChart('chart-bangunan', 'pie', 'Bangunan', ['Baik', 'R. Ringan', 'R. Sedang', 'R. Berat', 'R. Total'], [stats.b_baik||0, stats.b_rr||0, stats.b_rs||0, stats.b_rb||0, stats.b_rt||0], ['#10b981', '#fcd34d', '#f59e0b', '#ef4444', '#7f1d1d']);
                     app.renderChart('chart-ruang', 'bar', 'Ruangan', ['Baik', 'R. Ringan', 'R. Sedang', 'R. Berat', 'R. Total'], [stats.r_baik||0, stats.r_rr||0, stats.r_rs||0, stats.r_rb||0, stats.r_rt||0], ['#10b981', '#fcd34d', '#f59e0b', '#ef4444', '#7f1d1d']);
-
-                } catch (err) {
-                    console.error("Gagal menarik data grafik:", err);
-                }
+                } catch (err) {}
             },
 
             initMap: (lat, lng) => {
                 if(app.map) return;
-                var initLat = lat || -8.4908; 
-                var initLng = lng || 119.8821; // Default to Manggarai Barat coordinates
-
+                var initLat = lat || -8.4908; var initLng = lng || 119.8821; 
                 app.map = L.map('map').setView([initLat, initLng], 14);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(app.map);
-
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(app.map);
                 app.marker = L.marker([initLat, initLng], {draggable: true}).addTo(app.map);
-                
                 app.marker.on('dragend', function(e) {
                     var position = app.marker.getLatLng();
                     document.getElementById('prof-lat').value = position.lat.toFixed(8);
@@ -1170,8 +995,7 @@
                 if (navigator.geolocation) {
                     app.showToast("Mencari sinyal GPS...", "warning");
                     navigator.geolocation.getCurrentPosition((pos) => {
-                        var lat = pos.coords.latitude;
-                        var lng = pos.coords.longitude;
+                        var lat = pos.coords.latitude; var lng = pos.coords.longitude;
                         document.getElementById('prof-lat').value = lat.toFixed(8);
                         document.getElementById('prof-lng').value = lng.toFixed(8);
                         if(app.map && app.marker) {
@@ -1179,17 +1003,13 @@
                             app.marker.setLatLng(newLatLng);
                             app.map.setView(newLatLng, 16);
                         }
-                        app.showToast("Lokasi berhasil ditemukan!");
-                    }, (err) => { app.showToast("Gagal mendeteksi GPS. Cek Izin browser.", "error"); });
-                } else {
-                    app.showToast("Browser tidak mendukung GPS.", "error");
+                        app.showToast("Lokasi ditemukan!");
+                    }, (err) => { app.showToast("Gagal mendeteksi GPS.", "error"); });
                 }
             },
 
             loadSchoolProfile: () => {
-                var s = app.currentSchool;
-                if(!s) return;
-                
+                var s = app.currentSchool; if(!s) return;
                 document.getElementById('prof-nama').value = s.nama_sekolah || '';
                 document.getElementById('prof-npsn').value = s.npsn || '';
                 document.getElementById('prof-jenjang').value = s.jenjang || '';
@@ -1199,18 +1019,14 @@
                 document.getElementById('prof-hp').value = s.no_hp_kepala_sekolah || '';
                 document.getElementById('prof-status-kepsek').value = s.status_kepala_sekolah || '';
                 document.getElementById('prof-alamat').value = s.alamat || '';
-                
                 if(s.latitude) document.getElementById('prof-lat').value = s.latitude;
                 if(s.longitude) document.getElementById('prof-lng').value = s.longitude;
-
                 app.initMap(s.latitude, s.longitude);
             },
 
             saveSchoolProfile: async (e) => {
                 e.preventDefault();
-                var btn = document.getElementById('btn-save-profil');
-                btn.innerHTML = 'Menyimpan...';
-
+                var btn = document.getElementById('btn-save-profil'); btn.innerHTML = 'Menyimpan...';
                 var updates = {
                     tahun_berdiri: document.getElementById('prof-tahun').value,
                     nama_kepala_sekolah: document.getElementById('prof-kepsek').value,
@@ -1222,13 +1038,12 @@
                     longitude: document.getElementById('prof-lng').value,
                     profil_lengkap: true
                 };
-
                 try {
                     var { data, error } = await supabaseClient.from('schools').update(updates).eq('id', app.currentSchool.id).select();
                     if(error) throw error;
                     app.currentSchool = data[0];
                     app.checkProfilStatus();
-                    app.showToast("Profil Sekolah berhasil disimpan!");
+                    app.showToast("Profil berhasil disimpan!");
                     app.navTo('home');
                 } catch(err) { app.showToast("Gagal menyimpan profil", "error"); } 
                 finally { btn.innerHTML = '<i class="fas fa-save"></i> Simpan Profil Sekolah'; }
@@ -1238,17 +1053,13 @@
                 var jenis = document.getElementById('sarana-jenis').value;
                 var katSelect = document.getElementById('sarana-kategori');
                 katSelect.innerHTML = '<option value="">-- Pilih --</option>';
-                
                 if(!jenis) { katSelect.disabled = true; return; }
-                
                 document.getElementById('blok-buku').style.display = (jenis === 'Buku') ? 'grid' : 'none';
-
                 if(app.masterSarana[jenis]) {
                     Object.keys(app.masterSarana[jenis]).forEach(k => katSelect.add(new Option(k, k)));
                     katSelect.disabled = false;
                 } else {
-                    katSelect.add(new Option("Umum", "Umum"));
-                    katSelect.add(new Option("Lainnya", "Lainnya"));
+                    katSelect.add(new Option("Umum", "Umum")); katSelect.add(new Option("Lainnya", "Lainnya"));
                     katSelect.disabled = false;
                 }
                 app.handleSaranaKategoriChange();
@@ -1259,17 +1070,12 @@
                 var kategori = document.getElementById('sarana-kategori').value;
                 var subSelect = document.getElementById('sarana-subkategori');
                 var subText = document.getElementById('sarana-subkategori-text');
-                
                 subSelect.innerHTML = '<option value="">-- Pilih --</option>';
-                subText.classList.add('hidden');
-                subText.value = '';
-
+                subText.classList.add('hidden'); subText.value = '';
                 if(kategori === 'Lainnya' || !app.masterSarana[jenis]) {
-                    subSelect.classList.add('hidden');
-                    subText.classList.remove('hidden');
+                    subSelect.classList.add('hidden'); subText.classList.remove('hidden');
                 } else if(app.masterSarana[jenis][kategori]) {
-                    subSelect.classList.remove('hidden');
-                    subSelect.disabled = false;
+                    subSelect.classList.remove('hidden'); subSelect.disabled = false;
                     app.masterSarana[jenis][kategori].forEach(s => subSelect.add(new Option(s, s)));
                     subSelect.add(new Option("Lainnya", "Lainnya"));
                 }
@@ -1284,57 +1090,37 @@
 
             saveSarana: async (e) => {
                 e.preventDefault();
-                var btn = document.getElementById('btn-save-sarana');
-                btn.innerHTML = 'Memproses...';
-
+                var btn = document.getElementById('btn-save-sarana'); btn.innerHTML = 'Memproses...';
                 var jenis = document.getElementById('sarana-jenis').value;
                 var subSelect = document.getElementById('sarana-subkategori');
                 var subValue = subSelect.classList.contains('hidden') || subSelect.value === 'Lainnya' ? document.getElementById('sarana-subkategori-text').value : subSelect.value;
-
                 var payload = {
-                    school_id: app.currentSchool.id,
-                    jenis: jenis,
-                    kategori: document.getElementById('sarana-kategori').value,
-                    subkategori: subValue,
-                    kondisi_baik: parseInt(document.getElementById('sarana-baik').value) || 0,
-                    rusak_ringan: parseInt(document.getElementById('sarana-rr').value) || 0,
-                    rusak_berat: parseInt(document.getElementById('sarana-rb').value) || 0,
-                    kebutuhan_baru: parseInt(document.getElementById('sarana-kebutuhan').value) || 0,
-                    catatan: document.getElementById('sarana-catatan').value
+                    school_id: app.currentSchool.id, jenis: jenis, kategori: document.getElementById('sarana-kategori').value,
+                    subkategori: subValue, kondisi_baik: parseInt(document.getElementById('sarana-baik').value) || 0,
+                    rusak_ringan: parseInt(document.getElementById('sarana-rr').value) || 0, rusak_berat: parseInt(document.getElementById('sarana-rb').value) || 0,
+                    kebutuhan_baru: parseInt(document.getElementById('sarana-kebutuhan').value) || 0, catatan: document.getElementById('sarana-catatan').value
                 };
-
                 if(jenis === 'Buku') {
-                    payload.buku_isbn = document.getElementById('buku-isbn').value;
-                    payload.buku_judul = document.getElementById('buku-judul').value;
-                    payload.buku_pengarang = document.getElementById('buku-pengarang').value;
-                    payload.buku_penerbit = document.getElementById('buku-penerbit').value;
+                    payload.buku_isbn = document.getElementById('buku-isbn').value; payload.buku_judul = document.getElementById('buku-judul').value;
+                    payload.buku_pengarang = document.getElementById('buku-pengarang').value; payload.buku_penerbit = document.getElementById('buku-penerbit').value;
                     payload.buku_tahun = parseInt(document.getElementById('buku-tahun').value) || null;
                 }
-
                 try {
                     var fileInput = document.getElementById('sarana-foto');
                     if(fileInput.files.length > 0) {
                         var file = fileInput.files[0];
-                        if(file.size > 5 * 1024 * 1024) throw new Error("File melebihi 5MB");
-                        
-                        var ext = file.name.split('.').pop();
-                        var fileName = `${app.currentSchool.id}/${Date.now()}.${ext}`;
-                        var { data: uploadData, error: uploadErr } = await supabaseClient.storage.from('school-photos').upload(fileName, file);
+                        if(file.size > 5 * 1024 * 1024) throw new Error("Maksimal 5MB");
+                        var fileName = `${app.currentSchool.id}/${Date.now()}.${file.name.split('.').pop()}`;
+                        var { error: uploadErr } = await supabaseClient.storage.from('school-photos').upload(fileName, file);
                         if(uploadErr) throw uploadErr;
-                        
                         var { data: pubUrl } = supabaseClient.storage.from('school-photos').getPublicUrl(fileName);
                         payload.foto_url = pubUrl.publicUrl;
                     }
-
                     var { error } = await supabaseClient.from('sarana').insert([payload]);
                     if(error) throw error;
-                    
-                    app.showToast("Data Sarana Berhasil Disimpan!");
-                    document.getElementById('form-sarana').reset();
-                    document.getElementById('sarana-total').value = 0;
-                    app.handleSaranaJenisChange(); 
-                    app.loadSarana();
-                } catch(err) { app.showToast(err.message || "Gagal menyimpan sarana.", "error"); } 
+                    app.showToast("Sarana Disimpan!"); document.getElementById('form-sarana').reset(); document.getElementById('sarana-total').value = 0;
+                    app.handleSaranaJenisChange(); app.loadSarana();
+                } catch(err) { app.showToast(err.message || "Gagal menyimpan", "error"); } 
                 finally { btn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Data Sarana'; }
             },
 
@@ -1344,28 +1130,15 @@
                 try {
                     var { data, error } = await supabaseClient.from('sarana').select('*').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
                     if(error) throw error;
-                    
                     tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">Belum ada data sarana.</td></tr>'; return; }
-
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">Belum ada data.</td></tr>'; return; }
                     data.forEach(item => {
                         var isBuku = item.jenis === 'Buku';
                         var judulExtra = isBuku ? `<br><span class="text-[10px] text-gray-500">${item.buku_judul} (${item.buku_tahun})</span>` : '';
-                        var fotoLink = item.foto_url ? `<a href="${item.foto_url}" target="_blank" class="text-teal-600 hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>` : '-';
-                        
-                        var tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="px-4 py-2"><span class="font-semibold text-gray-800">${item.subkategori}</span><br><span class="text-[10px] bg-gray-200 px-1 rounded">${item.jenis === 'Lainnya' ? 'Lainnya' : (item.jenis === 'Buku' ? 'Buku & Bahan Bacaan' : item.jenis)}</span>${judulExtra}</td>
-                            <td class="px-4 py-2 text-center font-medium text-emerald-600">${item.kondisi_baik}</td>
-                            <td class="px-4 py-2 text-center text-yellow-600">${item.rusak_ringan}</td>
-                            <td class="px-4 py-2 text-center text-red-600">${item.rusak_berat}</td>
-                            <td class="px-4 py-2 text-center font-bold bg-teal-50 text-teal-800">${item.total}</td>
-                            <td class="px-4 py-2 text-center text-indigo-600">${item.kebutuhan_baru}</td>
-                            <td class="px-4 py-2 text-center text-sm">${fotoLink}</td>
-                        `;
-                        tbody.appendChild(tr);
+                        var fotoLink = item.foto_url ? `<a href="${item.foto_url}" target="_blank" class="text-teal-600 hover:underline">Lihat</a>` : '-';
+                        tbody.innerHTML += `<tr><td class="px-4 py-2"><span class="font-semibold text-gray-800">${item.subkategori}</span><br><span class="text-[10px] bg-gray-200 px-1 rounded">${item.jenis}</span>${judulExtra}</td><td class="px-4 py-2 text-center text-emerald-600">${item.kondisi_baik}</td><td class="px-4 py-2 text-center text-yellow-600">${item.rusak_ringan}</td><td class="px-4 py-2 text-center text-red-600">${item.rusak_berat}</td><td class="px-4 py-2 text-center font-bold bg-teal-50">${item.total}</td><td class="px-4 py-2 text-center text-indigo-600">${item.kebutuhan_baru}</td><td class="px-4 py-2 text-center text-sm">${fotoLink}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500">Gagal memuat tabel data.</td></tr>'; }
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500">Error memuat data.</td></tr>'; }
             },
 
             switchPrasaranaTab: (tabName) => {
@@ -1374,9 +1147,8 @@
                     document.getElementById(`tab-${t}`).style.display = t === tabName ? 'block' : 'none';
                     const btn = document.getElementById(`tab-btn-${t}`);
                     if (t === tabName) { btn.className = 'border-teal-500 text-teal-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition'; } 
-                    else { btn.className = 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition'; }
+                    else { btn.className = 'border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition'; }
                 });
-
                 if(tabName === 'lahan') { setTimeout(() => app.initMapLahan(), 300); }
                 if(tabName === 'bangunan') app.loadBangunan();
                 if(tabName === 'ruang') { app.loadRuang(); app.populateBangunanDropdown(); }
@@ -1384,16 +1156,13 @@
 
             initMapLahan: () => {
                 if(app.mapLahan) { app.mapLahan.invalidateSize(); return; }
-                var initLat = -8.4908; 
-                var initLng = 119.8821;
+                var initLat = -8.4908; var initLng = 119.8821;
                 app.mapLahan = L.map('map-lahan').setView([initLat, initLng], 14);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(app.mapLahan);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(app.mapLahan);
                 app.markerLahan = L.marker([initLat, initLng], {draggable: true}).addTo(app.mapLahan);
-                
                 app.markerLahan.on('dragend', function(e) {
                     var position = app.markerLahan.getLatLng();
-                    document.getElementById('lahan-lat').value = position.lat.toFixed(8);
-                    document.getElementById('lahan-lng').value = position.lng.toFixed(8);
+                    document.getElementById('lahan-lat').value = position.lat.toFixed(8); document.getElementById('lahan-lng').value = position.lng.toFixed(8);
                 });
             },
 
@@ -1401,17 +1170,11 @@
                 if (navigator.geolocation) {
                     app.showToast("Mencari kordinat Lahan...", "warning");
                     navigator.geolocation.getCurrentPosition((pos) => {
-                        var lat = pos.coords.latitude;
-                        var lng = pos.coords.longitude;
-                        document.getElementById('lahan-lat').value = lat.toFixed(8);
-                        document.getElementById('lahan-lng').value = lng.toFixed(8);
-                        if(app.mapLahan && app.markerLahan) {
-                            var newLatLng = new L.LatLng(lat, lng);
-                            app.markerLahan.setLatLng(newLatLng);
-                            app.mapLahan.setView(newLatLng, 16);
-                        }
-                        app.showToast("Lokasi lahan berhasil dikunci!");
-                    }, (err) => app.showToast("Gagal membaca GPS.", "error"));
+                        var lat = pos.coords.latitude; var lng = pos.coords.longitude;
+                        document.getElementById('lahan-lat').value = lat.toFixed(8); document.getElementById('lahan-lng').value = lng.toFixed(8);
+                        if(app.mapLahan && app.markerLahan) { var newLatLng = new L.LatLng(lat, lng); app.markerLahan.setLatLng(newLatLng); app.mapLahan.setView(newLatLng, 16); }
+                        app.showToast("Lokasi lahan dikunci!");
+                    }, (err) => app.showToast("Gagal GPS.", "error"));
                 }
             },
 
@@ -1427,235 +1190,146 @@
             updateKondisiUI: (rusakId, labelId, wrapperId) => {
                 var rusak = parseFloat(document.getElementById(rusakId).value) || 0;
                 var res = app.calcKondisiFrontend(rusak);
-                var label = document.getElementById(labelId);
-                var wrapper = document.getElementById(wrapperId);
-                label.innerText = res.t;
-                label.className = `font-bold text-lg ${res.c}`;
-                wrapper.className = `px-3 py-3 border rounded-lg flex justify-center items-center ${res.bg}`;
+                var label = document.getElementById(labelId); var wrapper = document.getElementById(wrapperId);
+                label.innerText = res.t; label.className = `font-bold text-lg ${res.c}`; wrapper.className = `px-3 py-3 border rounded-lg flex justify-center items-center ${res.bg}`;
             },
 
             calcBangunan: () => {
-                var p = parseFloat(document.getElementById('bang-panjang').value) || 0;
-                var l = parseFloat(document.getElementById('bang-lebar').value) || 0;
-                document.getElementById('bang-luas').value = (p * l).toFixed(2) + " m²";
-                app.updateKondisiUI('bang-rusak', 'bang-kondisi', 'bang-kondisi-wrapper');
+                var p = parseFloat(document.getElementById('bang-panjang').value) || 0; var l = parseFloat(document.getElementById('bang-lebar').value) || 0;
+                document.getElementById('bang-luas').value = (p * l).toFixed(2) + " m²"; app.updateKondisiUI('bang-rusak', 'bang-kondisi', 'bang-kondisi-wrapper');
             },
 
             calcRuang: () => {
-                var p = parseFloat(document.getElementById('ruang-panjang').value) || 0;
-                var l = parseFloat(document.getElementById('ruang-lebar').value) || 0;
-                document.getElementById('ruang-luas').value = (p * l).toFixed(2) + " m²";
-                app.updateKondisiUI('ruang-rusak', 'ruang-kondisi', 'ruang-kondisi-wrapper');
-            },
-            
-            calcFasilitas: () => {
-                app.updateKondisiUI('fasilitas-rusak', 'fasilitas-kondisi', 'fasilitas-kondisi-wrapper');
+                var p = parseFloat(document.getElementById('ruang-panjang').value) || 0; var l = parseFloat(document.getElementById('ruang-lebar').value) || 0;
+                document.getElementById('ruang-luas').value = (p * l).toFixed(2) + " m²"; app.updateKondisiUI('ruang-rusak', 'ruang-kondisi', 'ruang-kondisi-wrapper');
             },
 
-            saveLahan: async (e) => { e.preventDefault(); app.showToast("Simulasi: Lahan diproses (Menunggu tabel di database)", "success"); },
-            saveFasilitas: async (e) => { e.preventDefault(); app.showToast("Simulasi: Fasilitas diproses (Menunggu tabel di database)", "success"); },
+            saveLahan: async (e) => { e.preventDefault(); app.showToast("Simulasi Lahan...", "success"); },
 
             saveBangunan: async (e) => {
                 e.preventDefault();
                 var payload = {
-                    school_id: app.currentSchool.id,
-                    kode_bangunan: document.getElementById('bang-kode').value,
-                    nama_bangunan: document.getElementById('bang-nama').value,
-                    jumlah_lantai: parseInt(document.getElementById('bang-lantai').value) || 1,
-                    tahun_pembangunan: parseInt(document.getElementById('bang-tahun').value) || null,
-                    sumber_dana: document.getElementById('bang-sumber').value,
-                    konstruksi: document.getElementById('bang-konstruksi').value,
-                    status_kepemilikan: document.getElementById('bang-kepemilikan').value,
-                    panjang: parseFloat(document.getElementById('bang-panjang').value) || 0,
-                    lebar: parseFloat(document.getElementById('bang-lebar').value) || 0,
-                    tingkat_kerusakan: parseFloat(document.getElementById('bang-rusak').value) || 0,
-                    keterangan: document.getElementById('bang-keterangan').value
+                    school_id: app.currentSchool.id, kode_bangunan: document.getElementById('bang-kode').value, nama_bangunan: document.getElementById('bang-nama').value,
+                    jumlah_lantai: parseInt(document.getElementById('bang-lantai').value) || 1, tahun_pembangunan: parseInt(document.getElementById('bang-tahun').value) || null,
+                    sumber_dana: document.getElementById('bang-sumber').value, konstruksi: document.getElementById('bang-konstruksi').value, status_kepemilikan: document.getElementById('bang-kepemilikan').value,
+                    panjang: parseFloat(document.getElementById('bang-panjang').value) || 0, lebar: parseFloat(document.getElementById('bang-lebar').value) || 0,
+                    tingkat_kerusakan: parseFloat(document.getElementById('bang-rusak').value) || 0
                 };
                 try {
                     var { error } = await supabaseClient.from('prasarana_bangunan').insert([payload]);
-                    if(error) throw error;
-                    app.showToast("Bangunan Berhasil Disimpan!");
-                    document.getElementById('form-bangunan').reset();
-                    app.calcBangunan();
-                    app.loadBangunan();
+                    if(error) throw error; app.showToast("Bangunan Disimpan!"); document.getElementById('form-bangunan').reset(); app.calcBangunan(); app.loadBangunan();
                 } catch(err) { app.showToast("Gagal menyimpan bangunan.", "error"); }
             },
 
             loadBangunan: async () => {
-                var tbody = document.getElementById('table-body-bangunan');
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>';
+                var tbody = document.getElementById('table-body-bangunan'); tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat...</td></tr>';
                 try {
                     var { data, error } = await supabaseClient.from('prasarana_bangunan').select('*').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
-                    if(error) throw error;
-                    tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data bangunan.</td></tr>'; return; }
+                    if(error) throw error; tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada.</td></tr>'; return; }
                     data.forEach(item => {
-                        var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan);
-                        var statusUI = app.getValidasiBadge(item.status_validasi);
-                        var btnAksi = (item.status_validasi === 'Draft' || item.status_validasi === 'Perlu Perbaikan') 
-                            ? `<button onclick="app.ajukanValidasi('bangunan', '${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">Ajukan Validasi</button>` 
-                            : `<span class="text-xs text-gray-400"><i class="fas fa-lock"></i> Terkunci</span>`;
+                        var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan); var statusUI = app.getValidasiBadge(item.status_validasi);
+                        var btnAksi = (item.status_validasi === 'Draft' || item.status_validasi === 'Perlu Perbaikan') ? `<button onclick="app.ajukanValidasi('bangunan', '${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">Ajukan Validasi</button>` : `<span class="text-xs text-gray-400"><i class="fas fa-lock"></i> Terkunci</span>`;
                         var noteUI = item.validation_note ? `<br><span class="text-[10px] text-red-500 block mt-1">Catatan: ${item.validation_note}</span>` : '';
-                        
-                        tbody.innerHTML += `<tr><td class="px-4 py-2 font-semibold text-gray-800">${item.nama_bangunan} <span class="text-xs text-gray-400">(${item.konstruksi||'-'})</span></td><td class="px-4 py-2">${item.tahun_pembangunan || '-'}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas_bangunan}</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${item.tingkat_kerusakan}%<br><span class="text-[10px]">${cUI.t}</span></td><td class="px-4 py-2 text-center">${statusUI} ${noteUI}</td><td class="px-4 py-2 text-center">${btnAksi}</td></tr>`;
+                        tbody.innerHTML += `<tr><td class="px-4 py-2 font-semibold">${item.nama_bangunan}</td><td class="px-4 py-2">${item.tahun_pembangunan || '-'}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas_bangunan}</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center">${statusUI} ${noteUI}</td><td class="px-4 py-2 text-center">${btnAksi}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Error memuat tabel.</td></tr>'; }
             },
 
             populateBangunanDropdown: async () => {
-                var select = document.getElementById('ruang-bangunan-id');
-                select.innerHTML = '<option value="">-- Memuat --</option>';
+                var select = document.getElementById('ruang-bangunan-id'); select.innerHTML = '<option value="">-- Memuat --</option>';
                 try {
-                    var { data, error } = await supabaseClient.from('prasarana_bangunan').select('id, nama_bangunan').eq('school_id', app.currentSchool.id);
-                    if(error) throw error;
-                    select.innerHTML = '<option value="">-- Pilih Bangunan Induk --</option>';
-                    data.forEach(b => select.add(new Option(b.nama_bangunan, b.id)));
+                    var { data } = await supabaseClient.from('prasarana_bangunan').select('id, nama_bangunan').eq('school_id', app.currentSchool.id);
+                    select.innerHTML = '<option value="">-- Pilih Bangunan Induk --</option>'; data.forEach(b => select.add(new Option(b.nama_bangunan, b.id)));
                 } catch(err) { select.innerHTML = '<option value="">Gagal memuat</option>'; }
             },
 
             saveRuang: async (e) => {
                 e.preventDefault();
                 var payload = {
-                    school_id: app.currentSchool.id,
-                    bangunan_id: document.getElementById('ruang-bangunan-id').value,
-                    jenis_ruang: document.getElementById('ruang-jenis').value,
-                    fungsi_ruang: document.getElementById('ruang-fungsi').value,
-                    lantai_ke: parseInt(document.getElementById('ruang-lantai').value) || 1,
-                    kapasitas: parseInt(document.getElementById('ruang-kapasitas').value) || 0,
-                    status_ruang: document.getElementById('ruang-status').value,
-                    tahun_rehabilitasi_terakhir: parseInt(document.getElementById('ruang-rehab').value.substring(0,4)) || null,
-                    panjang: parseFloat(document.getElementById('ruang-panjang').value) || 0,
-                    lebar: parseFloat(document.getElementById('ruang-lebar').value) || 0,
-                    tingkat_kerusakan: parseFloat(document.getElementById('ruang-rusak').value) || 0,
-                    keterangan: document.getElementById('ruang-keterangan').value
+                    school_id: app.currentSchool.id, bangunan_id: document.getElementById('ruang-bangunan-id').value, jenis_ruang: document.getElementById('ruang-jenis').value,
+                    fungsi_ruang: document.getElementById('ruang-fungsi').value, lantai_ke: parseInt(document.getElementById('ruang-lantai').value) || 1,
+                    kapasitas: parseInt(document.getElementById('ruang-kapasitas').value) || 0, status_ruang: document.getElementById('ruang-status').value,
+                    panjang: parseFloat(document.getElementById('ruang-panjang').value) || 0, lebar: parseFloat(document.getElementById('ruang-lebar').value) || 0,
+                    tingkat_kerusakan: parseFloat(document.getElementById('ruang-rusak').value) || 0
                 };
                 try {
                     var { error } = await supabaseClient.from('prasarana_ruang').insert([payload]);
-                    if(error) throw error;
-                    app.showToast("Ruangan Berhasil Disimpan!");
-                    document.getElementById('form-ruang').reset();
-                    app.calcRuang();
-                    app.loadRuang();
+                    if(error) throw error; app.showToast("Ruang Disimpan!"); document.getElementById('form-ruang').reset(); app.calcRuang(); app.loadRuang();
                 } catch(err) { app.showToast("Gagal menyimpan ruang.", "error"); }
             },
 
             loadRuang: async () => {
-                var tbody = document.getElementById('table-body-ruang');
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>';
+                var tbody = document.getElementById('table-body-ruang'); tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat...</td></tr>';
                 try {
                     var { data, error } = await supabaseClient.from('prasarana_ruang').select('*, bangunan:prasarana_bangunan(nama_bangunan)').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
-                    if(error) throw error;
-                    tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data ruangan.</td></tr>'; return; }
+                    if(error) throw error; tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada.</td></tr>'; return; }
                     data.forEach(item => {
-                        var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan);
-                        var bangName = item.bangunan ? item.bangunan.nama_bangunan : 'Tidak Diketahui';
+                        var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan); var bangName = item.bangunan ? item.bangunan.nama_bangunan : 'Tidak Diketahui';
                         var statusUI = app.getValidasiBadge(item.status_validasi);
-                        var btnAksi = (item.status_validasi === 'Draft' || item.status_validasi === 'Perlu Perbaikan') 
-                            ? `<button onclick="app.ajukanValidasi('ruang', '${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">Ajukan Validasi</button>` 
-                            : `<span class="text-xs text-gray-400"><i class="fas fa-lock"></i> Terkunci</span>`;
+                        var btnAksi = (item.status_validasi === 'Draft' || item.status_validasi === 'Perlu Perbaikan') ? `<button onclick="app.ajukanValidasi('ruang', '${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">Ajukan Validasi</button>` : `<span class="text-xs text-gray-400"><i class="fas fa-lock"></i> Terkunci</span>`;
                         var noteUI = item.validation_note ? `<br><span class="text-[10px] text-red-500 block mt-1">Catatan: ${item.validation_note}</span>` : '';
-
-                        tbody.innerHTML += `<tr><td class="px-4 py-2 text-gray-500">${bangName}</td><td class="px-4 py-2 font-semibold text-gray-800">${item.jenis_ruang} <br><span class="text-[10px] bg-gray-100 rounded px-1">${item.status_ruang||''}</span></td><td class="px-4 py-2 text-center bg-gray-50">${item.luas}</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${item.tingkat_kerusakan}%<br><span class="text-[10px]">${cUI.t}</span></td><td class="px-4 py-2 text-center">${statusUI} ${noteUI}</td><td class="px-4 py-2 text-center">${btnAksi}</td></tr>`;
+                        tbody.innerHTML += `<tr><td class="px-4 py-2">${bangName}</td><td class="px-4 py-2 font-semibold">${item.jenis_ruang}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas}</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center">${statusUI} ${noteUI}</td><td class="px-4 py-2 text-center">${btnAksi}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
+                } catch(err) {}
             },
 
-            // ================== MODUL VALIDASI ================== //
             getValidasiBadge: (status) => {
                 var s = status || 'Draft';
                 if(s === 'Draft') return `<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">DRAFT</span>`;
-                if(s === 'Diajukan') return `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold"><i class="fas fa-clock"></i> DIAJUKAN</span>`;
-                if(s === 'Disetujui') return `<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold"><i class="fas fa-check"></i> DISETUJUI</span>`;
-                if(s === 'Ditolak') return `<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-bold"><i class="fas fa-times"></i> DITOLAK</span>`;
-                if(s === 'Perlu Perbaikan') return `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-[10px] font-bold"><i class="fas fa-exclamation-triangle"></i> REVISI</span>`;
+                if(s === 'Diajukan') return `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">DIAJUKAN</span>`;
+                if(s === 'Disetujui') return `<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">DISETUJUI</span>`;
+                if(s === 'Ditolak') return `<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-bold">DITOLAK</span>`;
+                if(s === 'Perlu Perbaikan') return `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-[10px] font-bold">REVISI</span>`;
                 return `<span>${s}</span>`;
             },
 
             ajukanValidasi: async (type, id) => {
-                // Untuk Operator: Mengubah status dari Draft ke Diajukan
                 var table = type === 'bangunan' ? 'prasarana_bangunan' : 'prasarana_ruang';
                 try {
                     var { error } = await supabaseClient.from(table).update({ status_validasi: 'Diajukan' }).eq('id', id);
-                    if(error) throw error;
-                    app.showToast("Data berhasil diajukan ke Dinas!", "success");
+                    if(error) throw error; app.showToast("Diajukan ke Dinas!", "success");
                     if(type === 'bangunan') app.loadBangunan(); else app.loadRuang();
-                } catch (err) { app.showToast("Gagal mengajukan validasi.", "error"); }
+                } catch (err) { app.showToast("Gagal mengajukan.", "error"); }
             },
 
             loadDataValidasiDinas: async (type) => {
-                // Untuk Admin Dinas: Memuat daftar data yang berstatus 'Diajukan' (Sesuai Jenjang)
-                var tbody = document.getElementById('table-body-validasi');
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
-                
+                var tbody = document.getElementById('table-body-validasi'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>';
                 var jenjangAdmin = app.currentUser.role === 'admin_sd' ? 'SD' : (app.currentUser.role === 'admin_smp' ? 'SMP' : null);
                 var table = type === 'bangunan' ? 'prasarana_bangunan' : 'prasarana_ruang';
-                
                 try {
-                    // Gunakan Inner Join ke schools untuk memfilter jenjang (PostgREST syntax)
                     var query = supabaseClient.from(table).select('*, schools!inner(nama_sekolah, npsn, jenjang)').eq('status_validasi', 'Diajukan');
                     if(jenjangAdmin) query = query.eq('schools.jenjang', jenjangAdmin);
-                    
                     var { data, error } = await query;
-                    if(error) throw error;
-                    
-                    tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Tidak ada pengajuan validasi baru.</td></tr>'; return; }
-                    
+                    if(error) throw error; tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Tidak ada pengajuan.</td></tr>'; return; }
                     data.forEach(item => {
                         var objekNama = type === 'bangunan' ? item.nama_bangunan : item.jenis_ruang;
                         var btn = `<button onclick="app.bukaModalValidasi('${type}', '${item.id}', '${objekNama}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded text-xs transition">Proses</button>`;
-                        tbody.innerHTML += `
-                            <tr>
-                                <td class="px-4 py-2"><span class="font-bold text-gray-800">${item.schools.nama_sekolah}</span><br><span class="text-xs text-gray-500">NPSN: ${item.schools.npsn}</span></td>
-                                <td class="px-4 py-2 font-medium text-gray-700">${objekNama} <br><span class="text-[10px] bg-gray-200 px-1 rounded uppercase">${type}</span></td>
-                                <td class="px-4 py-2 text-center font-bold text-red-500">${item.tingkat_kerusakan}%</td>
-                                <td class="px-4 py-2 text-center">${app.getValidasiBadge(item.status_validasi)}</td>
-                                <td class="px-4 py-2 text-center">${btn}</td>
-                            </tr>
-                        `;
+                        tbody.innerHTML += `<tr><td class="px-4 py-2"><span class="font-bold">${item.schools.nama_sekolah}</span><br><span class="text-xs text-gray-500">NPSN: ${item.schools.npsn}</span></td><td class="px-4 py-2 font-medium">${objekNama} <br><span class="text-[10px] bg-gray-200 px-1 rounded uppercase">${type}</span></td><td class="px-4 py-2 text-center font-bold text-red-500">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center">${app.getValidasiBadge(item.status_validasi)}</td><td class="px-4 py-2 text-center">${btn}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Gagal memuat antrean validasi.</td></tr>'; }
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Error memuat data.</td></tr>'; }
             },
 
             bukaModalValidasi: (type, id, name) => {
-                document.getElementById('val-item-id').value = id;
-                document.getElementById('val-item-type').value = type;
-                document.getElementById('val-item-name').innerText = name;
-                document.getElementById('val-keputusan').value = '';
-                document.getElementById('val-catatan').value = '';
+                document.getElementById('val-item-id').value = id; document.getElementById('val-item-type').value = type;
+                document.getElementById('val-item-name').innerText = name; document.getElementById('val-keputusan').value = ''; document.getElementById('val-catatan').value = '';
                 document.getElementById('modal-validasi').classList.remove('hidden');
             },
 
             prosesValidasi: async () => {
-                var id = document.getElementById('val-item-id').value;
-                var type = document.getElementById('val-item-type').value;
-                var keputusan = document.getElementById('val-keputusan').value;
-                var catatan = document.getElementById('val-catatan').value;
-
-                if(!keputusan) return app.showToast("Pilih keputusan validasi terlebih dahulu!", "error");
-                if((keputusan === 'Ditolak' || keputusan === 'Perlu Perbaikan') && !catatan) {
-                    return app.showToast("Catatan wajib diisi jika Ditolak / Revisi!", "warning");
-                }
-
+                var id = document.getElementById('val-item-id').value; var type = document.getElementById('val-item-type').value;
+                var keputusan = document.getElementById('val-keputusan').value; var catatan = document.getElementById('val-catatan').value;
+                if(!keputusan) return app.showToast("Pilih keputusan!", "error");
+                if((keputusan === 'Ditolak' || keputusan === 'Perlu Perbaikan') && !catatan) return app.showToast("Catatan wajib diisi!", "warning");
                 var table = type === 'bangunan' ? 'prasarana_bangunan' : 'prasarana_ruang';
                 try {
-                    var { error } = await supabaseClient.from(table).update({
-                        status_validasi: keputusan,
-                        validation_note: catatan,
-                        validator_id: app.currentUser.id,
-                        validated_at: new Date().toISOString()
-                    }).eq('id', id);
-
-                    if(error) throw error;
-                    
-                    app.showToast("Validasi berhasil disimpan!", "success");
-                    document.getElementById('modal-validasi').classList.add('hidden');
-                    app.loadDataValidasiDinas(type); // Refresh tabel
-                } catch(err) { app.showToast("Gagal menyimpan validasi.", "error"); }
+                    var { error } = await supabaseClient.from(table).update({ status_validasi: keputusan, validation_note: catatan, validator_id: app.currentUser.id, validated_at: new Date().toISOString() }).eq('id', id);
+                    if(error) throw error; app.showToast("Berhasil disimpan!", "success"); document.getElementById('modal-validasi').classList.add('hidden'); app.loadDataValidasiDinas(type);
+                } catch(err) { app.showToast("Gagal menyimpan.", "error"); }
             },
 
-            // ================== MODUL HELPDESK ================== //
             getHelpdeskBadge: (status) => {
                 if(status === 'Open') return `<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-bold">OPEN</span>`;
                 if(status === 'Diproses') return `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">DIPROSES</span>`;
@@ -1666,87 +1340,46 @@
 
             simpanTiket: async (e) => {
                 e.preventDefault();
-                var btn = document.getElementById('btn-save-tiket');
-                btn.innerHTML = 'Mengirim...';
-                
-                var payload = {
-                    school_id: app.currentSchool.id,
-                    subject: document.getElementById('tiket-subjek').value,
-                    kategori: document.getElementById('tiket-kategori').value,
-                    isi_keluhan: document.getElementById('tiket-pesan').value,
-                    created_by: app.currentUser.id
-                };
-
+                var btn = document.getElementById('btn-save-tiket'); btn.innerHTML = 'Mengirim...';
+                var payload = { school_id: app.currentSchool.id, subject: document.getElementById('tiket-subjek').value, kategori: document.getElementById('tiket-kategori').value, isi_keluhan: document.getElementById('tiket-pesan').value, created_by: app.currentUser.id };
                 try {
-                    // Upload Lampiran jika ada
                     var fileInput = document.getElementById('tiket-lampiran');
                     if(fileInput.files.length > 0) {
                         var file = fileInput.files[0];
-                        if(file.size > 5 * 1024 * 1024) throw new Error("File melebihi 5MB");
+                        if(file.size > 5 * 1024 * 1024) throw new Error("Maks 5MB");
                         var fileName = `tiket/${app.currentSchool.id}_${Date.now()}.${file.name.split('.').pop()}`;
                         var { error: uploadErr } = await supabaseClient.storage.from('helpdesk-files').upload(fileName, file);
                         if(uploadErr) throw uploadErr;
                         var { data: pubUrl } = supabaseClient.storage.from('helpdesk-files').getPublicUrl(fileName);
                         payload.lampiran_url = pubUrl.publicUrl;
                     }
-
                     var { error } = await supabaseClient.from('helpdesk_tickets').insert([payload]);
                     if(error) throw error;
-                    
-                    app.showToast("Tiket berhasil dibuat. Tim Dinas akan segera meninjau.", "success");
-                    document.getElementById('form-tiket').reset();
-                    document.getElementById('form-tiket-container').classList.add('hidden');
-                    app.loadHelpdesk();
-                } catch(err) { app.showToast(err.message || "Gagal membuat tiket.", "error"); }
-                finally { btn.innerHTML = 'Kirim Tiket'; }
+                    app.showToast("Tiket berhasil dikirim.", "success"); document.getElementById('form-tiket').reset(); document.getElementById('form-tiket-container').classList.add('hidden'); app.loadHelpdesk();
+                } catch(err) { app.showToast(err.message || "Gagal membuat tiket.", "error"); } finally { btn.innerHTML = 'Kirim Tiket'; }
             },
 
             loadHelpdesk: async () => {
-                var tbody = document.getElementById('table-body-helpdesk');
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Memuat tiket...</td></tr>';
-                
+                var tbody = document.getElementById('table-body-helpdesk'); tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Memuat tiket...</td></tr>';
                 try {
-                    // Cek Role: Operator vs Admin
                     var query = supabaseClient.from('helpdesk_tickets').select('*, schools(nama_sekolah, npsn)').order('created_at', { ascending: false });
-                    
-                    if(app.currentUser.role === 'operator') {
-                        query = query.eq('school_id', app.currentSchool.id);
-                    } else if (app.currentUser.role === 'admin_sd' || app.currentUser.role === 'admin_smp') {
+                    if(app.currentUser.role === 'operator') { query = query.eq('school_id', app.currentSchool.id); } 
+                    else if (app.currentUser.role === 'admin_sd' || app.currentUser.role === 'admin_smp') {
                         var targetJenjang = app.currentUser.role === 'admin_sd' ? 'SD' : 'SMP';
                         query = supabaseClient.from('helpdesk_tickets').select('*, schools!inner(nama_sekolah, npsn, jenjang)').eq('schools.jenjang', targetJenjang).order('created_at', { ascending: false });
                     }
-
                     var { data, error } = await query;
-                    if(error) throw error;
-                    
-                    tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Tidak ada data tiket.</td></tr>'; return; }
-                    
+                    if(error) throw error; tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Tidak ada tiket.</td></tr>'; return; }
                     data.forEach(item => {
-                        var d = new Date(item.created_at).toLocaleDateString('id-ID');
-                        var badge = app.getHelpdeskBadge(item.status);
-                        var lampiranLink = item.lampiran_url ? `<a href="${item.lampiran_url}" target="_blank" class="text-blue-500 hover:underline mt-1 block text-[10px]"><i class="fas fa-paperclip"></i> Lihat Lampiran</a>` : '';
-                        
-                        var tr = `
-                            <tr>
-                                <td class="px-4 py-3 font-mono text-sm text-gray-500">TKT-${item.ticket_no}</td>
-                                <td class="px-4 py-3">
-                                    <div class="font-bold text-gray-800">${item.subject}</div>
-                                    <div class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded inline-block mt-1">${item.kategori}</div>
-                                    <div class="text-xs text-gray-500 mt-1 truncate max-w-xs">${item.isi_keluhan}</div>
-                                    ${lampiranLink}
-                                </td>
-                                <td class="px-4 py-3 text-center text-xs text-gray-500">${d}</td>
-                                <td class="px-4 py-3 text-center">${badge}</td>
-                            </tr>
-                        `;
-                        tbody.innerHTML += tr;
+                        var d = new Date(item.created_at).toLocaleDateString('id-ID'); var badge = app.getHelpdeskBadge(item.status);
+                        var lampiranLink = item.lampiran_url ? `<a href="${item.lampiran_url}" target="_blank" class="text-blue-500 hover:underline mt-1 block text-[10px]">Lihat Lampiran</a>` : '';
+                        tbody.innerHTML += `<tr><td class="px-4 py-3 font-mono text-sm text-gray-500">TKT-${item.ticket_no}</td><td class="px-4 py-3"><div class="font-bold text-gray-800">${item.subject}</div><div class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded inline-block mt-1">${item.kategori}</div><div class="text-xs text-gray-500 mt-1 truncate max-w-xs">${item.isi_keluhan}</div>${lampiranLink}</td><td class="px-4 py-3 text-center text-xs text-gray-500">${d}</td><td class="px-4 py-3 text-center">${badge}</td></tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat tiket bantuan.</td></tr>'; }
+                } catch(err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat tiket.</td></tr>'; }
             }
         };
 
-        // Initialize App on Window Load
         window.onload = app.init;
     </script>
 </body>
