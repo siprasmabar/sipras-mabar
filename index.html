@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -19,6 +20,16 @@
         .map-container { height: 400px; width: 100%; border-radius: 0.5rem; z-index: 1; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-animate { animation: slideInRight 0.3s ease-out forwards; }
+        
+        @media print {
+            aside, nav, header, button, #dashboard-dinas-filters, #toast-container, .nav-btn, #banner-profil-warning { display: none !important; }
+            #view-dashboard { display: block !important; height: auto !important; overflow: visible !important; }
+            .flex-1.flex.flex-col { display: block !important; overflow: visible !important; }
+            .dashboard-content { display: block !important; overflow: visible !important; }
+            body, .bg-slate-50, .bg-gray-100 { background-color: white !important; }
+            canvas { max-height: 300px !important; page-break-inside: avoid; }
+            .shadow-sm { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
@@ -49,7 +60,7 @@
                 <h2 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-6 leading-tight">Data Sarana dan Prasarana Sekolah,<br><span class="text-teal-600">Akurat untuk Perencanaan yang Tepat.</span></h2>
                 <p class="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">Sistem Informasi Pendataan Sarana dan Prasarana Sekolah Kabupaten Manggarai Barat. Platform resmi untuk pemutakhiran, validasi, dan monitoring aset pendidikan.</p>
                 <div class="flex justify-center gap-4">
-                    <button onclick="app.showLoginModal()" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"><i class="fas fa-sign-in-alt mr-2"></i> Login Operator</button>
+                    <button onclick="app.showLoginModal()" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"><i class="fas fa-sign-in-alt mr-2"></i> Login Pengguna</button>
                 </div>
                 <div class="mt-16 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div><i class="fas fa-map-marked-alt text-4xl text-blue-500 mb-4"></i><h3 class="font-bold text-lg mb-2">Pemetaan Geospasial</h3><p class="text-sm text-gray-500">Integrasi koordinat wilayah untuk akurasi data lokasi.</p></div>
@@ -115,15 +126,29 @@
                         <h2 class="font-bold text-lg tracking-wide">SIPRAS<span class="text-teal-400">MABAR</span></h2>
                     </div>
                 </div>
+                
                 <div class="p-4">
-                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Menu Operator</div>
                     <nav class="space-y-1" id="sidebar-nav">
-                        <a href="#" onclick="app.navTo('home')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg bg-teal-600 text-white transition"><i class="fas fa-home w-5"></i> Beranda</a>
-                        <a href="#" onclick="app.navTo('profil')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-building w-5"></i> Profil Sekolah</a>
-                        <a href="#" onclick="app.navTo('sarana')" id="menu-sarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-chair w-5"></i> Data Sarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
-                        <a href="#" onclick="app.navTo('prasarana')" id="menu-prasarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-door-open w-5"></i> Data Prasarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
+                        <a href="#" onclick="app.navTo('home')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg bg-teal-600 text-white transition"><i class="fas fa-home w-5"></i> Dashboard</a>
+                        
+                        <!-- Menu Operator -->
+                        <div id="menu-operator-group" class="hidden mt-4">
+                            <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-2">Menu Operator</div>
+                            <a href="#" onclick="app.navTo('profil')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-building w-5"></i> Profil Sekolah</a>
+                            <a href="#" onclick="app.navTo('sarana')" id="menu-sarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-chair w-5"></i> Data Sarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
+                            <a href="#" onclick="app.navTo('prasarana')" id="menu-prasarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-door-open w-5"></i> Data Prasarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
+                        </div>
+
+                        <!-- Menu Dinas (Admin & Superadmin) -->
+                        <div id="menu-dinas-group" class="hidden mt-4">
+                            <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-2">Menu Admin Dinas</div>
+                            <a href="#" onclick="app.navTo('data-sekolah')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-school w-5"></i> Data Sekolah</a>
+                            <a href="#" onclick="app.navTo('validasi')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-clipboard-check w-5"></i> Validasi Data</a>
+                            <a href="#" onclick="app.navTo('peta-sebaran')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-map-marked-alt w-5"></i> Peta Sebaran</a>
+                        </div>
                     </nav>
                 </div>
+                
                 <div class="mt-auto p-4 border-t border-slate-800">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center"><i class="fas fa-user text-slate-300"></i></div>
@@ -141,13 +166,13 @@
             <!-- Main Content -->
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
                 <!-- Topbar -->
-                <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-10">
+                <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-10 shrink-0">
                     <div class="flex items-center gap-4">
                         <button class="md:hidden text-gray-500 hover:text-teal-600"><i class="fas fa-bars text-xl"></i></button>
-                        <h2 class="font-semibold text-gray-800" id="topbar-title">Beranda</h2>
+                        <h2 class="font-semibold text-gray-800" id="topbar-title">Dashboard</h2>
                     </div>
                     <div class="flex items-center gap-4">
-                        <span class="text-sm font-medium px-3 py-1 bg-teal-50 text-teal-700 rounded-full border border-teal-100 hidden md:block" id="topbar-school-name">Memuat Sekolah...</span>
+                        <span class="text-sm font-medium px-3 py-1 bg-teal-50 text-teal-700 rounded-full border border-teal-100 hidden md:block" id="topbar-school-name">Memuat Data...</span>
                         <button class="text-gray-400 hover:text-teal-600 relative">
                             <i class="fas fa-bell text-xl"></i>
                             <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -164,35 +189,88 @@
                             <div class="flex-shrink-0"><i class="fas fa-exclamation-triangle text-yellow-400 mt-1"></i></div>
                             <div class="ml-3">
                                 <h3 class="text-sm font-medium text-yellow-800">Perhatian: Profil Sekolah Belum Lengkap!</h3>
-                                <p class="text-sm text-yellow-700 mt-1">Anda tidak dapat mengisi Data Sarana dan Prasarana sebelum melengkapi Profil Sekolah dan titik kordinat (GPS). Silakan lengkapi terlebih dahulu.</p>
+                                <p class="text-sm text-yellow-700 mt-1">Anda tidak dapat mengisi Data Sarana dan Prasarana sebelum melengkapi Profil Sekolah dan titik koordinat (GPS). Silakan lengkapi terlebih dahulu.</p>
                                 <button onclick="app.navTo('profil')" class="mt-3 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded text-sm font-medium transition">Lengkapi Sekarang</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- VIEW: HOME -->
+                    <!-- VIEW: HOME (DASHBOARD) -->
                     <div id="content-home" class="dashboard-content block">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
-                                <div><p class="text-sm text-gray-500 font-medium">Total Sarana</p><p class="text-2xl font-bold text-gray-800">0</p></div>
-                                <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-xl"><i class="fas fa-boxes"></i></div>
+                        
+                        <!-- PROGRESS KELENGKAPAN DATA (KHUSUS OPERATOR) -->
+                        <div id="dashboard-operator-progress" class="hidden mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-800 mb-3">Status Kelengkapan Data Pendataan</h3>
+                            <div class="flex items-center gap-4">
+                                <div class="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                                    <div id="progress-bar-fill" class="bg-teal-500 h-4 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                </div>
+                                <span id="progress-text" class="font-bold text-teal-700">0%</span>
                             </div>
-                            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
-                                <div><p class="text-sm text-gray-500 font-medium">Kondisi Baik</p><p class="text-2xl font-bold text-emerald-600">0</p></div>
-                                <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div>
+                            <p class="text-xs text-gray-500 mt-2">Indikator akan mencapai 100% jika Anda telah mengisi Profil, Lahan, Bangunan, Ruangan, dan Sarana.</p>
+                        </div>
+
+                        <!-- FILTER DINAS (ADMIN/SUPERADMIN) -->
+                        <div id="dashboard-dinas-filters" class="hidden mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Filter Jenjang</label>
+                                <select id="filter-jenjang" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-teal-500 outline-none" onchange="app.loadDashboardData()">
+                                    <option value="ALL">Semua Jenjang</option><option value="SD">SD</option><option value="SMP">SMP</option>
+                                </select>
                             </div>
-                            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
-                                <div><p class="text-sm text-gray-500 font-medium">Total Bangunan</p><p class="text-2xl font-bold text-gray-800">0</p></div>
-                                <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center text-xl"><i class="fas fa-building"></i></div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Filter Kecamatan</label>
+                                <select id="filter-kecamatan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-teal-500 outline-none" onchange="app.loadDashboardData()">
+                                    <option value="ALL">Semua Kecamatan</option>
+                                </select>
                             </div>
-                            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
-                                <div><p class="text-sm text-gray-500 font-medium">Ruang Rusak</p><p class="text-2xl font-bold text-red-600">0</p></div>
-                                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl"><i class="fas fa-house-damage"></i></div>
+                            <div class="flex items-end">
+                                <button onclick="window.print()" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fas fa-print mr-2"></i> Cetak Laporan</button>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">Selamat Datang di SIPRAS MABAR</h3>
-                            <p class="text-gray-600 text-sm">Gunakan menu di sebelah kiri untuk mulai melakukan pendataan Sarana dan Prasarana sekolah Anda. Pastikan data yang dimasukkan akurat dan sesuai dengan kondisi rill di lapangan.</p>
+
+                        <!-- STATISTIK KARTU (CARD) -->
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" id="dashboard-stats-container">
+                            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+                                <div><p class="text-xs text-gray-500 font-medium">Total Sarana</p><p class="text-xl font-bold text-gray-800" id="stat-tot-sarana">0</p></div>
+                                <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center"><i class="fas fa-boxes"></i></div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+                                <div><p class="text-xs text-gray-500 font-medium">Kondisi Baik</p><p class="text-xl font-bold text-emerald-600" id="stat-baik">0</p></div>
+                                <div class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+                                <div><p class="text-xs text-gray-500 font-medium">Total Bangunan</p><p class="text-xl font-bold text-gray-800" id="stat-tot-bangunan">0</p></div>
+                                <div class="w-10 h-10 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center"><i class="fas fa-building"></i></div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+                                <div><p class="text-xs text-gray-500 font-medium">Total Ruang</p><p class="text-xl font-bold text-gray-800" id="stat-tot-ruang">0</p></div>
+                                <div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center"><i class="fas fa-door-open"></i></div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+                                <div><p class="text-xs text-gray-500 font-medium">Ruang Rusak</p><p class="text-xl font-bold text-red-600" id="stat-ruang-rusak">0</p></div>
+                                <div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center"><i class="fas fa-house-damage"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- GRAFIK CHART.JS -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                <h3 class="font-bold text-gray-700 mb-4 text-sm"><i class="fas fa-chart-pie text-teal-500 mr-2"></i> Kondisi Sarana</h3>
+                                <div class="relative h-64"><canvas id="chart-sarana"></canvas></div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                <h3 class="font-bold text-gray-700 mb-4 text-sm"><i class="fas fa-chart-bar text-purple-500 mr-2"></i> Kebutuhan Sarana Baru</h3>
+                                <div class="relative h-64"><canvas id="chart-kebutuhan"></canvas></div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                <h3 class="font-bold text-gray-700 mb-4 text-sm"><i class="fas fa-building text-orange-500 mr-2"></i> Kondisi Bangunan</h3>
+                                <div class="relative h-64"><canvas id="chart-bangunan"></canvas></div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                <h3 class="font-bold text-gray-700 mb-4 text-sm"><i class="fas fa-door-open text-blue-500 mr-2"></i> Kondisi Ruang</h3>
+                                <div class="relative h-64"><canvas id="chart-ruang"></canvas></div>
+                            </div>
                         </div>
                     </div>
 
@@ -319,9 +397,9 @@
                                             <textarea id="sarana-catatan" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 outline-none" placeholder="Isi catatan bila diperlukan..."></textarea>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto Kerusakan (Maks 5MB)</label>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto/Dokumen Bukti (Maks 5MB)</label>
                                             <input type="file" id="sarana-foto" accept=".jpg, .jpeg, .png, .pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer text-sm">
-                                            <p class="text-[10px] text-gray-500 mt-1">* Mendukung format PNG, JPEG, JPG, PDF.</p>
+                                            <p class="text-[10px] text-gray-500 mt-1">* Opsional. Mendukung PNG, JPEG, JPG, PDF.</p>
                                         </div>
                                     </div>
                                     
@@ -605,9 +683,9 @@
     <!-- MAIN JAVASCRIPT APP LOGIC -->
     <script>
         // ==========================================
-        // KONFIGURASI SUPABASE
+        // KONFIGURASI SUPABASE (Isi dengan Key Anda!)
         // ==========================================
-        var SUPABASE_URL = "https://jiruttcarflcoepuhkiw.supabase.co"; // MASUKKAN URL ANDA DI SINI
+        var SUPABASE_URL = "https://jiruttcarflcoepuhkiw.supabase.co"; // PASTIKAN ADA TANDA KUTIP TUTUP
         var SUPABASE_ANON_KEY = "sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f"; // MASUKKAN KEY ANDA DI SINI
         
         var supabaseClient = null;
@@ -617,6 +695,9 @@
             currentSchool: null,
             map: null,
             marker: null,
+            mapLahan: null,
+            markerLahan: null,
+            charts: {}, // Penyimpanan instance grafik agar tidak crash saat render ulang
 
             masterSarana: {
                 "Meubeler": {
@@ -670,7 +751,7 @@
 
             init: async () => {
                 try {
-                    if(SUPABASE_URL && SUPABASE_ANON_KEY) {
+                    if(SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== "") {
                         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                         var session = await supabaseClient.auth.getSession();
                         if(session.data.session) {
@@ -680,7 +761,7 @@
                         }
                     } else {
                         app.switchView('landing');
-                        console.warn("Supabase Keys belum dikonfigurasi.");
+                        console.warn("Supabase Keys belum dikonfigurasi. UI tetap berjalan dalam mode simulasi.");
                     }
                 } catch(err) {
                     console.error("Gagal terhubung ke Supabase:", err);
@@ -720,14 +801,21 @@
                     return;
                 }
 
+                if(contentName === 'data-sekolah' || contentName === 'peta-sebaran' || contentName === 'validasi') {
+                    app.showToast("Fitur khusus admin/dinas akan diimplementasikan di fase berikutnya.", "warning");
+                    document.getElementById('content-home').style.display = 'block';
+                    return;
+                }
+
                 document.getElementById(`content-${contentName}`).style.display = 'block';
 
-                const titles = { 'home':'Beranda', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana' };
+                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana' };
                 document.getElementById('topbar-title').innerText = titles[contentName];
 
                 if(contentName === 'profil') { app.loadSchoolProfile(); } 
                 else if(contentName === 'sarana') { app.loadSarana(); } 
                 else if(contentName === 'prasarana') { app.switchPrasaranaTab('lahan'); }
+                else if(contentName === 'home') { app.loadDashboardData(); }
             },
 
             showLoginModal: () => document.getElementById('modal-login').classList.remove('hidden'),
@@ -741,14 +829,14 @@
 
             handleLogin: async (e) => {
                 e.preventDefault();
-                if(!supabaseClient) return app.showToast("Database belum dikonfigurasi di Code. Silakan isi SUPABASE_URL.", "error");
+                if(!supabaseClient) return app.showToast("Koneksi Supabase belum dikonfigurasi. Cek Code Editor.", "error");
 
                 var btn = document.getElementById('btn-login');
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 
                 var username = document.getElementById('login-username').value;
                 var pass = document.getElementById('login-password').value;
-                var dummyEmail = username + "@sipras.local";
+                var dummyEmail = username + "@sipras.local"; // Supabase Auth bypass trick
                 
                 try {
                     var { data, error } = await supabaseClient.auth.signInWithPassword({ email: dummyEmail, password: pass });
@@ -779,8 +867,30 @@
                     }
 
                     document.getElementById('sidebar-user-name').innerText = user.nama;
-                    document.getElementById('sidebar-user-role').innerText = user.role;
+                    document.getElementById('sidebar-user-role').innerText = user.role.replace('_', ' ').toUpperCase();
                     
+                    // PENYESUAIAN ANTARMUKA BERDASARKAN ROLE
+                    if(user.role === 'operator') {
+                        document.getElementById('menu-operator-group').classList.remove('hidden');
+                        document.getElementById('menu-dinas-group').classList.add('hidden');
+                        document.getElementById('dashboard-operator-progress').classList.remove('hidden');
+                        document.getElementById('dashboard-dinas-filters').classList.add('hidden');
+                    } else {
+                        document.getElementById('menu-operator-group').classList.add('hidden');
+                        document.getElementById('menu-dinas-group').classList.remove('hidden');
+                        document.getElementById('dashboard-operator-progress').classList.add('hidden');
+                        document.getElementById('dashboard-dinas-filters').classList.remove('hidden');
+                        document.getElementById('topbar-school-name').innerText = "Portal Dinas";
+                        document.getElementById('topbar-school-name').classList.remove('hidden');
+                        
+                        // Kunci Filter Jenjang Sesuai Kewenangan Admin
+                        var filterJenjang = document.getElementById('filter-jenjang');
+                        if(user.role === 'admin_sd') { filterJenjang.value = 'SD'; filterJenjang.disabled = true; }
+                        else if(user.role === 'admin_smp') { filterJenjang.value = 'SMP'; filterJenjang.disabled = true; }
+                        
+                        app.loadMasterKecamatan();
+                    }
+
                     if(user.role === 'operator' && user.school_id) {
                         var { data: school } = await supabaseClient.from('schools').select('*').eq('id', user.school_id).single();
                         if(school) {
@@ -790,6 +900,7 @@
                         }
                     }
                     app.switchView('dashboard');
+                    app.loadDashboardData(); // Render otomatis chart dashboard saat masuk
                 } catch(error) {
                     app.showToast("Gagal memuat profil pengguna.", "error");
                 }
@@ -836,12 +947,96 @@
                     iconPrasarana.classList.add('hidden');
                     bannerWarning.classList.add('hidden');
                 }
+                if(app.currentUser && app.currentUser.role === 'operator') app.calcCompleteness();
+            },
+
+            loadMasterKecamatan: async () => {
+                try {
+                    var { data } = await supabaseClient.from('ref_kecamatan').select('id, nama_kecamatan').order('nama_kecamatan');
+                    if(data) {
+                        var sel = document.getElementById('filter-kecamatan');
+                        sel.innerHTML = '<option value="ALL">Semua Kecamatan</option>';
+                        data.forEach(k => sel.add(new Option(k.nama_kecamatan, k.id)));
+                    }
+                } catch(err) {}
+            },
+
+            calcCompleteness: async () => {
+                if(!app.currentSchool) return;
+                let score = 0;
+                if(app.currentSchool.profil_lengkap) score += 20;
+                try {
+                    let { count: cLahan } = await supabaseClient.from('prasarana_lahan').select('*', { count: 'exact', head: true }).eq('school_id', app.currentSchool.id);
+                    if(cLahan > 0) score += 20;
+                    let { count: cBang } = await supabaseClient.from('prasarana_bangunan').select('*', { count: 'exact', head: true }).eq('school_id', app.currentSchool.id);
+                    if(cBang > 0) score += 20;
+                    let { count: cRuang } = await supabaseClient.from('prasarana_ruang').select('*', { count: 'exact', head: true }).eq('school_id', app.currentSchool.id);
+                    if(cRuang > 0) score += 20;
+                    let { count: cSarana } = await supabaseClient.from('sarana').select('*', { count: 'exact', head: true }).eq('school_id', app.currentSchool.id);
+                    if(cSarana > 0) score += 20;
+                } catch(err) {}
+                
+                document.getElementById('progress-bar-fill').style.width = score + '%';
+                document.getElementById('progress-text').innerText = score + '%';
+            },
+
+            renderChart: (canvasId, type, label, labels, data, colors) => {
+                var ctx = document.getElementById(canvasId).getContext('2d');
+                if(app.charts[canvasId]) app.charts[canvasId].destroy(); // Destroy old chart to prevent overlay glitch
+                app.charts[canvasId] = new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: labels,
+                        datasets: [{ label: label, data: data, backgroundColor: colors, borderWidth: 1 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: type === 'pie' || type === 'doughnut' ? 'right' : 'top' } } }
+                });
+            },
+
+            loadDashboardData: async () => {
+                // Menentukan parameter filter berdasarkan role
+                var p_jenjang = document.getElementById('filter-jenjang') ? document.getElementById('filter-jenjang').value : 'ALL';
+                var p_kec = document.getElementById('filter-kecamatan') ? document.getElementById('filter-kecamatan').value : 'ALL';
+                var sid = app.currentUser.role === 'operator' ? app.currentSchool.id : null;
+
+                try {
+                    // Eksekusi fungsi RPC Database
+                    var { data, error } = await supabaseClient.rpc('get_dashboard_stats', {
+                        p_school_id: sid,
+                        p_jenjang: p_jenjang === 'ALL' ? null : p_jenjang,
+                        p_kecamatan_id: p_kec === 'ALL' ? null : p_kec
+                    });
+                    
+                    if(error) throw error;
+                    
+                    var stats = data || {
+                        tot_sarana:0, baik:0, rr:0, rb:0, keb_baru:0, 
+                        tot_bangunan:0, b_baik:0, b_rr:0, b_rs:0, b_rb:0, b_rt:0,
+                        tot_ruang:0, r_baik:0, r_rr:0, r_rs:0, r_rb:0, r_rt:0
+                    };
+
+                    // Render angka ke Stats Cards
+                    document.getElementById('stat-tot-sarana').innerText = stats.tot_sarana || 0;
+                    document.getElementById('stat-baik').innerText = stats.baik || 0;
+                    document.getElementById('stat-tot-bangunan').innerText = stats.tot_bangunan || 0;
+                    document.getElementById('stat-tot-ruang').innerText = stats.tot_ruang || 0;
+                    document.getElementById('stat-ruang-rusak').innerText = (stats.r_rr||0) + (stats.r_rs||0) + (stats.r_rb||0) + (stats.r_rt||0);
+
+                    // Render Charts
+                    app.renderChart('chart-sarana', 'doughnut', 'Sarana', ['Baik', 'R. Ringan', 'R. Berat'], [stats.baik||0, stats.rr||0, stats.rb||0], ['#10b981', '#f59e0b', '#ef4444']);
+                    app.renderChart('chart-kebutuhan', 'bar', 'Kebutuhan', ['Total Kebutuhan Sarana Baru'], [stats.keb_baru||0], ['#8b5cf6']);
+                    app.renderChart('chart-bangunan', 'pie', 'Bangunan', ['Baik', 'R. Ringan', 'R. Sedang', 'R. Berat', 'R. Total'], [stats.b_baik||0, stats.b_rr||0, stats.b_rs||0, stats.b_rb||0, stats.b_rt||0], ['#10b981', '#fcd34d', '#f59e0b', '#ef4444', '#7f1d1d']);
+                    app.renderChart('chart-ruang', 'bar', 'Ruangan', ['Baik', 'R. Ringan', 'R. Sedang', 'R. Berat', 'R. Total'], [stats.r_baik||0, stats.r_rr||0, stats.r_rs||0, stats.r_rb||0, stats.r_rt||0], ['#10b981', '#fcd34d', '#f59e0b', '#ef4444', '#7f1d1d']);
+
+                } catch (err) {
+                    console.error("Gagal menarik data grafik:", err);
+                }
             },
 
             initMap: (lat, lng) => {
                 if(app.map) return;
                 var initLat = lat || -8.4908; 
-                var initLng = lng || 119.8821;
+                var initLng = lng || 119.8821; // Default to Manggarai Barat coordinates
 
                 app.map = L.map('map').setView([initLat, initLng], 14);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1074,8 +1269,6 @@
                 if(tabName === 'ruang') { app.loadRuang(); app.populateBangunanDropdown(); }
             },
 
-            mapLahan: null,
-            markerLahan: null,
             initMapLahan: () => {
                 if(app.mapLahan) { app.mapLahan.invalidateSize(); return; }
                 var initLat = -8.4908; 
@@ -1146,8 +1339,8 @@
                 app.updateKondisiUI('fasilitas-rusak', 'fasilitas-kondisi', 'fasilitas-kondisi-wrapper');
             },
 
-            saveLahan: async (e) => { e.preventDefault(); app.showToast("Simulasi: Lahan diproses", "success"); },
-            saveFasilitas: async (e) => { e.preventDefault(); app.showToast("Simulasi: Fasilitas diproses", "success"); },
+            saveLahan: async (e) => { e.preventDefault(); app.showToast("Simulasi: Lahan diproses (Menunggu tabel di database)", "success"); },
+            saveFasilitas: async (e) => { e.preventDefault(); app.showToast("Simulasi: Fasilitas diproses (Menunggu tabel di database)", "success"); },
 
             saveBangunan: async (e) => {
                 e.preventDefault();
