@@ -975,59 +975,128 @@
             },
 
             switchPrasaranaTab: (tabName) => {
-                document.getElementById('tab-bangunan').style.display = tabName === 'bangunan' ? 'block' : 'none';
-                document.getElementById('tab-ruang').style.display = tabName === 'ruang' ? 'block' : 'none';
-                
-                document.getElementById('tab-btn-bangunan').className = tabName === 'bangunan' 
-                    ? 'border-teal-500 text-teal-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition' 
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition';
-                
-                document.getElementById('tab-btn-ruang').className = tabName === 'ruang'
-                    ? 'border-teal-500 text-teal-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition';
+                const tabs = ['lahan', 'bangunan', 'ruang', 'fasilitas'];
+                tabs.forEach(t => {
+                    document.getElementById(`tab-${t}`).style.display = t === tabName ? 'block' : 'none';
+                    const btn = document.getElementById(`tab-btn-${t}`);
+                    if (t === tabName) {
+                        btn.className = 'border-teal-500 text-teal-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition';
+                    } else {
+                        btn.className = 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition';
+                    }
+                });
 
+                // Logic load data per tab
+                if(tabName === 'lahan') {
+                    // Leaflet map needs a resize trigger when a hidden tab becomes visible
+                    setTimeout(() => app.initMapLahan(), 300); 
+                }
                 if(tabName === 'bangunan') app.loadBangunan();
                 if(tabName === 'ruang') { app.loadRuang(); app.populateBangunanDropdown(); }
             },
 
+            mapLahan: null,
+            markerLahan: null,
+            initMapLahan: () => {
+                if(app.mapLahan) {
+                    app.mapLahan.invalidateSize();
+                    return;
+                }
+                var initLat = -8.4908; 
+                var initLng = 119.8821;
+                app.mapLahan = L.map('map-lahan').setView([initLat, initLng], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(app.mapLahan);
+                app.markerLahan = L.marker([initLat, initLng], {draggable: true}).addTo(app.mapLahan);
+                
+                app.markerLahan.on('dragend', function(e) {
+                    var position = app.markerLahan.getLatLng();
+                    document.getElementById('lahan-lat').value = position.lat.toFixed(8);
+                    document.getElementById('lahan-lng').value = position.lng.toFixed(8);
+                });
+            },
+
+            getLocationGPSLahan: () => {
+                if (navigator.geolocation) {
+                    app.showToast("Mencari kordinat Lahan...", "warning");
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        var lat = pos.coords.latitude;
+                        var lng = pos.coords.longitude;
+                        document.getElementById('lahan-lat').value = lat.toFixed(8);
+                        document.getElementById('lahan-lng').value = lng.toFixed(8);
+                        if(app.mapLahan && app.markerLahan) {
+                            var newLatLng = new L.LatLng(lat, lng);
+                            app.markerLahan.setLatLng(newLatLng);
+                            app.mapLahan.setView(newLatLng, 16);
+                        }
+                        app.showToast("Lokasi lahan berhasil dikunci!");
+                    }, (err) => app.showToast("Gagal membaca GPS.", "error"));
+                }
+            },
+
             calcKondisiFrontend: (persen) => {
-                if(persen <= 30) return { t:"Rusak Ringan", c:"text-yellow-600" };
-                if(persen <= 46) return { t:"Rusak Sedang", c:"text-orange-600" };
-                if(persen <= 85) return { t:"Rusak Berat", c:"text-red-600" };
-                return { t:"Rusak Total", c:"text-red-800 font-extrabold" };
+                // Sesuai Spesifikasi: 0%(Baik), 1-30%(Rusak Ringan), >30-46%(Rusak Sedang), >46-85%(Rusak Berat), >85%(Rusak Total)
+                if(persen === 0 || persen === "0") return { t:"Baik", c:"text-emerald-700", bg:"bg-emerald-50 border-emerald-200" };
+                if(persen > 0 && persen <= 30) return { t:"Rusak Ringan", c:"text-yellow-600", bg:"bg-yellow-50 border-yellow-200" };
+                if(persen > 30 && persen <= 46) return { t:"Rusak Sedang", c:"text-orange-600", bg:"bg-orange-50 border-orange-200" };
+                if(persen > 46 && persen <= 85) return { t:"Rusak Berat", c:"text-red-600", bg:"bg-red-50 border-red-200" };
+                if(persen > 85) return { t:"Rusak Total", c:"text-red-800 font-extrabold", bg:"bg-red-100 border-red-300" };
+                return { t:"-", c:"text-gray-500", bg:"bg-gray-50 border-gray-200" };
+            },
+
+            updateKondisiUI: (rusakId, labelId, wrapperId) => {
+                var rusak = parseFloat(document.getElementById(rusakId).value) || 0;
+                var res = app.calcKondisiFrontend(rusak);
+                var label = document.getElementById(labelId);
+                var wrapper = document.getElementById(wrapperId);
+                label.innerText = res.t;
+                label.className = `font-bold text-lg ${res.c}`;
+                wrapper.className = `px-3 py-3 border rounded flex justify-center items-center ${res.bg}`;
             },
 
             calcBangunan: () => {
                 var p = parseFloat(document.getElementById('bang-panjang').value) || 0;
                 var l = parseFloat(document.getElementById('bang-lebar').value) || 0;
                 document.getElementById('bang-luas').value = (p * l).toFixed(2) + " m²";
-                
-                var rusak = parseFloat(document.getElementById('bang-rusak').value) || 0;
-                var k = document.getElementById('bang-kondisi');
-                if(rusak === 0) { k.innerText = "Baik"; k.className = "px-3 py-2 bg-emerald-50 border border-emerald-200 rounded font-bold text-emerald-700 text-center"; }
-                else { var r = app.calcKondisiFrontend(rusak); k.innerText = r.t; k.className = `px-3 py-2 bg-gray-50 border border-gray-200 rounded font-bold text-center ${r.c}`; }
+                app.updateKondisiUI('bang-rusak', 'bang-kondisi', 'bang-kondisi-wrapper');
             },
 
             calcRuang: () => {
                 var p = parseFloat(document.getElementById('ruang-panjang').value) || 0;
                 var l = parseFloat(document.getElementById('ruang-lebar').value) || 0;
                 document.getElementById('ruang-luas').value = (p * l).toFixed(2) + " m²";
-                
-                var rusak = parseFloat(document.getElementById('ruang-rusak').value) || 0;
-                var k = document.getElementById('ruang-kondisi');
-                if(rusak === 0) { k.innerText = "Baik"; k.className = "px-3 py-2 bg-emerald-50 border border-emerald-200 rounded font-bold text-emerald-700 text-center"; }
-                else { var r = app.calcKondisiFrontend(rusak); k.innerText = r.t; k.className = `px-3 py-2 bg-gray-50 border border-gray-200 rounded font-bold text-center ${r.c}`; }
+                app.updateKondisiUI('ruang-rusak', 'ruang-kondisi', 'ruang-kondisi-wrapper');
+            },
+            
+            calcFasilitas: () => {
+                app.updateKondisiUI('fasilitas-rusak', 'fasilitas-kondisi', 'fasilitas-kondisi-wrapper');
+            },
+
+            saveLahan: async (e) => {
+                e.preventDefault();
+                app.showToast("Data lahan diproses...", "warning");
+                // Implementasi database menyusul jika tabel lahan ada di DB
+            },
+            saveFasilitas: async (e) => {
+                e.preventDefault();
+                app.showToast("Data fasilitas diproses...", "warning");
+                // Implementasi database menyusul
             },
 
             saveBangunan: async (e) => {
                 e.preventDefault();
                 var payload = {
                     school_id: app.currentSchool.id,
+                    kode_bangunan: document.getElementById('bang-kode').value,
                     nama_bangunan: document.getElementById('bang-nama').value,
+                    jumlah_lantai: parseInt(document.getElementById('bang-lantai').value) || 1,
                     tahun_pembangunan: parseInt(document.getElementById('bang-tahun').value) || null,
+                    sumber_dana: document.getElementById('bang-sumber').value,
+                    konstruksi: document.getElementById('bang-konstruksi').value,
+                    status_kepemilikan: document.getElementById('bang-kepemilikan').value,
                     panjang: parseFloat(document.getElementById('bang-panjang').value) || 0,
                     lebar: parseFloat(document.getElementById('bang-lebar').value) || 0,
-                    tingkat_kerusakan: parseFloat(document.getElementById('bang-rusak').value) || 0
+                    tingkat_kerusakan: parseFloat(document.getElementById('bang-rusak').value) || 0,
+                    keterangan: document.getElementById('bang-keterangan').value
                 };
                 try {
                     var { error } = await supabaseClient.from('prasarana_bangunan').insert([payload]);
@@ -1048,8 +1117,8 @@
                     tbody.innerHTML = '';
                     if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada data bangunan.</td></tr>'; return; }
                     data.forEach(item => {
-                        var kColor = item.kondisi === 'Baik' ? 'text-emerald-600' : 'text-red-600';
-                        tbody.innerHTML += `<tr><td class="px-4 py-2 font-semibold text-gray-800">${item.nama_bangunan}</td><td class="px-4 py-2">${item.tahun_pembangunan || '-'}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas_bangunan}</td><td class="px-4 py-2 text-center">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center font-bold ${kColor}">${item.kondisi}</td></tr>`;
+                        var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan);
+                        tbody.innerHTML += `<tr><td class="px-4 py-2 font-semibold text-gray-800">${item.nama_bangunan} <span class="text-xs text-gray-400">(${item.konstruksi||'-'})</span></td><td class="px-4 py-2">${item.tahun_pembangunan || '-'}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas_bangunan}</td><td class="px-4 py-2 text-center">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${cUI.t}</td></tr>`;
                     });
                 } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
             },
@@ -1071,9 +1140,15 @@
                     school_id: app.currentSchool.id,
                     bangunan_id: document.getElementById('ruang-bangunan-id').value,
                     jenis_ruang: document.getElementById('ruang-jenis').value,
+                    fungsi_ruang: document.getElementById('ruang-fungsi').value,
+                    lantai_ke: parseInt(document.getElementById('ruang-lantai').value) || 1,
+                    kapasitas: parseInt(document.getElementById('ruang-kapasitas').value) || 0,
+                    status_ruang: document.getElementById('ruang-status').value,
+                    tahun_rehabilitasi_terakhir: parseInt(document.getElementById('ruang-rehab').value.substring(0,4)) || null, // Ambil tahun dari input date
                     panjang: parseFloat(document.getElementById('ruang-panjang').value) || 0,
                     lebar: parseFloat(document.getElementById('ruang-lebar').value) || 0,
-                    tingkat_kerusakan: parseFloat(document.getElementById('ruang-rusak').value) || 0
+                    tingkat_kerusakan: parseFloat(document.getElementById('ruang-rusak').value) || 0,
+                    keterangan: document.getElementById('ruang-keterangan').value
                 };
                 try {
                     var { error } = await supabaseClient.from('prasarana_ruang').insert([payload]);
@@ -1089,15 +1164,14 @@
                 var tbody = document.getElementById('table-body-ruang');
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>';
                 try {
-                    // Fetch with Join to get Bangunan Name
                     var { data, error } = await supabaseClient.from('prasarana_ruang').select('*, bangunan:prasarana_bangunan(nama_bangunan)').eq('school_id', app.currentSchool.id).order('created_at', { ascending: false });
                     if(error) throw error;
                     tbody.innerHTML = '';
                     if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada data ruangan.</td></tr>'; return; }
                     data.forEach(item => {
-                        var kColor = item.kondisi === 'Baik' ? 'text-emerald-600' : 'text-red-600';
+                        var cUI = app.calcKondisiFrontend(item.tingkat_kerusakan);
                         var bangName = item.bangunan ? item.bangunan.nama_bangunan : 'Tidak Diketahui';
-                        tbody.innerHTML += `<tr><td class="px-4 py-2 text-gray-500">${bangName}</td><td class="px-4 py-2 font-semibold text-gray-800">${item.jenis_ruang}</td><td class="px-4 py-2 text-center bg-gray-50">${item.luas}</td><td class="px-4 py-2 text-center">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center font-bold ${kColor}">${item.kondisi}</td></tr>`;
+                        tbody.innerHTML += `<tr><td class="px-4 py-2 text-gray-500">${bangName}</td><td class="px-4 py-2 font-semibold text-gray-800">${item.jenis_ruang} <br><span class="text-[10px] bg-gray-100 rounded px-1">${item.status_ruang||''}</span></td><td class="px-4 py-2 text-center bg-gray-50">${item.luas}</td><td class="px-4 py-2 text-center">${item.tingkat_kerusakan}%</td><td class="px-4 py-2 text-center font-bold ${cUI.c}">${cUI.t}</td></tr>`;
                     });
                 } catch(err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Gagal memuat tabel.</td></tr>'; }
             }
