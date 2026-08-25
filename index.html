@@ -273,46 +273,17 @@
                                                 <option value="">-- Pilih Jenis --</option>
                                                 <option value="Meubeler">Meubeler</option>
                                                 <option value="Peralatan IT">Peralatan IT</option>
+                                                <option value="Peralatan Pembelajaran">Peralatan Pembelajaran</option>
                                                 <option value="Buku">Buku & Bahan Bacaan</option>
                                                 <option value="Peralatan Olahraga">Peralatan Olahraga</option>
                                                 <option value="Peralatan UKS">Peralatan UKS</option>
+                                                <option value="Lainnya">Sarana Pendukung Lainnya</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
-                                            <select id="sarana-kategori" required onchange="app.handleSaranaKategoriChange()" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50" disabled><option value="">Pilih Jenis Dahulu</option></select>
-                                        </div>
-                                        <div id="container-subkategori">
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Subkategori <span class="text-red-500">*</span></label>
-                                            <select id="sarana-subkategori" required class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50" disabled><option value="">Pilih Kategori Dahulu</option></select>
-                                            <input type="text" id="sarana-subkategori-text" class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg outline-none mt-2" placeholder="Tulis subkategori...">
-                                        </div>
-                                    </div>
-
-                                    <!-- Blok Khusus Buku -->
-                                    <div id="blok-buku" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-100 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div class="md:col-span-3 font-semibold text-blue-800 text-sm border-b border-blue-200 pb-2">Detail Identitas Buku</div>
-                                        <div><label class="block text-xs font-medium text-gray-700 mb-1">ISBN/Kode</label><input type="text" id="buku-isbn" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                                        <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Judul Buku</label><input type="text" id="buku-judul" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Pengarang</label><input type="text" id="buku-pengarang" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Penerbit</label><input type="text" id="buku-penerbit" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Tahun Terbit</label><input type="number" id="buku-tahun" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"></div>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                        <div><label class="block text-xs font-semibold text-emerald-600 mb-1">Kondisi Baik</label><input type="number" id="sarana-baik" min="0" value="0" oninput="app.calcSaranaTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-bold"></div>
-                                        <div><label class="block text-xs font-semibold text-yellow-600 mb-1">Rusak Ringan</label><input type="number" id="sarana-rr" min="0" value="0" oninput="app.calcSaranaTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-bold"></div>
-                                        <div><label class="block text-xs font-semibold text-red-600 mb-1">Rusak Berat</label><input type="number" id="sarana-rb" min="0" value="0" oninput="app.calcSaranaTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-bold"></div>
-                                        <div><label class="block text-xs font-semibold text-teal-700 mb-1">Total (Auto)</label><input type="text" id="sarana-total" value="0" readonly class="w-full px-3 py-2 bg-teal-50 border border-teal-200 rounded-lg text-center font-bold text-teal-700"></div>
-                                        <div><label class="block text-xs font-semibold text-indigo-600 mb-1">Kebutuhan Baru</label><input type="number" id="sarana-kebutuhan" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-bold"></div>
-                                    </div>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Catatan / Keterangan</label><textarea id="sarana-catatan" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"></textarea></div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto Bukti (Maks 5MB)</label>
-                                            <input type="file" id="sarana-foto" accept="image/jpeg, image/png, image/jpg" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 text-sm">
-                                            <p class="text-[10px] text-gray-500 mt-1">* Opsional, disarankan untuk barang Rusak Berat.</p>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto/Dokumen Bukti (Maks 5MB)</label>
+                                            <input type="file" id="sarana-foto" accept="image/jpeg, image/png, image/jpg, application/pdf" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 text-sm">
+                                            <p class="text-[10px] text-gray-500 mt-1">* Opsional. Mendukung PNG, JPEG, JPG, PDF.</p>
                                         </div>
                                     </div>
                                     <div class="flex justify-end pt-4"><button type="submit" id="btn-save-sarana" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm transition"><i class="fas fa-save mr-2"></i> Simpan Data</button></div>
@@ -480,19 +451,54 @@
             map: null,
             marker: null,
 
-            // Data Master untuk Dropdown Bertingkat Sarana
+            // Data Master untuk Dropdown Bertingkat Sarana (Updated)
             masterSarana: {
                 "Meubeler": {
-                    "Meja": ["Meja siswa", "Meja guru", "Meja kepala sekolah"],
-                    "Kursi": ["Kursi siswa", "Kursi guru", "Kursi kepala sekolah"]
+                    "Meja": ["Meja siswa", "Meja guru", "Meja kepala sekolah", "Meja TU", "Meja laboratorium"],
+                    "Kursi": ["Kursi siswa", "Kursi guru", "Kursi kepala sekolah", "Kursi tamu"],
+                    "Lemari": ["Lemari kelas", "Lemari guru", "Lemari arsip", "Lemari perpustakaan", "Lemari alat laboratorium"],
+                    "Rak": ["Rak buku", "Rak dokumen", "Rak alat"],
+                    "Papan": ["Papan tulis", "Whiteboard", "Papan pengumuman", "Papan nama sekolah"],
+                    "Perabot Lainnya": ["Sofa", "Bangku", "Tempat duduk tunggu"]
                 },
                 "Peralatan IT": {
-                    "Komputer": ["PC Desktop", "Laptop", "Server"],
-                    "Perangkat Tampilan": ["Proyektor", "Smart TV"]
+                    "Komputer": ["PC desktop", "Komputer All-in-One", "Laptop", "Chromebook"],
+                    "Perangkat Tampilan": ["Proyektor", "Interactive Flat Panel (IFP)", "Monitor", "SmartBoard"],
+                    "Printer": ["Printer Inkjet", "Printer Laser", "Mesin Fotokopi", "Scanner"],
+                    "Jaringan": ["Starlink", "Router", "Switch", "Access point", "Modem"],
+                    "Audio": ["Speaker", "Microphone", "Amplifier", "Bel Sekolah"],
+                    "Perangkat Pendukung lainnya": ["Televisi", "Antena Parabola", "Kamera", "Webcam", "UPS", "Stavol", "Harddisk Eksternal", "Kamera CCTV", "Monitor CCTV", "DVR/NVR"]
+                },
+                "Peralatan Pembelajaran": {
+                    "IPA": ["Mikroskop Cahaya Monokuler", "Kaca Preparat & Kaca Penutup", "Preparat Awetan", "Torso & Model Anatomi", "Peralatan Bedah Sederhana", "Cawan Petri & Kaca Pembesar", "Quadrat Frame / Kuadrat Plastik", "Alat Kaca", "Pemanas", "Mortar & Pestle (Lumpang & Alun)", "Mekanika & pengukuran", "Optik", "Gelombang & Bunyi", "Listrik & Magnet"],
+                    "Matematika": ["Kit matematika", "Alat ukur", "Bangun ruang"],
+                    "IPS": ["Globe", "Peta", "Atlas", "Miniature"]
                 },
                 "Buku": {
-                    "Buku Teks": ["Buku Siswa", "Buku Guru"],
-                    "Buku Non Teks": ["Referensi", "Pengayaan", "Fiksi"]
+                    "Buku Pelajaran": ["TEKS-07: Buku Teks Utama Kelas 7", "TEKS-08: Buku Teks Utama Kelas 8", "TEKS-09: Buku Teks Utama Kelas 9", "PEND-SMP: Buku Panduan Soal & Asesmen SMP"],
+                    "Buku Non Fiksi & Referensi Tugas": ["000-REF: Ensiklopedia & Karya Umum", "100-PSI: Psikologi Remaja & Bimbingan Konseling (BK)", "200-AGM: Agama & Budi Pekerti", "300-SOS: IPS, Pendidikan Pancasila (PPKn), & Pramuka", "400-BHS: Kamus & Tata Bahasa (Indonesia, Inggris, Daerah)", "500-SAI: Matematika & IPA (Biologi, Fisika)", "600-TEK: Kesehatan Remaja, Prakarya, & Informatika", "700-ART: Seni Budaya, Musik, & Olahraga", "900-SEJ: Sejarah Nasional, Atlas, & Biografi Tokoh"],
+                    "Literasi & Hiburan": ["F-NOV: Novel Remaja / Chicklit / Fantasi", "F-CPN: Kumpulan Cerita Pendek (Cerpen)", "F-KMK: Komik Edukasi & Manga Legal", "F-SRA: Kumpulan Puisi & Sastra Remaja"]
+                },
+                "Peralatan Olahraga": {
+                    "Permainan Bola": ["Bola sepak", "Bola voli", "Bola basket"],
+                    "Atletik": ["Peluru", "Tongkat estafet"],
+                    "Senam": ["Matras", "Tali skipping"],
+                    "Permainan Raket": ["Raket badminton", "Net badminton"],
+                    "Peralatan Pendukung": ["Peluit", "Stopwatch", "Pompa bola", "Net voli"]
+                },
+                "Peralatan UKS": {
+                    "Perabot UKS": ["Tempat tidur UKS", "Meja UKS", "Kursi UKS", "Lemari UKS"],
+                    "Alat Kesehatan": ["Tensimeter", "Termometer", "Timbangan"],
+                    "P3K": ["Kotak P3K", "Kasa", "Perban"],
+                    "Kebersihan": ["Tempat sampah", "Wastafel"]
+                },
+                "Lainnya": {
+                    "Transportasi": ["Motor Dinas", "Mobil Dinas"],
+                    "Peralatan Kesenian": ["Gitar", "Keyboard", "Drum", "Pianika", "Easel", "Kuas", "Palet", "Properti tari", "Selendang"],
+                    "Utilitas": ["Stabilizer", "Pompa Air", "Toren", "Kipas Angin", "Air Condisioner", "Genset", "Panel Listrik", "Jam dinding"],
+                    "Peralatan Dapur": ["Kompor", "Rice cooker", "Oven", "Lemari dapur", "Rak piring", "Piring", "Gelas", "Sendok", "Dispenser", "Kulkas"],
+                    "Peralatan Keselamatan": ["APAR", "Lampu Emergency", "Gembok"],
+                    "Peralatan Kebersihan": ["Sapu", "Pel", "Kemoceng", "Ember", "Cangkul", "Sekop", "Sapu lidi", "Tempat sampah", "Tong sampah", "Mesin potong rumput", "Vacuum cleaner"]
                 }
             },
 
