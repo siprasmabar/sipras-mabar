@@ -30,6 +30,12 @@
             canvas { max-height: 300px !important; page-break-inside: avoid; }
             .shadow-sm { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
         }
+        
+        @media print {
+            body.printing-sptjm #app-container { display: none !important; }
+            body.printing-sptjm #toast-container { display: none !important; }
+            body.printing-sptjm #print-sptjm-template { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
@@ -168,6 +174,7 @@
                             <a href="#" onclick="app.navTo('profil')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-building w-5"></i> Profil Sekolah</a>
                             <a href="#" onclick="app.navTo('sarana')" id="menu-sarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-chair w-5"></i> Data Sarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
                             <a href="#" onclick="app.navTo('prasarana')" id="menu-prasarana" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-door-open w-5"></i> Data Prasarana <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
+                            <a href="#" onclick="app.navTo('sptjm')" id="menu-sptjm" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-file-signature w-5"></i> Arsip SPTJM <i class="fas fa-lock text-xs ml-auto hidden locked-icon"></i></a>
                             <a href="#" onclick="app.navTo('helpdesk')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-headset w-5"></i> Bantuan (Helpdesk)</a>
                         </div>
 
@@ -176,6 +183,7 @@
                             <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-2">Menu Admin Dinas</div>
                             <a href="#" onclick="app.navTo('data-sekolah')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-school w-5"></i> Data Sekolah</a>
                             <a href="#" onclick="app.navTo('validasi')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-clipboard-check w-5"></i> Validasi Data</a>
+                            <a href="#" onclick="app.navTo('sptjm')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-file-signature w-5"></i> Arsip SPTJM</a>
                             <a href="#" onclick="app.navTo('pengumuman')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-bullhorn w-5"></i> Pengumuman</a>
                             <a href="#" onclick="app.navTo('helpdesk')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-headset w-5"></i> Tiket Bantuan</a>
                             <a href="#" onclick="app.navTo('peta-sebaran')" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition"><i class="fas fa-map-marked-alt w-5"></i> Peta Sebaran</a>
@@ -759,7 +767,98 @@
                         </div>
                     </div>
 
+                    <div id="content-sptjm" class="dashboard-content hidden space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6 border-b border-gray-100 pb-4">
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-800">Surat Pernyataan Tanggung Jawab Mutlak (SPTJM)</h2>
+                                    <p class="text-sm text-gray-500">Bukti keabsahan data sarana dan prasarana sekolah di Kabupaten Manggarai Barat.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Area Khusus Operator (Cetak & Upload) -->
+                            <div id="sptjm-operator-ui" class="hidden mb-8 space-y-4">
+                                <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg flex flex-col md:flex-row gap-4 justify-between items-center">
+                                    <div>
+                                        <h3 class="font-bold text-blue-800 text-sm">Langkah 1: Unduh & Tanda Tangan</h3>
+                                        <p class="text-xs text-blue-600 mt-1">Cetak template SPTJM yang telah otomatis terisi data profil sekolah Anda. Tempelkan Meterai Rp 10.000 dan tandatangani.</p>
+                                    </div>
+                                    <button onclick="app.cetakSPTJM()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition flex items-center justify-center gap-2 whitespace-nowrap">
+                                        <i class="fas fa-print"></i> Cetak Dokumen SPTJM
+                                    </button>
+                                </div>
+                                
+                                <div class="p-4 bg-teal-50 border border-teal-100 rounded-lg">
+                                    <h3 class="font-bold text-teal-800 text-sm mb-1">Langkah 2: Unggah SPTJM Final</h3>
+                                    <p class="text-xs text-teal-600 mb-4">Pindai (Scan) dokumen SPTJM yang sudah ditandatangani lalu unggah dalam format PDF (Maksimal 5MB).</p>
+                                    
+                                    <form id="form-sptjm" onsubmit="app.uploadSPTJM(event)" class="flex flex-col md:flex-row gap-4 items-end">
+                                        <div class="flex-1 w-full">
+                                            <input type="file" id="sptjm-file" required accept=".pdf" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm">
+                                        </div>
+                                        <button type="submit" id="btn-save-sptjm" class="w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-lg font-medium text-sm h-full flex items-center justify-center gap-2">
+                                            <i class="fas fa-upload"></i> Unggah Dokumen
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Tabel Arsip (Untuk Semua Role) -->
+                            <h3 class="font-bold text-gray-700 mb-3 text-sm">Arsip Dokumen SPTJM Terunggah</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-gray-600">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-3">Nama Sekolah & NPSN</th>
+                                            <th class="px-4 py-3">Tanggal Unggah</th>
+                                            <th class="px-4 py-3 text-center">Status</th>
+                                            <th class="px-4 py-3 text-center">Tindakan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-body-sptjm" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </main>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Template Cetak SPTJM (Tersembunyi, hanya muncul saat di-print) -->
+    <div id="print-sptjm-template" class="hidden bg-white text-black p-10 font-serif w-full h-auto min-h-screen z-[99999]">
+        <div class="text-center mb-6 border-b-4 border-black pb-4 flex flex-col items-center">
+            <h1 class="text-2xl font-bold uppercase tracking-wide">PEMERINTAH KABUPATEN MANGGARAI BARAT</h1>
+            <h2 class="text-xl font-bold uppercase tracking-wide mt-1">DINAS PENDIDIKAN KEPEMUDAAN DAN OLAHRAGA</h2>
+        </div>
+        <h3 class="text-center font-bold text-xl mb-10 underline uppercase">Surat Pernyataan Tanggung Jawab Mutlak</h3>
+        
+        <p class="mb-4 text-justify text-lg leading-relaxed">Yang bertanda tangan di bawah ini:</p>
+        <table class="w-full mb-6 text-lg ml-4">
+            <tr><td class="w-56 py-2 font-medium">Nama</td><td class="w-6 text-center">:</td><td><span id="sptjm-print-kepsek" class="font-bold"></span></td></tr>
+            <tr><td class="py-2 font-medium">NIP</td><td class="text-center">:</td><td><span id="sptjm-print-nip"></span></td></tr>
+            <tr><td class="py-2 font-medium">Jabatan</td><td class="text-center">:</td><td>Kepala Sekolah <span id="sptjm-print-sekolah" class="font-bold"></span></td></tr>
+            <tr><td class="py-2 font-medium">NPSN</td><td class="text-center">:</td><td><span id="sptjm-print-npsn"></span></td></tr>
+            <tr><td class="py-2 font-medium align-top">Alamat Sekolah</td><td class="text-center align-top">:</td><td><span id="sptjm-print-alamat"></span></td></tr>
+        </table>
+        
+        <p class="mb-4 text-justify text-lg leading-relaxed indent-8">
+            Menyatakan dengan sesungguhnya bahwa seluruh data Sarana dan Prasarana yang kami input ke dalam <strong>Sistem Informasi Pendataan Sarana dan Prasarana Sekolah (SIPRAS MABAR)</strong> adalah benar, akurat, valid, dan sesuai dengan kondisi faktual di lapangan pada saat pendataan ini dilakukan.
+        </p>
+        <p class="mb-12 text-justify text-lg leading-relaxed indent-8">
+            Apabila di kemudian hari ditemukan bahwa data yang kami sampaikan tidak benar, fiktif, atau terdapat unsur rekayasa, maka kami bersedia menanggung resiko dan menerima sanksi sesuai dengan peraturan perundang-undangan yang berlaku, serta siap dituntut ganti rugi secara hukum atas kerugian negara yang ditimbulkan akibat kesalahan data tersebut.
+        </p>
+        
+        <div class="flex justify-end mt-12 pr-10">
+            <div class="text-center w-80">
+                <p class="mb-1 text-lg">Manggarai Barat, <span id="sptjm-print-tanggal"></span></p>
+                <p class="mb-16 text-lg">Kepala Sekolah,</p>
+                <div class="relative flex justify-center items-center mb-6">
+                    <p class="text-xs text-gray-400 border border-gray-400 py-3 px-6 absolute left-0 uppercase font-mono">Meterai<br>Rp 10.000</p>
+                </div>
+                <p class="font-bold underline text-lg mt-10" id="sptjm-print-ttd">NAMA KEPALA SEKOLAH</p>
+                <p class="text-lg mt-1" id="sptjm-print-ttd-nip">NIP. -</p>
             </div>
         </div>
     </div>
@@ -803,7 +902,7 @@
                 },
                 "Buku": {
                     "Buku Pelajaran": ["TEKS-07: Buku Teks Utama Kelas 7", "TEKS-08: Buku Teks Utama Kelas 8", "TEKS-09: Buku Teks Utama Kelas 9", "PEND-SMP: Buku Panduan Soal & Asesmen SMP"],
-                    "Buku Non Fiksi & Referensi Tugas": ["000-REF: Ensiklopedia & Karya Umum", "100-PSI: Psikologi Remaja & Bimbingan Konseling (BK)", "200-AGM: Agama & Budi Pekerti", "300-SOS: IPS, Pendidikan Pancasila (PPKn), & Pramuka", "400-BHS: Kamus & Tata Bahasa (Indonesia, Inggris, Daerah)", "500-SAI: Matematika & IPA (Biologi, Fisika)", "600-TEK: Kesehatan Remaja, Prakarya, & Informatika", "700-ART: Seni Budaya, Musik, & Olahraga", "900-SEJ: Sejarah Nasional, Atlas, & Biografi Tokoh"],
+                    "Buku Non Fiksi & Referensi Tugas": ["000-REF : Ensiklopedia & Karya Umum", "100-PSI: Psikologi Remaja & Bimbingan Konseling (BK)", "200-AGM: Agama & Budi Pekerti", "300-SOS: IPS, Pendidikan Pancasila (PPKn), & Pramuka", "400-BHS: Kamus & Tata Bahasa (Indonesia, Inggris, Daerah)", "500-SAI: Matematika & IPA (Biologi, Fisika)", "600-TEK: Kesehatan Remaja, Prakarya, & Informatika", "700-ART: Seni Budaya, Musik, & Olahraga", "900-SEJ: Sejarah Nasional, Atlas, & Biografi Tokoh"],
                     "Literasi & Hiburan": ["F-NOV: Novel Remaja / Chicklit / Fantasi", "F-CPN: Kumpulan Cerita Pendek (Cerpen)", "F-KMK: Komik Edukasi & Manga Legal", "F-SRA: Kumpulan Puisi & Sastra Remaja"]
                 },
                 "Peralatan Olahraga": {
@@ -867,13 +966,13 @@
 
                 document.querySelectorAll('.dashboard-content').forEach(el => el.style.display = 'none');
                 
-                if((contentName === 'sarana' || contentName === 'prasarana') && app.currentSchool && !app.currentSchool.profil_lengkap) {
+                if((contentName === 'sarana' || contentName === 'prasarana' || contentName === 'sptjm') && app.currentSchool && !app.currentSchool.profil_lengkap) {
                     app.showToast("Akses ditolak. Silakan lengkapi Profil Sekolah terlebih dahulu.", "error");
                     document.getElementById('content-home').style.display = 'block';
                     return;
                 }
 
-                if(contentName === 'data-sekolah' || contentName === 'peta-sebaran') {
+                if(contentName === 'data-sekolah' || contentName === 'peta-sebaran' || contentName === 'validasi') {
                     app.showToast("Fitur khusus admin/dinas akan diimplementasikan di fase berikutnya.", "warning");
                     document.getElementById('content-home').style.display = 'block';
                     return;
@@ -881,7 +980,7 @@
 
                 document.getElementById(`content-${contentName}`).style.display = 'block';
 
-                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana', 'validasi':'Validasi Data', 'helpdesk': 'Helpdesk & Bantuan', 'pengumuman': 'Pengumuman Resmi' };
+                const titles = { 'home':'Dashboard', 'profil':'Profil Sekolah', 'sarana':'Data Sarana', 'prasarana':'Data Prasarana', 'validasi':'Validasi Data', 'helpdesk': 'Helpdesk & Bantuan', 'pengumuman': 'Pengumuman Resmi', 'sptjm': 'Surat Pernyataan (SPTJM)' };
                 document.getElementById('topbar-title').innerText = titles[contentName];
 
                 if(contentName === 'profil') { app.loadSchoolProfile(); } 
@@ -890,6 +989,10 @@
                 else if(contentName === 'home') { app.loadDashboardData(); }
                 else if(contentName === 'validasi') { app.loadDataValidasiDinas('bangunan'); }
                 else if(contentName === 'helpdesk') { app.loadHelpdesk(); }
+                else if(contentName === 'sptjm') { 
+                    if(app.currentUser && app.currentUser.role === 'operator') document.getElementById('sptjm-operator-ui').classList.remove('hidden');
+                    app.loadSPTJM(); 
+                }
             },
 
             showLoginModal: () => document.getElementById('modal-login').classList.remove('hidden'),
@@ -976,18 +1079,28 @@
             checkProfilStatus: () => {
                 var menuSarana = document.getElementById('menu-sarana');
                 var menuPrasarana = document.getElementById('menu-prasarana');
+                var menuSptjm = document.getElementById('menu-sptjm');
                 var bannerWarning = document.getElementById('banner-profil-warning');
+                
                 if(app.currentSchool && !app.currentSchool.profil_lengkap) {
                     menuSarana.classList.add('opacity-50', 'cursor-not-allowed');
                     menuPrasarana.classList.add('opacity-50', 'cursor-not-allowed');
+                    if(menuSptjm) menuSptjm.classList.add('opacity-50', 'cursor-not-allowed');
+                    
                     menuSarana.querySelector('.locked-icon').classList.remove('hidden');
                     menuPrasarana.querySelector('.locked-icon').classList.remove('hidden');
+                    if(menuSptjm) menuSptjm.querySelector('.locked-icon').classList.remove('hidden');
+                    
                     bannerWarning.classList.remove('hidden');
                 } else {
                     menuSarana.classList.remove('opacity-50', 'cursor-not-allowed');
                     menuPrasarana.classList.remove('opacity-50', 'cursor-not-allowed');
+                    if(menuSptjm) menuSptjm.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
                     menuSarana.querySelector('.locked-icon').classList.add('hidden');
                     menuPrasarana.querySelector('.locked-icon').classList.add('hidden');
+                    if(menuSptjm) menuSptjm.querySelector('.locked-icon').classList.add('hidden');
+                    
                     bannerWarning.classList.add('hidden');
                 }
                 if(app.currentUser && app.currentUser.role === 'operator') app.calcCompleteness();
@@ -1503,23 +1616,100 @@
             },
 
             loadHelpdesk: async () => {
-                var tbody = document.getElementById('table-body-helpdesk'); tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Memuat tiket...</td></tr>';
+                // ... existing loadHelpdesk code ...
+            },
+
+            cetakSPTJM: () => {
+                var s = app.currentSchool;
+                if(!s || !s.nama_kepala_sekolah) return app.showToast("Nama Kepala Sekolah belum diisi di Profil!", "error");
+                
+                // Isi template tersembunyi
+                document.getElementById('sptjm-print-kepsek').innerText = s.nama_kepala_sekolah.toUpperCase();
+                document.getElementById('sptjm-print-nip').innerText = s.nip_kepala_sekolah || '-';
+                document.getElementById('sptjm-print-sekolah').innerText = s.nama_sekolah.toUpperCase();
+                document.getElementById('sptjm-print-npsn').innerText = s.npsn;
+                document.getElementById('sptjm-print-alamat').innerText = s.alamat || '-';
+                
+                document.getElementById('sptjm-print-ttd').innerText = s.nama_kepala_sekolah.toUpperCase();
+                document.getElementById('sptjm-print-ttd-nip').innerText = "NIP. " + (s.nip_kepala_sekolah || '-');
+                
+                // Tanggal hari ini
+                var options = { day: 'numeric', month: 'long', year: 'numeric' };
+                document.getElementById('sptjm-print-tanggal').innerText = new Date().toLocaleDateString('id-ID', options);
+
+                // Tambahkan kelas khusus ke body agar hanya template yang diprint
+                document.body.classList.add('printing-sptjm');
+                window.print();
+                
+                // Kembalikan ke tampilan normal setelah print dialog selesai (atau dibatalkan)
+                setTimeout(() => { document.body.classList.remove('printing-sptjm'); }, 1000);
+            },
+
+            uploadSPTJM: async (e) => {
+                e.preventDefault();
+                var btn = document.getElementById('btn-save-sptjm'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
                 try {
-                    var query = supabaseClient.from('helpdesk_tickets').select('*, schools(nama_sekolah, npsn)').order('created_at', { ascending: false });
-                    if(app.currentUser.role === 'operator') { query = query.eq('school_id', app.currentSchool.id); } 
-                    else if (app.currentUser.role === 'admin_sd' || app.currentUser.role === 'admin_smp') {
-                        var targetJenjang = app.currentUser.role === 'admin_sd' ? 'SD' : 'SMP';
-                        query = supabaseClient.from('helpdesk_tickets').select('*, schools!inner(nama_sekolah, npsn, jenjang)').eq('schools.jenjang', targetJenjang).order('created_at', { ascending: false });
+                    var fileInput = document.getElementById('sptjm-file');
+                    if(fileInput.files.length === 0) throw new Error("Pilih file PDF terlebih dahulu.");
+                    var file = fileInput.files[0];
+                    if(file.size > 5 * 1024 * 1024) throw new Error("Ukuran maksimal file adalah 5MB");
+                    
+                    var fileName = `${app.currentSchool.id}/SPTJM_${Date.now()}.pdf`;
+                    var { error: uploadErr } = await supabaseClient.storage.from('sptjm').upload(fileName, file);
+                    if(uploadErr) throw uploadErr;
+                    
+                    var { data: pubUrl } = supabaseClient.storage.from('sptjm').getPublicUrl(fileName);
+                    
+                    // Simpan ke database
+                    var payload = { school_id: app.currentSchool.id, file_url: pubUrl.publicUrl, uploaded_by: app.currentUser.id };
+                    var { error: dbErr } = await supabaseClient.from('sptjm_docs').insert([payload]);
+                    if(dbErr) throw dbErr;
+                    
+                    app.showToast("SPTJM Berhasil Diunggah!", "success");
+                    document.getElementById('form-sptjm').reset();
+                    app.loadSPTJM();
+                } catch(err) { 
+                    app.showToast(err.message || "Gagal mengunggah SPTJM.", "error"); 
+                } finally { 
+                    btn.innerHTML = '<i class="fas fa-upload"></i> Unggah Dokumen'; 
+                }
+            },
+
+            loadSPTJM: async () => {
+                var tbody = document.getElementById('table-body-sptjm'); 
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Memuat data...</td></tr>';
+                
+                try {
+                    var query = supabaseClient.from('sptjm_docs').select('*, schools(nama_sekolah, npsn, nama_kepala_sekolah, jenjang)').order('created_at', { ascending: false });
+                    
+                    if(app.currentUser.role === 'operator') { 
+                        query = query.eq('school_id', app.currentSchool.id); 
+                    } else if (app.currentUser.role === 'admin_sd') {
+                        query = query.eq('schools.jenjang', 'SD');
+                    } else if (app.currentUser.role === 'admin_smp') {
+                        query = query.eq('schools.jenjang', 'SMP');
                     }
+                    
                     var { data, error } = await query;
-                    if(error) throw error; tbody.innerHTML = '';
-                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Tidak ada tiket.</td></tr>'; return; }
+                    if(error) throw error; 
+                    
+                    tbody.innerHTML = '';
+                    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada SPTJM yang diunggah.</td></tr>'; return; }
+                    
                     data.forEach(item => {
-                        var d = new Date(item.created_at).toLocaleDateString('id-ID'); var badge = app.getHelpdeskBadge(item.status);
-                        var lampiranLink = item.lampiran_url ? `<a href="${item.lampiran_url}" target="_blank" class="text-blue-500 hover:underline mt-1 block text-[10px]">Lihat Lampiran</a>` : '';
-                        tbody.innerHTML += `<tr><td class="px-4 py-3 font-mono text-sm text-gray-500">TKT-${item.ticket_no}</td><td class="px-4 py-3"><div class="font-bold text-gray-800">${item.subject}</div><div class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded inline-block mt-1">${item.kategori}</div><div class="text-xs text-gray-500 mt-1 truncate max-w-xs">${item.isi_keluhan}</div>${lampiranLink}</td><td class="px-4 py-3 text-center text-xs text-gray-500">${d}</td><td class="px-4 py-3 text-center">${badge}</td></tr>`;
+                        var d = new Date(item.created_at).toLocaleDateString('id-ID', {day: '2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}); 
+                        var btnLihat = `<a href="${item.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-xs font-medium transition"><i class="fas fa-file-pdf text-red-500"></i> Lihat PDF</a>`;
+                        
+                        tbody.innerHTML += `<tr>
+                            <td class="px-4 py-3"><div class="font-bold text-gray-800">${item.schools.nama_sekolah}</div><div class="text-[10px] text-gray-500">NPSN: ${item.schools.npsn}</div></td>
+                            <td class="px-4 py-3 text-sm">${item.schools.nama_kepala_sekolah || '-'}</td>
+                            <td class="px-4 py-3 text-center text-xs text-gray-500">${d}</td>
+                            <td class="px-4 py-3 text-center">${btnLihat}</td>
+                        </tr>`;
                     });
-                } catch(err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat tiket.</td></tr>'; }
+                } catch(err) { 
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat arsip SPTJM.</td></tr>'; 
+                }
             }
         };
 
