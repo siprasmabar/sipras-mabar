@@ -1,0 +1,6 @@
+{
+  "name": "SIPRAS MABAR",
+  "description": "Sistem Informasi Sarana dan Prasarana Sekolah Kabupaten Manggarai Barat (SD & SMP)",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
