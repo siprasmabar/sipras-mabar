@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- PWA Manifest untuk GitHub Pages -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#14b8a6">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIPRAS MABAR - Kab. Manggarai Barat</title>
@@ -41,6 +37,9 @@
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -523,36 +522,80 @@
             }
         }
 
-        // --- Authentication Simulation ---
-        loginForm.addEventListener('submit', (e) => {
+        //        // Ganti URL dan KEY di bawah dengan yang ada di Project Settings -> API Supabase Anda
+        const SUPABASE_URL = 'https://jiruttcarflcoepuhkiw.supabase.co'; // TODO: Ganti ini
+        const SUPABASE_ANON_KEY = 'sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f'; // TODO: Ganti ini
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnText = document.getElementById('login-btn-text');
             const spinner = document.getElementById('login-spinner');
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
             
             btnText.innerText = 'Memverifikasi...';
             spinner.classList.remove('hide');
 
-            // Simulate Network Request to Supabase Auth
-            setTimeout(() => {
+            try {
+                // Proses Login ke Supabase Auth
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+
+                // Jika berhasil login
                 state.isLoggedIn = true;
+                state.currentUser = data.user;
+                
+                // Mengambil data profil user dari tabel custom kita
+                const { data: profileData, error: profileError } = await supabaseClient
+                    .from('user_profiles')
+                    .select('nama_lengkap, role')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (!profileError && profileData) {
+                    document.getElementById('user-display-name').innerText = profileData.nama_lengkap;
+                    document.getElementById('user-display-role').innerText = profileData.role.toUpperCase();
+                }
+
                 loginView.classList.add('hide');
                 appView.classList.remove('hide');
                 
-                // Initialize modules after login
+                // Initialize modules
                 initCharts();
                 initMap();
                 navigate('dashboard');
-            }, 1500);
+
+            } catch (error) {
+                showAlert('Login Gagal', 'Email atau Password salah, atau akun tidak terdaftar.', 'error');
+            } finally {
+                btnText.innerText = 'Masuk Sistem';
+                spinner.classList.add('hide');
+            }
         });
 
-        function logout() {
+        async function logout() {
+            // Keluar dari sesi Supabase
+            const { error } = await supabaseClient.auth.signOut();
+            
+            if (error) {
+                showAlert('Error', 'Gagal melakukan logout.', 'error');
+                return;
+            }
+
             state.isLoggedIn = false;
+            state.currentUser = null;
             appView.classList.add('hide');
             loginView.classList.remove('hide');
             
-            // Reset state text
+            // Reset state form login
             document.getElementById('login-btn-text').innerText = 'Masuk Sistem';
             document.getElementById('login-spinner').classList.add('hide');
+            document.getElementById('login-password').value = '';
         }
 
         // --- STREAMING_CHUNK: Inisialisasi Chart.js ---
@@ -597,8 +640,7 @@
             if (state.mapInstance) return;
             
             // Koordinat Manggarai Barat (Labuan Bajo area)
-            state.mapInstance = L.map('map').setView[-8.4907, 119.8821]; // Fallback to Labuan bajo coord
-            state.mapInstance.setView([-8.4907, 119.8821], 10);
+            state.mapInstance = L.map('map').setView([-8.4907, 119.8821], 10);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
@@ -628,19 +670,5 @@
         }
 
     </script>
-   <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      // Hilangkan tanda '/' sebelum sw.js
-      navigator.serviceWorker.register('sw.js') 
-        .then(registration => {
-          console.log('PWA ServiceWorker berhasil didaftarkan');
-        })
-        .catch(error => {
-          console.log('PWA ServiceWorker gagal didaftarkan: ', error);
-        });
-    });
-  }
-</script>
 </body>
 </html>
