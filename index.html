@@ -448,6 +448,65 @@
                     </div>
                 </div>
 
+                <div id="page-helpdesk" class="page-content hide fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Pusat Bantuan (Helpdesk)</h3>
+                            <p class="text-sm text-slate-500 mt-1">Sampaikan kendala teknis atau pertanyaan seputar aplikasi kepada Admin Dinas.</p>
+                        </div>
+                        <button onclick="openModalTiket()" class="bg-brand-tosca text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-tosca-dark transition-colors shadow-sm flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Buat Tiket
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-3 w-32">ID Tiket</th>
+                                    <th class="px-6 py-3">Judul Kendala</th>
+                                    <th class="px-6 py-3 w-40">Tanggal</th>
+                                    <th class="px-6 py-3 w-32">Status</th>
+                                    <th class="px-6 py-3 text-center w-28">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="helpdesk-tbody" class="divide-y divide-slate-100">
+                                <!-- Data akan dimuat otomatis oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="modal-tambah-tiket" class="hide fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+                    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full mx-4">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h3 class="text-lg font-bold text-slate-800">Buat Tiket Bantuan Baru</h3>
+                            <button onclick="closeModalTiket()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+                        </div>
+                        <form id="form-tambah-tiket" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Judul Kendala / Topik</label>
+                                <input type="text" id="tiket-judul" placeholder="Contoh: Salah input NPSN saat pendaftaran" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi Detail</label>
+                                <textarea id="tiket-deskripsi" rows="4" placeholder="Jelaskan kendala Anda selengkap mungkin agar Admin mudah membantu..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Lampiran Pendukung (Screenshot/PDF)</label>
+                                <input type="file" id="tiket-lampiran" class="w-full px-3 py-2 border border-slate-300 bg-slate-50 rounded-lg text-sm focus:outline-none">
+                                <p class="text-xs text-slate-400 mt-1">*Opsional. Maksimal ukuran file 2MB.</p>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-6 pt-4 border-t border-slate-100">
+                                <button type="button" onclick="closeModalTiket()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">Batal</button>
+                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-brand-tosca hover:bg-brand-tosca-dark rounded-lg transition-colors flex items-center">
+                                    <i class="fas fa-paper-plane mr-2"></i> Kirim Tiket
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -514,7 +573,8 @@
                 'profil': 'Profil Sekolah',
                 'sarana': 'Pendataan Sarana',
                 'prasarana': 'Pendataan Prasarana',
-                'sptjm': 'Dokumen SPTJM'
+                'sptjm': 'Dokumen SPTJM',
+                'helpdesk': 'Pusat Bantuan (Helpdesk)'
             };
             pageTitle.innerText = titles[viewName] || 'SIPRAS MABAR';
 
@@ -542,6 +602,7 @@
 
                 if (viewName === 'profil') fetchProfil();
                 if (viewName === 'sarana') fetchSarana();
+                if (viewName === 'helpdesk') fetchTickets();
 
             } else {
                 // Fallback for empty menus
@@ -862,6 +923,79 @@
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Gagal terhubung ke database.</td></tr>';
             }
+        }
+
+        // --- STREAMING_CHUNK: Menginisialisasi Modul Helpdesk & Ticketing ---
+        function openModalTiket() {
+            document.getElementById('modal-tambah-tiket').classList.remove('hide');
+        }
+
+        function closeModalTiket() {
+            document.getElementById('modal-tambah-tiket').classList.add('hide');
+            document.getElementById('form-tambah-tiket').reset();
+        }
+
+        document.getElementById('form-tambah-tiket').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Logika Supabase Insert
+            /*
+            const judul = document.getElementById('tiket-judul').value;
+            const desc = document.getElementById('tiket-deskripsi').value;
+            await supabaseClient.from('helpdesk_tickets').insert({
+                judul: judul, deskripsi: desc, school_id: user_school_id
+            });
+            */
+            
+            closeModalTiket();
+            showAlert('Tiket Terkirim', 'Tiket bantuan Anda telah masuk ke antrean Admin Dinas. Silakan tunggu balasan secara berkala.', 'success', fetchTickets);
+        });
+
+        async function fetchTickets() {
+            const tbody = document.getElementById('helpdesk-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Sinkronisasi antrean tiket...</td></tr>';
+            
+            setTimeout(() => {
+                // Mock Data Tiket Helpdesk
+                const dbData = [
+                    { id: 'TKT-042', judul: 'Salah input luas lahan di menu Prasarana', status: 'closed', tgl: '28 Aug 2026' },
+                    { id: 'TKT-048', judul: 'Bagaimana cara upload dokumen SPTJM?', status: 'process', tgl: '29 Aug 2026' },
+                    { id: 'TKT-051', judul: 'Aplikasi error saat klik simpan foto', status: 'open', tgl: '29 Aug 2026' }
+                ];
+
+                let rows = '';
+                dbData.forEach(item => {
+                    let badgeClass = 'bg-slate-100 text-slate-700';
+                    let statusText = 'Selesai';
+                    
+                    if (item.status === 'open') { 
+                        badgeClass = 'bg-red-100 text-red-700'; statusText = 'Menunggu'; 
+                    } else if (item.status === 'process') { 
+                        badgeClass = 'bg-blue-100 text-blue-700'; statusText = 'Diproses'; 
+                    }
+                    
+                    rows += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-slate-700">${item.id}</td>
+                            <td class="px-6 py-4 text-slate-800 font-medium">${item.judul}</td>
+                            <td class="px-6 py-4 text-slate-500 text-sm whitespace-nowrap">${item.tgl}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold flex items-center w-max ${badgeClass}">
+                                    ${item.status === 'open' ? '<i class="fas fa-clock mr-1"></i>' : ''}
+                                    ${item.status === 'process' ? '<i class="fas fa-tools mr-1"></i>' : ''}
+                                    ${item.status === 'closed' ? '<i class="fas fa-check-circle mr-1"></i>' : ''}
+                                    ${statusText}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="showAlert('Riwayat Percakapan', 'Fitur Live Chat/Balasan Admin untuk tiket ${item.id} akan ditampilkan di sini.', 'info')" class="text-brand-tosca hover:text-brand-tosca-dark font-semibold text-sm border border-brand-tosca hover:bg-brand-tosca hover:text-white px-3 py-1.5 rounded-lg transition-all w-full">Lihat Detail</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = rows;
+            }, 500);
         }
 
     </script>
