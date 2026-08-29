@@ -628,5 +628,18 @@
         }
 
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('PWA ServiceWorker berhasil didaftarkan');
+        })
+        .catch(error => {
+          console.log('PWA ServiceWorker gagal didaftarkan: ', error);
+        });
+    });
+  }
+</script>
 </body>
 </html>
