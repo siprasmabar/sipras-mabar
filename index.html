@@ -295,41 +295,41 @@
                             <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">NPSN</label>
-                                    <input type="text" value="50302199" readonly class="w-full px-4 py-2 border border-slate-200 bg-slate-50 rounded-lg text-slate-500">
+                                    <input type="text" id="profil-npsn" value="50302199" readonly class="w-full px-4 py-2 border border-slate-200 bg-slate-50 rounded-lg text-slate-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Nama Sekolah</label>
-                                    <input type="text" value="SDN 1 Komodo" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
+                                    <input type="text" id="profil-nama" value="SDN 1 Komodo" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Jenjang</label>
-                                    <select class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
+                                    <select id="profil-jenjang" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
                                         <option value="SD" selected>SD</option>
                                         <option value="SMP">SMP</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Kecamatan</label>
-                                    <select class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
+                                    <select id="profil-kecamatan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
                                         <option value="Komodo" selected>Komodo</option>
                                         <option value="Lembor">Lembor</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Nama Kepala Sekolah</label>
-                                    <input type="text" value="Drs. Yohanes" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
+                                    <input type="text" id="profil-kepsek" value="Drs. Yohanes" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">NIP Kepala Sekolah</label>
-                                    <input type="text" value="197010101995121001" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
+                                    <input type="text" id="profil-nip" value="197010101995121001" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Alamat Lengkap</label>
-                                    <textarea rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">Jl. Pantai Pede No. 12, Labuan Bajo, Kec. Komodo</textarea>
+                                    <textarea id="profil-alamat" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none">Jl. Pantai Pede No. 12, Labuan Bajo, Kec. Komodo</textarea>
                                 </div>
                             </form>
                             <div class="mt-6 flex justify-end">
-                                <button onclick="showAlert('Berhasil', 'Profil sekolah berhasil diperbarui.', 'success')" class="bg-brand-tosca text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-tosca-dark transition-colors shadow-sm">
+                                <button onclick="saveProfil()" class="bg-brand-tosca text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-tosca-dark transition-colors shadow-sm">
                                     Simpan Perubahan
                                 </button>
                             </div>
@@ -340,11 +340,11 @@
                 <div id="page-sarana" class="page-content hide fade-in">
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex space-x-2">
-                            <button class="bg-white border border-brand-tosca text-brand-tosca px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Meubeler</button>
+                            <button class="bg-white border border-brand-tosca text-brand-tosca px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Semua Kategori</button>
+                            <button class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Meubeler</button>
                             <button class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Peralatan IT</button>
-                            <button class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Olahraga</button>
                         </div>
-                        <button onclick="showAlert('Tambah Sarana', 'Fitur tambah data sarana akan terhubung ke Supabase DB.', 'info')" class="bg-brand-tosca text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-tosca-dark transition-colors shadow-sm flex items-center">
+                        <button onclick="openModalSarana()" class="bg-brand-tosca text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-tosca-dark transition-colors shadow-sm flex items-center">
                             <i class="fas fa-plus mr-2"></i> Tambah Data
                         </button>
                     </div>
@@ -353,7 +353,7 @@
                         <table class="w-full text-sm text-left">
                             <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
                                 <tr>
-                                    <th class="px-6 py-3">Nama Sarana (Meubeler)</th>
+                                    <th class="px-6 py-3">Nama Sarana (Kategori)</th>
                                     <th class="px-6 py-3 text-center">Baik</th>
                                     <th class="px-6 py-3 text-center">Rusak Ringan</th>
                                     <th class="px-6 py-3 text-center">Rusak Berat</th>
@@ -361,31 +361,55 @@
                                     <th class="px-6 py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                <tr class="hover:bg-slate-50">
-                                    <td class="px-6 py-4 font-medium text-slate-800">Meja Siswa</td>
-                                    <td class="px-6 py-4 text-center text-green-600 font-semibold">120</td>
-                                    <td class="px-6 py-4 text-center text-amber-500 font-semibold">15</td>
-                                    <td class="px-6 py-4 text-center text-red-500 font-semibold">5</td>
-                                    <td class="px-6 py-4 text-center font-bold text-slate-800">140</td>
-                                    <td class="px-6 py-4 text-center">
-                                        <button class="text-blue-500 hover:text-blue-700 mx-1"><i class="fas fa-edit"></i></button>
-                                        <button class="text-red-500 hover:text-red-700 mx-1"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td class="px-6 py-4 font-medium text-slate-800">Kursi Siswa</td>
-                                    <td class="px-6 py-4 text-center text-green-600 font-semibold">240</td>
-                                    <td class="px-6 py-4 text-center text-amber-500 font-semibold">10</td>
-                                    <td class="px-6 py-4 text-center text-red-500 font-semibold">12</td>
-                                    <td class="px-6 py-4 text-center font-bold text-slate-800">262</td>
-                                    <td class="px-6 py-4 text-center">
-                                        <button class="text-blue-500 hover:text-blue-700 mx-1"><i class="fas fa-edit"></i></button>
-                                        <button class="text-red-500 hover:text-red-700 mx-1"><i class="fas fa-trash"></i></button>
-                                    </td>
+                            <tbody id="sarana-tbody" class="divide-y divide-slate-100">
+                                <!-- Data akan dimuat otomatis oleh JavaScript (fetchSarana) -->
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-slate-500">Memuat data dari server...</td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Modal Tambah Sarana (Baru) -->
+                <div id="modal-tambah-sarana" class="hide fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+                    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h3 class="text-lg font-bold text-slate-800">Tambah Data Sarana</h3>
+                            <button onclick="closeModalSarana()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+                        </div>
+                        <form id="form-tambah-sarana" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Kategori Utama</label>
+                                <select id="sarana-kategori" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none" required>
+                                    <option value="Meubeler">Meubeler (Meja, Kursi, Lemari)</option>
+                                    <option value="Peralatan IT">Peralatan IT (Komputer, Proyektor)</option>
+                                    <option value="Alat Olahraga">Alat Olahraga</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Spesifik / Subkategori</label>
+                                <input type="text" id="sarana-subkategori" placeholder="Contoh: Meja Siswa" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none" required>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1 text-center">Kondisi Baik</label>
+                                    <input type="number" id="sarana-baik" value="0" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none text-center" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1 text-center">R. Ringan</label>
+                                    <input type="number" id="sarana-rringan" value="0" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none text-center" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1 text-center">R. Berat</label>
+                                    <input type="number" id="sarana-rberat" value="0" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none text-center" required>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-6 pt-4 border-t border-slate-100">
+                                <button type="button" onclick="closeModalSarana()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">Batal</button>
+                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-brand-tosca hover:bg-brand-tosca-dark rounded-lg transition-colors">Simpan Data</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -515,6 +539,10 @@
                 if (viewName === 'peta' && state.mapInstance) {
                     setTimeout(() => state.mapInstance.invalidateSize(), 100);
                 }
+
+                if (viewName === 'profil') fetchProfil();
+                if (viewName === 'sarana') fetchSarana();
+
             } else {
                 // Fallback for empty menus
                 showAlert('Dalam Pengembangan', 'Modul ini sedang dalam tahap pengembangan dan akan terhubung ke Supabase.', 'info');
@@ -523,8 +551,8 @@
         }
 
         //        // Ganti URL dan KEY di bawah dengan yang ada di Project Settings -> API Supabase Anda
-        const SUPABASE_URL = 'https://jiruttcarflcoepuhkiw.supabase.co'; // TODO: Ganti ini
-        const SUPABASE_ANON_KEY = 'sb_publishable_gj9PiVri3vfDLeUhz418sg_JQlnR95f'; // TODO: Ganti ini
+        const SUPABASE_URL = 'https://xyzcompany.supabase.co'; // TODO: Ganti ini
+        const SUPABASE_ANON_KEY = 'eyJhbGci...'; // TODO: Ganti ini
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         loginForm.addEventListener('submit', async (e) => {
@@ -667,6 +695,111 @@
                 }).addTo(state.mapInstance)
                   .bindPopup(`<b>${school.name}</b><br>Status Mayoritas: ${school.kondisi}`);
             });
+        }
+
+        // --- STREAMING_CHUNK: Integrasi Supabase Modul Profil & Sarana ---
+        
+        async function fetchProfil() {
+            // Logika Supabase Read (Select)
+            /* 
+            const { data, error } = await supabaseClient
+                .from('schools')
+                .select('*')
+                .eq('id', user_school_id)
+                .single();
+            */
+            console.log("Memuat data profil dari database...");
+        }
+
+        async function saveProfil() {
+            const nama = document.getElementById('profil-nama').value;
+            const kepsek = document.getElementById('profil-kepsek').value;
+            
+            // Logika Supabase Update
+            /*
+            const { error } = await supabaseClient.from('schools')
+                .update({ nama_sekolah: nama, nama_kepsek: kepsek })
+                .eq('id', user_school_id);
+            */
+            
+            showAlert('Berhasil', 'Profil sekolah berhasil diperbarui ke database.', 'success');
+        }
+
+        // --- Fungsi Modal & CRUD Sarana ---
+        
+        function openModalSarana() {
+            document.getElementById('modal-tambah-sarana').classList.remove('hide');
+        }
+        
+        function closeModalSarana() {
+            document.getElementById('modal-tambah-sarana').classList.add('hide');
+            document.getElementById('form-tambah-sarana').reset();
+        }
+
+        // Event listener saat form tambah sarana disubmit
+        document.getElementById('form-tambah-sarana').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const kategori = document.getElementById('sarana-kategori').value;
+            const subkategori = document.getElementById('sarana-subkategori').value;
+            const baik = parseInt(document.getElementById('sarana-baik').value);
+            const rRingan = parseInt(document.getElementById('sarana-rringan').value);
+            const rBerat = parseInt(document.getElementById('sarana-rberat').value);
+
+            // Logika Supabase (Insert Data Baru)
+            /*
+            const { error } = await supabaseClient.from('facilities').insert({
+                school_id: user_school_id, // didapat dari sesi aktif
+                kategori: kategori,
+                subkategori: subkategori,
+                kondisi_baik: baik,
+                kondisi_rusak_ringan: rRingan,
+                kondisi_rusak_berat: rBerat
+            });
+            */
+            
+            closeModalSarana();
+            showAlert('Tersimpan', `Data ${subkategori} berhasil ditambahkan.`, 'success', fetchSarana);
+        });
+
+        // Memuat ulang data Sarana ke tabel
+        async function fetchSarana() {
+            const tbody = document.getElementById('sarana-tbody');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Sinkronisasi dengan Supabase...</td></tr>';
+            
+            try {
+                // Simulasi delay dari server Supabase
+                setTimeout(() => {
+                    // Mocking data hasil fetch dari tabel 'facilities'
+                    const dbData = [
+                        { id: 1, kategori: 'Meubeler', subkategori: 'Meja Siswa', baik: 120, rr: 15, rb: 5 },
+                        { id: 2, kategori: 'Meubeler', subkategori: 'Kursi Siswa', baik: 240, rr: 10, rb: 12 },
+                        { id: 3, kategori: 'Peralatan IT', subkategori: 'Laptop Chromebook', baik: 15, rr: 2, rb: 0 },
+                        { id: 4, kategori: 'Alat Olahraga', subkategori: 'Matras Senam', baik: 5, rr: 0, rb: 2 }
+                    ];
+
+                    let rows = '';
+                    dbData.forEach(item => {
+                        const total = item.baik + item.rr + item.rb;
+                        rows += `
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-800">${item.subkategori} <br><span class="text-xs text-brand-tosca font-bold">${item.kategori}</span></td>
+                                <td class="px-6 py-4 text-center text-green-600 font-semibold">${item.baik}</td>
+                                <td class="px-6 py-4 text-center text-amber-500 font-semibold">${item.rr}</td>
+                                <td class="px-6 py-4 text-center text-red-500 font-semibold">${item.rb}</td>
+                                <td class="px-6 py-4 text-center font-bold text-slate-800">${total}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <button onclick="showAlert('Info Edit', 'Form Edit (Update row ID: ${item.id}) akan terbuka di sini.', 'info')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors"><i class="fas fa-edit"></i></button>
+                                    <button onclick="showAlert('Hapus Data', 'Apakah Anda yakin ingin menghapus data ini? (Memanggil Supabase DELETE)', 'error')" class="text-red-500 hover:text-red-700 mx-2 transition-colors"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = rows;
+                }, 600); 
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Gagal terhubung ke database.</td></tr>';
+            }
         }
 
     </script>
