@@ -178,6 +178,16 @@
                 <a href="#" onclick="navigate('helpdesk')" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-slate-700 hover:text-white transition-colors" data-target="helpdesk">
                     <i class="fas fa-headset w-6"></i> <span class="text-sm font-medium">Helpdesk</span>
                 </a>
+
+                <div class="pt-4 pb-1">
+                    <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengaturan Sistem</p>
+                </div>
+                <a href="#" onclick="navigate('users')" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-slate-700 hover:text-white transition-colors" data-target="users">
+                    <i class="fas fa-users-cog w-6"></i> <span class="text-sm font-medium">Manajemen User</span>
+                </a>
+                <a href="#" onclick="navigate('logs')" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-slate-700 hover:text-white transition-colors" data-target="logs">
+                    <i class="fas fa-history w-6"></i> <span class="text-sm font-medium">Log Aktivitas</span>
+                </a>
             </nav>
 
             <div class="p-4 border-t border-slate-700">
@@ -609,6 +619,76 @@
                     </div>
                 </div>
 
+                <div id="page-users" class="page-content hide fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Manajemen Pengguna (User Access)</h3>
+                            <p class="text-sm text-slate-500 mt-1">Kelola akun Operator Sekolah, Admin Dinas, dan Superadmin.</p>
+                        </div>
+                        <button onclick="showAlert('Tambah User', 'Formulir penambahan user baru via Supabase Auth akan muncul di sini. (Memerlukan API Key)', 'info')" class="bg-brand-tosca text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-tosca-dark transition-colors shadow-sm flex items-center">
+                            <i class="fas fa-user-plus mr-2"></i> Tambah User
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-t-xl border border-b-0 border-slate-200 flex flex-wrap gap-4 items-center bg-slate-50">
+                        <div class="relative flex-1 min-w-[200px]">
+                            <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" placeholder="Cari nama, email, atau NPSN..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-tosca outline-none text-sm">
+                        </div>
+                        <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-brand-tosca outline-none">
+                            <option value="">Semua Role</option>
+                            <option value="superadmin">Superadmin</option>
+                            <option value="admin">Admin Jenjang</option>
+                            <option value="operator">Operator Sekolah</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-white rounded-b-xl shadow-sm border border-slate-200 overflow-x-auto">
+                        <table class="w-full text-sm text-left whitespace-nowrap">
+                            <thead class="bg-slate-100 text-slate-600 font-medium border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-3">Nama Pengguna</th>
+                                    <th class="px-6 py-3">Role Akses</th>
+                                    <th class="px-6 py-3">Instansi / Sekolah</th>
+                                    <th class="px-6 py-3 text-center">Status</th>
+                                    <th class="px-6 py-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody" class="divide-y divide-slate-100">
+                                <!-- Data dimuat oleh fetchUsers() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="page-logs" class="page-content hide fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Log Aktivitas Sistem (Audit Trail)</h3>
+                            <p class="text-sm text-slate-500 mt-1">Pantau seluruh pergerakan CRUD, otentikasi, dan perubahan data penting dalam sistem.</p>
+                        </div>
+                        <button onclick="showAlert('Export Log', 'Mengunduh laporan log aktivitas dalam format CSV/Excel...', 'info')" class="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm flex items-center">
+                            <i class="fas fa-download mr-2"></i> Export CSV
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-3 w-48">Timestamp</th>
+                                    <th class="px-6 py-3">Aktor (User)</th>
+                                    <th class="px-6 py-3">Tindakan</th>
+                                    <th class="px-6 py-3 w-32 text-center">IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-tbody" class="divide-y divide-slate-100 font-mono text-xs">
+                                <!-- Data dimuat oleh fetchLogs() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -676,7 +756,10 @@
                 'sarana': 'Pendataan Sarana',
                 'prasarana': 'Pendataan Prasarana',
                 'sptjm': 'Dokumen SPTJM',
-                'helpdesk': 'Pusat Bantuan (Helpdesk)'
+                'helpdesk': 'Pusat Bantuan (Helpdesk)',
+                'pengumuman': 'Pengumuman & Pesan',
+                'users': 'Manajemen Pengguna',
+                'logs': 'Log Aktivitas Sistem'
             };
             pageTitle.innerText = titles[viewName] || 'SIPRAS MABAR';
 
@@ -705,7 +788,9 @@
                 if (viewName === 'profil') fetchProfil();
                 if (viewName === 'sarana') fetchSarana();
                 if (viewName === 'helpdesk') fetchTickets();
-                if (viewName === 'pengumuman') fetchPengumuman(); // Tambahkan pemicu data pengumuman
+                if (viewName === 'pengumuman') fetchPengumuman(); 
+                if (viewName === 'users') fetchUsers(); // Trigger fetch User
+                if (viewName === 'logs') fetchLogs();   // Trigger fetch Log
 
             } else {
                 // Fallback for empty menus
@@ -1223,6 +1308,87 @@
                     showAlert('Berhasil', 'Dokumen SPTJM berhasil diunggah. Silakan tunggu proses verifikasi oleh Admin Dinas.', 'success');
                 }, 300); // delay tipis agar alert sebelumnya tertutup sempurna
             }, 2000); // Simulasi delay internet 2 detik
+        }
+
+        // --- STREAMING_CHUNK: Logika Manajemen User & Log Aktivitas ---
+        
+        async function fetchUsers() {
+            const tbody = document.getElementById('users-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data akun...</td></tr>';
+            
+            setTimeout(() => {
+                const mockUsers = [
+                    { id: 'usr-1', nama: 'Budi Santoso', email: 'budi@dinas.go.id', role: 'superadmin', instansi: 'Dinas Pendidikan', status: 'aktif' },
+                    { id: 'usr-2', nama: 'Siti Aminah', email: 'siti.sd@dinas.go.id', role: 'admin_sd', instansi: 'Bidang SD (Dinas)', status: 'aktif' },
+                    { id: 'usr-3', nama: 'Operator SDN 1', email: 'op@sdn1komodo.sch.id', role: 'operator', instansi: 'SDN 1 Komodo', status: 'aktif' },
+                    { id: 'usr-4', nama: 'Operator SMPN 2', email: 'op@smpn2lembor.sch.id', role: 'operator', instansi: 'SMPN 2 Lembor', status: 'nonaktif' }
+                ];
+
+                let html = '';
+                mockUsers.forEach(u => {
+                    let roleBadge = '<span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-bold uppercase">Operator</span>';
+                    if(u.role === 'superadmin') roleBadge = '<span class="px-2 py-1 bg-purple-100 text-purple-700 border border-purple-200 rounded text-xs font-bold uppercase">Superadmin</span>';
+                    else if(u.role.includes('admin')) roleBadge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 border border-blue-200 rounded text-xs font-bold uppercase">Admin Jenjang</span>';
+
+                    let statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold"><i class="fas fa-check mr-1"></i> Aktif</span>';
+                    if(u.status === 'nonaktif') statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold"><i class="fas fa-ban mr-1"></i> Nonaktif</span>';
+
+                    html += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-slate-800">${u.nama}</div>
+                                <div class="text-xs text-slate-500">${u.email}</div>
+                            </td>
+                            <td class="px-6 py-4">${roleBadge}</td>
+                            <td class="px-6 py-4 font-medium text-slate-700">${u.instansi}</td>
+                            <td class="px-6 py-4 text-center">${statusBadge}</td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="showAlert('Reset Password', 'Mengirim email reset password ke ${u.email}...', 'info')" class="text-amber-500 hover:text-amber-700 mx-2 transition-colors tooltip" title="Reset Password"><i class="fas fa-key"></i></button>
+                                <button onclick="showAlert('Suspend User', 'Apakah Anda yakin menonaktifkan user ini?', 'error')" class="text-red-500 hover:text-red-700 mx-2 transition-colors tooltip" title="Nonaktifkan"><i class="fas fa-user-slash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            }, 500);
+        }
+
+        async function fetchLogs() {
+            const tbody = document.getElementById('logs-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-slate-500 font-sans"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat log audit...</td></tr>';
+            
+            setTimeout(() => {
+                const mockLogs = [
+                    { tgl: '2026-08-29 10:15:32', user: 'Operator SDN 1 (op@sdn1...)', aksi: 'UPDATE_SARANA', detail: 'Mengubah kondisi Kursi Siswa (Baik: 120 -> 115, Rusak: 5 -> 10)', ip: '114.125.10.22' },
+                    { tgl: '2026-08-29 09:42:11', user: 'Siti Aminah (Admin SD)', aksi: 'VERIFY_SPTJM', detail: 'Memverifikasi SPTJM untuk school_id: 50302199', ip: '103.11.200.5' },
+                    { tgl: '2026-08-29 08:30:05', user: 'Operator SDN 1 (op@sdn1...)', aksi: 'AUTH_LOGIN', detail: 'Berhasil login ke dalam sistem', ip: '114.125.10.22' },
+                    { tgl: '2026-08-28 23:15:00', user: 'Budi Santoso (Superadmin)', aksi: 'SUSPEND_USER', detail: 'Menonaktifkan user_id: usr-4 (Alasan: Mutasi tugas)', ip: '192.168.1.100' }
+                ];
+
+                let html = '';
+                mockLogs.forEach(l => {
+                    // Warna teks aksi berdasarkan tipe
+                    let actionColor = 'text-blue-600';
+                    if(l.aksi.includes('UPDATE') || l.aksi.includes('INSERT') || l.aksi.includes('DELETE')) actionColor = 'text-amber-600';
+                    if(l.aksi.includes('SUSPEND') || l.aksi.includes('FAIL')) actionColor = 'text-red-600';
+                    if(l.aksi.includes('AUTH_LOGIN')) actionColor = 'text-green-600';
+
+                    html += `
+                        <tr class="hover:bg-slate-100 transition-colors border-b border-slate-100">
+                            <td class="px-6 py-3 text-slate-500">${l.tgl}</td>
+                            <td class="px-6 py-3 font-semibold text-slate-700">${l.user}</td>
+                            <td class="px-6 py-3">
+                                <span class="font-bold ${actionColor}">${l.aksi}</span><br>
+                                <span class="text-slate-500 whitespace-normal block mt-1">${l.detail}</span>
+                            </td>
+                            <td class="px-6 py-3 text-center text-slate-400 bg-slate-50">${l.ip}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            }, 400);
         }
 
     </script>
